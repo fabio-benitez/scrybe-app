@@ -1,0 +1,54 @@
+openapi: 3.0.3
+
+info:
+  title: Scrybe API
+  version: 0.1.0
+  description: API REST para la aplicación Scrybe.
+
+servers:
+  - url: http://localhost:8081/api/v1
+    description: Entorno local
+
+paths:
+  /health:
+    get:
+      summary: Comprueba el estado de la API
+      tags:
+        - Health
+      responses:
+        "200":
+          description: API operativa
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  /health/db:
+    get:
+      summary: Comprueba la conexión con la base de datos
+      tags:
+        - Health
+      responses:
+        "200":
+          description: Base de datos disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+        "503":
+          description: Base de datos no disponible
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "database connection failed"
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: database connection ok
