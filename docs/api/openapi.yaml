@@ -35,6 +35,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthResponse"
+              example:
+                status: "database connection ok"
         "503":
           description: Base de datos no disponible
           content:
@@ -51,4 +53,4 @@ components:
       properties:
         status:
           type: string
-          example: database connection ok
+          example: ok
