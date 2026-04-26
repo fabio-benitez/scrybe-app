@@ -2,7 +2,7 @@
 
 Aplicación web en desarrollo orientada a la gestión estructurada de contenido personal.
 
-Actualmente el proyecto se centra en la construcción de una base sólida a nivel de backend, incluyendo la configuración de la API, la conexión a base de datos y la estructura inicial de la aplicación.
+Actualmente el proyecto se centra en la construcción de una base sólida a nivel de backend, incluyendo API, autenticación, base de datos y arquitectura.
 
 El objetivo es evolucionar esta base hacia una herramienta que permita crear, organizar y gestionar información de forma estructurada en un único espacio.
 
@@ -14,7 +14,9 @@ El objetivo es evolucionar esta base hacia una herramienta que permita crear, or
 - Conexión a PostgreSQL implementada
 - API en Go operativa
 - Endpoints de health disponibles
-- Integración inicial con base de datos
+- Autenticación basada en JWT (Supabase Auth + JWKS)
+- Perfil de usuario (`user_profiles`) sincronizado con `auth.users`
+- Endpoint `/profile` protegido por autenticación
 - Documentación de la API mediante OpenAPI (Swagger UI)
 
 El proyecto se encuentra en fase inicial de desarrollo.
@@ -24,23 +26,19 @@ El proyecto se encuentra en fase inicial de desarrollo.
 
 - Backend: Go (API REST)
 - Base de datos: PostgreSQL (Supabase)
+- Autenticación: Supabase Auth (JWT + JWKS)
 - Router HTTP: chi
 - Middleware HTTP: CORS configurable
 - Infraestructura local: Docker + Supabase CLI
-
-**Nota:** El stack tecnológico podrá ajustarse durante el desarrollo en función de las necesidades del proyecto.
 
 
 ## Requisitos
 
 Antes de comenzar, asegúrate de tener instalado:
 
-- Node.js: https://nodejs.org  
-- Docker Desktop: https://www.docker.com/products/docker-desktop/  
-- Supabase CLI (vía npx o instalación local)
-
-Guía oficial de Supabase CLI:  
-https://supabase.com/docs/guides/local-development/cli/getting-started
+- Node.js: https://nodejs.org
+- Docker Desktop: https://www.docker.com/products/docker-desktop/
+- Supabase CLI
 
 
 ## Instalación y ejecución en local
@@ -60,7 +58,7 @@ npx supabase start
 
 3. Configurar variables de entorno:
 
-Crear un archivo `.env` a partir de `.env.example` y completar los valores necesarios.
+Crear un archivo `.env` a partir de `.env.example`.
 
 4. Levantar la API:
 
@@ -75,50 +73,44 @@ go run ./apps/api/cmd/api
 ```
 
 
+## Flujo de autenticación
+
+El proyecto utiliza Supabase Auth como proveedor de identidad.
+
+- Registro y login se realizan contra Supabase
+- La API valida los JWT mediante claves públicas (JWKS)
+- Los endpoints protegidos requieren:
+
+```http
+Authorization: Bearer <access_token>
+```
+
+Al crear un usuario, un trigger en la base de datos crea automáticamente su perfil en `user_profiles`.
+
+
 ## Servicios disponibles
 
-- API (base):  
-  http://localhost:8081
-
-- API Health:  
-  http://localhost:8081/api/v1/health
-
-- API Health (DB):  
-  http://localhost:8081/api/v1/health/db
-
-- Swagger UI:  
-  http://localhost:8082
-
-- Supabase Studio:  
-  http://127.0.0.1:54323
-
-
-## Variables de entorno
-
-Consultar `.env.example` para ver las variables necesarias.
-
-Principales grupos:
-
-- API
-- Database
-- Auth
-- Storage
-- CORS
+- API: `http://localhost:8081`
+- Health: `http://localhost:8081/api/v1/health`
+- Health DB: `http://localhost:8081/api/v1/health/db`
+- Profile: `http://localhost:8081/api/v1/profile`
+- Swagger: `http://localhost:8082`
+- Supabase Studio: `http://127.0.0.1:54323`
 
 
 ## Estructura del proyecto
 
-El backend está organizado siguiendo una arquitectura modular:
-
-- `internal/platform`: infraestructura compartida (base de datos, servicios externos)
-- `internal/<modulo>`: módulos de dominio (domain, application, infrastructure, delivery)
-- `cmd`: puntos de entrada de la aplicación
-
-La estructura está diseñada para permitir escalabilidad sin acoplamiento fuerte entre capas.
+- `internal/platform`: infraestructura
+- `internal/<modulo>`:
+  - `domain`
+  - `application`
+  - `infrastructure`
+  - `delivery`
+- `cmd`: entrypoint
 
 
 ## Notas
 
-El proyecto está diseñado como base para evolucionar progresivamente hacia una aplicación completa de gestión de contenido.
-
-Se prioriza una arquitectura sólida antes de añadir nuevas funcionalidades.
+- Supabase se usa como infraestructura
+- La API valida JWT vía JWKS
+- Se prioriza una base sólida antes de añadir funcionalidades

@@ -18,10 +18,7 @@ type DatabaseConfig struct {
 }
 
 type AuthConfig struct {
-	Provider  string
-	BaseURL   string
-	SecretKey string
-	JWTSecret string
+	JWKSURL string
 }
 
 type StorageConfig struct {
@@ -47,10 +44,7 @@ func LoadAPIConfig() (*APIConfig, error) {
 		},
 
 		Auth: AuthConfig{
-			Provider:  getEnvOrDefault("AUTH_PROVIDER", "supabase"),
-			BaseURL:   getEnvOrDefault("AUTH_BASE_URL", ""),
-			SecretKey: getEnvOrDefault("AUTH_SECRET_KEY", ""),
-			JWTSecret: getEnvOrDefault("AUTH_JWT_SECRET", ""),
+			JWKSURL: getEnvOrDefault("AUTH_JWKS_URL", ""),
 		},
 
 		Storage: StorageConfig{
@@ -80,8 +74,8 @@ func (c *APIConfig) validate() error {
 		return errors.New("DATABASE_URL is required")
 	}
 
-	if c.Auth.BaseURL == "" {
-		return errors.New("AUTH_BASE_URL is required")
+	if c.Auth.JWKSURL == "" {
+		return errors.New("AUTH_JWKS_URL is required")
 	}
 
 	return nil
