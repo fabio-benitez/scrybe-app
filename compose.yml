@@ -13,8 +13,6 @@ services:
     command: go run ./cmd/api
     env_file:
       - .env
-    environment:
-      API_ADDR: ${API_ADDR:-:8081}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     ports:

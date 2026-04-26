@@ -9,6 +9,10 @@ servers:
   - url: http://localhost:8081/api/v1
     description: Entorno local
 
+
+# =========================
+# Paths
+# =========================
 paths:
   /health:
     get:
@@ -46,7 +50,36 @@ paths:
               example:
                 status: "database connection failed"
 
+  /profile:
+    get:
+      summary: Obtiene el perfil del usuario autenticado
+      tags:
+        - Profile
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Perfil del usuario autenticado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Perfil no encontrado
+
+
+# =========================
+# Components
+# =========================
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     HealthResponse:
       type: object
@@ -54,3 +87,29 @@ components:
         status:
           type: string
           example: ok
+
+    ProfileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: f1c56607-3266-4a97-91cf-6a51f24a3946
+        email:
+          type: string
+          format: email
+          example: fabio@scrybe.com
+        display_name:
+          type: string
+          example: fabio
+        avatar_file_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: null
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
