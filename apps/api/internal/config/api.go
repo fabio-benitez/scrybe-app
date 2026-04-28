@@ -56,7 +56,7 @@ func LoadAPIConfig() (*APIConfig, error) {
 
 		CORS: CORSConfig{
 			AllowedOrigins:   getEnvAsSlice("CORS_ALLOWED_ORIGINS"),
-			AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 			AllowedHeaders:   []string{"Content-Type", "Accept", "Authorization"},
 			AllowCredentials: true,
 		},

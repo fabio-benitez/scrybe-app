@@ -59,3 +59,37 @@ func (r *PostgresRepository) FindByID(
 
 	return &profile, nil
 }
+
+func (r *PostgresRepository) UpdateDisplayName(
+	ctx context.Context,
+	id string,
+	displayName string,
+) (*domain.Profile, error) {
+	query := `
+		UPDATE user_profiles
+		SET display_name = $2, updated_at = NOW()
+		WHERE id = $1
+		RETURNING id, email, display_name, avatar_file_id, created_at, updated_at
+	`
+
+	var profile domain.Profile
+
+	err := r.db.QueryRow(ctx, query, id, displayName).Scan(
+		&profile.ID,
+		&profile.Email,
+		&profile.DisplayName,
+		&profile.AvatarFileID,
+		&profile.CreatedAt,
+		&profile.UpdatedAt,
+	)
+
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrProfileNotFound
+		}
+
+		return nil, err
+	}
+
+	return &profile, nil
+}
