@@ -34,7 +34,8 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	profileRepo := profileinfra.NewPostgresRepository(dbPool)
 	getProfileUC := profileapp.NewGetProfileUseCase(profileRepo)
-	profileHandler := profilehttp.NewHandler(getProfileUC)
+	updateProfileUC := profileapp.NewUpdateProfileUseCase(profileRepo)
+	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC)
 
 	// Router
 	r := chi.NewRouter()

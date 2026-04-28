@@ -69,6 +69,32 @@ paths:
         "404":
           description: Perfil no encontrado
 
+    patch:
+      summary: Actualiza el perfil del usuario autenticado
+      tags:
+        - Profile
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+      responses:
+        "200":
+          description: Perfil actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProfileResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "404":
+          description: Perfil no encontrado
+
 
 # =========================
 # Components
@@ -81,12 +107,29 @@ components:
       bearerFormat: JWT
 
   schemas:
+    # =========================
+    # Health
+    # =========================
     HealthResponse:
       type: object
       properties:
         status:
           type: string
           example: ok
+
+    # =========================
+    # Profile
+    # =========================
+    UpdateProfileRequest:
+      type: object
+      required:
+        - display_name
+      properties:
+        display_name:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: fabio
 
     ProfileResponse:
       type: object

@@ -1,0 +1,33 @@
+meta {
+  name: Get Profile
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api_base_url}}/profile
+  body: none
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get Profile
+  
+  Obtiene el perfil del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Respuesta:
+  - 200 → perfil
+  - 401 → no autenticado
+  - 404 → no existe perfil
+}
