@@ -1,0 +1,29 @@
+docs {
+  # Scrybe API - Bruno Collection
+  
+  Colección de requests para probar la API de Scrybe en local.
+  
+  ## Requisitos
+  
+  - API corriendo en http://localhost:8081
+  - Supabase corriendo en http://localhost:54321
+  - Usuario registrado
+  
+  ## Flujo básico
+  
+  1. Sign Up (`/auth/v1/signup`)
+  2. Login (`/auth/v1/token`)
+  3. Guardar `access_token`
+  4. Usar endpoints protegidos (`/profile`)
+  
+  ## Variables
+  
+  - `api_base_url`
+  - `auth_base_url`
+  - `access_token`
+  
+  ## Notas
+  
+  - Los endpoints de auth pertenecen a Supabase
+  - La API de Scrybe solo valida JWT
+}

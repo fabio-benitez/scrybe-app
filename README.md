@@ -1,4 +1,6 @@
-# Descripción general
+# Scrybe
+
+## Descripción general
 
 Aplicación web en desarrollo orientada a la gestión estructurada de contenido personal.
 
@@ -16,7 +18,8 @@ El objetivo es evolucionar esta base hacia una herramienta que permita crear, or
 - Endpoints de health disponibles
 - Autenticación basada en JWT (Supabase Auth + JWKS)
 - Perfil de usuario (`user_profiles`) sincronizado con `auth.users`
-- Endpoint `/profile` protegido por autenticación
+- Endpoint `GET /profile` protegido por autenticación
+- Endpoint `PATCH /profile` para actualización de perfil
 - Documentación de la API mediante OpenAPI (Swagger UI)
 
 El proyecto se encuentra en fase inicial de desarrollo.
@@ -88,6 +91,42 @@ Authorization: Bearer <access_token>
 Al crear un usuario, un trigger en la base de datos crea automáticamente su perfil en `user_profiles`.
 
 
+## Uso de la API en desarrollo
+
+Para probar los endpoints en local se incluye una colección para Bruno en:
+
+```txt
+docs/bruno
+```
+
+### Flujo básico
+
+1. Sign Up (`/auth/v1/signup`)
+2. Login (`/auth/v1/token`)
+3. El token se guarda automáticamente en la variable `access_token`
+4. Usar endpoints protegidos de la API, como `/profile`
+
+### Variables necesarias
+
+Definidas en:
+
+```txt
+docs/bruno/environments/local.bru
+```
+
+Variables actuales:
+
+- `api_base_url`
+- `auth_base_url`
+- `supabase_anon_key`
+- `access_token`
+
+### Nota
+
+- La documentación oficial de la API está en OpenAPI (`docs/api/openapi.yaml`)
+- La colección Bruno es solo una ayuda para desarrollo local
+
+
 ## Servicios disponibles
 
 - API: `http://localhost:8081`
@@ -100,17 +139,47 @@ Al crear un usuario, un trigger en la base de datos crea automáticamente su per
 
 ## Estructura del proyecto
 
-- `internal/platform`: infraestructura
-- `internal/<modulo>`:
-  - `domain`
-  - `application`
-  - `infrastructure`
-  - `delivery`
-- `cmd`: entrypoint
+```txt
+apps/
+  api/
+    cmd/
+    internal/
+      platform/
+      <modulo>/
+        domain/
+        application/
+        infrastructure/
+        delivery/
+  web/
+
+docs/
+  api/
+    openapi.yaml
+  bruno/
+
+supabase/
+  migrations/
+```
+
+
+## Arquitectura
+
+El backend sigue una arquitectura modular y desacoplada, inspirada en una arquitectura hexagonal ligera.
+
+Cada módulo puede organizarse en:
+
+- `domain`: entidades, errores y contratos del dominio
+- `application`: casos de uso y reglas de aplicación
+- `infrastructure`: implementaciones concretas, como PostgreSQL
+- `delivery`: entrada HTTP u otros mecanismos de entrega
+
+Supabase se usa como infraestructura, no como sustituto de la lógica de negocio de la aplicación.
 
 
 ## Notas
 
-- Supabase se usa como infraestructura
-- La API valida JWT vía JWKS
+- Supabase se usa como proveedor inicial de Auth, PostgreSQL y Storage
+- La API valida JWT mediante JWKS
+- Los datos propios de la aplicación se gestionan desde la API
 - Se prioriza una base sólida antes de añadir funcionalidades
+- OpenAPI debe mantenerse alineado con la implementación

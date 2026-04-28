@@ -1,0 +1,44 @@
+meta {
+  name: Login
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{auth_base_url}}/token
+  body: json
+  auth: inherit
+}
+
+params:query {
+  grant_type: password
+}
+
+headers {
+  apikey: {{supabase_anon_key}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "email": "fabio@scrybe.com",
+    "password": "123456"
+  }
+}
+
+tests {
+  if (res.status === 200 && res.body.access_token) {
+    bru.setEnvVar("access_token", res.body.access_token);
+  }
+}
+
+docs {
+  ## Login
+  
+  Inicia sesión contra Supabase Auth y guarda automáticamente el `access_token` en el environment activo.
+  
+  ### Variables usadas:
+  - `auth_base_url`
+  - `supabase_anon_key`
+  - `access_token`
+}
