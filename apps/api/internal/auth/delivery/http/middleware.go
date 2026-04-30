@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/platform/auth"
+	httpresponse "github.com/fabio-benitez/scrybe-app/apps/api/internal/platform/http/response"
 )
 
 type tokenValidator interface {
@@ -24,21 +25,21 @@ func (m *Middleware) RequireAuth(next http.Handler) http.Handler {
 		authHeader := r.Header.Get("Authorization")
 
 		if authHeader == "" {
-			http.Error(w, "Authorization header is required", http.StatusUnauthorized)
+			httpresponse.Unauthorized(w, "Authorization header is required")
 			return
 		}
 
 		token, ok := strings.CutPrefix(authHeader, "Bearer ")
 
 		if !ok || strings.TrimSpace(token) == "" {
-			http.Error(w, "Bearer token is required", http.StatusUnauthorized)
+			httpresponse.Unauthorized(w, "Bearer token is required")
 			return
 		}
 
 		user, err := m.validator.ValidateToken(token)
 
 		if err != nil {
-			http.Error(w, "Invalid or expired token", http.StatusUnauthorized)
+			httpresponse.Unauthorized(w, "Invalid or expired token")
 			return
 		}
 

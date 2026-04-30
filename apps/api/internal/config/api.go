@@ -22,10 +22,12 @@ type AuthConfig struct {
 }
 
 type StorageConfig struct {
-	Provider  string
-	BaseURL   string
-	SecretKey string
-	Bucket    string
+	Provider         string
+	BaseURL          string
+	SecretKey        string
+	Bucket           string
+	MaxUploadBytes   int64
+	AllowedMimeTypes []string
 }
 
 type CORSConfig struct {
@@ -48,10 +50,12 @@ func LoadAPIConfig() (*APIConfig, error) {
 		},
 
 		Storage: StorageConfig{
-			Provider:  getEnvOrDefault("STORAGE_PROVIDER", "supabase"),
-			BaseURL:   getEnvOrDefault("STORAGE_BASE_URL", ""),
-			SecretKey: getEnvOrDefault("STORAGE_SECRET_KEY", ""),
-			Bucket:    getEnvOrDefault("STORAGE_BUCKET", "attachments"),
+			Provider:         getEnvOrDefault("STORAGE_PROVIDER", "supabase"),
+			BaseURL:          getEnvOrDefault("STORAGE_BASE_URL", ""),
+			SecretKey:        getEnvOrDefault("STORAGE_SECRET_KEY", ""),
+			Bucket:           getEnvOrDefault("STORAGE_BUCKET", "attachments"),
+			MaxUploadBytes:   getEnvAsInt64OrDefault("STORAGE_MAX_UPLOAD_BYTES", 52428800),
+			AllowedMimeTypes: getEnvAsSlice("STORAGE_ALLOWED_MIME_TYPES"),
 		},
 
 		CORS: CORSConfig{
