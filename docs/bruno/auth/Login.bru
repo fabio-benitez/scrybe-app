@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{auth_base_url}}/token
+  url: {{auth_base_url}}/token?grant_type=password
   body: json
   auth: inherit
 }
