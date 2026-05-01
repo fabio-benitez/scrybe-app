@@ -22,6 +22,12 @@ body:multipart-form {
   file: @file(./fixtures/profile.png)
 }
 
+tests {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("file_id", res.body.id);
+  }
+}
+
 docs {
   ## Upload File
   
