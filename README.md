@@ -1,101 +1,114 @@
 # Scrybe
 
-## Descripción general
+## Descripción
 
-Aplicación web en desarrollo orientada a la gestión estructurada de contenido personal.
+Scrybe es una aplicación web en desarrollo orientada a la gestión estructurada de contenido personal (notas, archivos, enlaces, etc.).
 
-Actualmente el proyecto se centra en la construcción de una base sólida a nivel de backend, incluyendo API, autenticación, base de datos y arquitectura.
+Actualmente el proyecto se centra en la construcción de una base sólida a nivel de backend, incluyendo API, autenticación, base de datos y arquitectura, con el objetivo de evolucionar hacia una herramienta escalable y mantenible.
 
-El objetivo es evolucionar esta base hacia una herramienta que permita crear, organizar y gestionar información de forma estructurada en un único espacio.
-
+---
 
 ## Estado del proyecto
 
-- Estructura base del proyecto creada
-- Supabase configurado en entorno local
-- Conexión a PostgreSQL implementada
+- El proyecto se encuentra en fase activa de desarrollo
 - API en Go operativa
-- Endpoints de health disponibles
-- Autenticación basada en JWT (Supabase Auth + JWKS)
+- Supabase configurado en entorno local
+- Autenticación JWT integrada (Supabase Auth + JWKS)
 - Perfil de usuario (`user_profiles`) sincronizado con `auth.users`
-- Endpoint `GET /profile` protegido por autenticación
-- Endpoint `PATCH /profile` para actualización de perfil
-- Documentación de la API mediante OpenAPI (Swagger UI)
+- Endpoints de health disponibles
+- Módulo `profile`:
+  - `GET /profile`
+  - `PATCH /profile`
+- Módulo `files`:
+  - `POST /files` → subida de archivos
+  - `GET /files/{file_id}` → obtención de metadata
+- Documentación mediante OpenAPI
+- Colección Bruno para pruebas manuales
 
-El proyecto se encuentra en fase inicial de desarrollo.
+---
 
-
-## Tecnologías
+## Stack tecnológico
 
 - Backend: Go (API REST)
 - Base de datos: PostgreSQL (Supabase)
 - Autenticación: Supabase Auth (JWT + JWKS)
 - Router HTTP: chi
-- Middleware HTTP: CORS configurable
-- Infraestructura local: Docker + Supabase CLI
+- Storage: Supabase Storage
+- Documentación API: OpenAPI (Swagger UI)
+- Testing manual: Bruno
+- Infraestructura local: Docker + Supabase CLI (vía npx)
 
+---
 
 ## Requisitos
 
-Antes de comenzar, asegúrate de tener instalado:
-
 - Node.js: https://nodejs.org
 - Docker Desktop: https://www.docker.com/products/docker-desktop/
-- Supabase CLI
+- Go (>= 1.22): https://go.dev/
+- Supabase CLI: https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npm&queryGroups=access-method&access-method=studio
 
+---
 
 ## Instalación y ejecución en local
 
-1. Clonar el repositorio:
+### 1. Clonar el repositorio
 
 ```bash
 git clone <url-del-repositorio>
 cd scrybe-app
 ```
 
-2. Levantar Supabase:
+### 2. Levantar Supabase
 
 ```bash
 npx supabase start
 ```
 
-3. Configurar variables de entorno:
+### 3. Configurar variables de entorno
 
 Crear un archivo `.env` a partir de `.env.example`.
 
-4. Levantar la API:
+Algunas variables cambian según ejecutes la API dentro de Docker o directamente en tu máquina.
+
+Ejemplo importante (dependiendo de cómo ejecutes la API):
+
+```env
+# Para ejecución en Docker
+DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres?sslmode=disable
+
+# Si ejecutas la API con go run
+# DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres?sslmode=disable
+```
+
+### 4. Levantar la API
+
+Opción recomendada (Docker):
 
 ```bash
 docker compose up --build -d
 ```
 
-O alternativamente:
+Opción alternativa:
 
 ```bash
-go run ./apps/api/cmd/api
+cd apps/api
+go run ./cmd/api
 ```
 
+### 5. (Opcional) Sincronizar dependencias
 
-## Flujo de autenticación
-
-El proyecto utiliza Supabase Auth como proveedor de identidad.
-
-- Registro y login se realizan contra Supabase
-- La API valida los JWT mediante claves públicas (JWKS)
-- Los endpoints protegidos requieren:
-
-```http
-Authorization: Bearer <access_token>
+```bash
+cd apps/api
+go mod tidy
 ```
 
-Al crear un usuario, un trigger en la base de datos crea automáticamente su perfil en `user_profiles`.
-
+---
 
 ## Uso de la API en desarrollo
 
-Para probar los endpoints en local se incluye una colección para Bruno en:
+Colección Bruno:
 
-```txt
+```text
 docs/bruno
 ```
 
@@ -103,83 +116,84 @@ docs/bruno
 
 1. Sign Up (`/auth/v1/signup`)
 2. Login (`/auth/v1/token`)
-3. El token se guarda automáticamente en la variable `access_token`
-4. Usar endpoints protegidos de la API, como `/profile`
+3. El `access_token` se guarda automáticamente
+4. Uso de endpoints (`/profile`, `/files`)
 
-### Variables necesarias
+### Variables
 
 Definidas en:
 
-```txt
+```text
 docs/bruno/environments/local.bru
 ```
 
-Variables actuales:
+| Variable           | Descripción                                      | Ejemplo                                      |
+|--------------------|--------------------------------------------------|----------------------------------------------|
+| api_base_url       | URL base de la API                               | http://localhost:8081/api/v1                 |
+| auth_base_url      | URL base de Supabase Auth                        | http://localhost:54321/auth/v1               |
+| supabase_anon_key  | Clave pública de Supabase                        | sb_publishable_xxxxxxxxxxxxxxxxx             |
+| access_token       | JWT de autenticación                             | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...      |
+| file_id            | ID de archivo para endpoints de files            | 76661000-7cf1-4bdb-9a59-66b80b17209f         |
 
-- `api_base_url`
-- `auth_base_url`
-- `supabase_anon_key`
-- `access_token`
 
-### Nota
+---
 
-- La documentación oficial de la API está en OpenAPI (`docs/api/openapi.yaml`)
-- La colección Bruno es solo una ayuda para desarrollo local
+## Documentación de la API
 
+- OpenAPI: `docs/api/openapi.yaml`
+- Swagger UI: http://localhost:8082
+
+---
 
 ## Servicios disponibles
 
-- API: `http://localhost:8081`
-- Health: `http://localhost:8081/api/v1/health`
-- Health DB: `http://localhost:8081/api/v1/health/db`
-- Profile: `http://localhost:8081/api/v1/profile`
-- Swagger: `http://localhost:8082`
-- Supabase Studio: `http://127.0.0.1:54323`
+- API: http://localhost:8081
+- Health: http://localhost:8081/api/v1/health
+- Health DB: http://localhost:8081/api/v1/health/db
+- Swagger: http://localhost:8082
+- Supabase Studio: http://127.0.0.1:54323
 
+---
 
-## Estructura del proyecto
+## Arquitectura
 
-```txt
+Arquitectura modular basada en hexagonal ligera.
+
+Cada módulo sigue esta estructura:
+
+- domain
+- application
+- infrastructure
+- delivery
+
+Supabase se usa como infraestructura.
+
+---
+
+## Estructura
+
+```text
 apps/
   api/
-    cmd/
     internal/
-      platform/
       <modulo>/
         domain/
         application/
         infrastructure/
         delivery/
-  web/
 
 docs/
   api/
-    openapi.yaml
   bruno/
 
 supabase/
-  migrations/
 ```
 
+---
 
-## Arquitectura
+## Filosofía del proyecto
 
-El backend sigue una arquitectura modular y desacoplada, inspirada en una arquitectura hexagonal ligera.
-
-Cada módulo puede organizarse en:
-
-- `domain`: entidades, errores y contratos del dominio
-- `application`: casos de uso y reglas de aplicación
-- `infrastructure`: implementaciones concretas, como PostgreSQL
-- `delivery`: entrada HTTP u otros mecanismos de entrega
-
-Supabase se usa como infraestructura, no como sustituto de la lógica de negocio de la aplicación.
-
-
-## Notas
-
-- Supabase se usa como proveedor inicial de Auth, PostgreSQL y Storage
-- La API valida JWT mediante JWKS
-- Los datos propios de la aplicación se gestionan desde la API
-- Se prioriza una base sólida antes de añadir funcionalidades
-- OpenAPI debe mantenerse alineado con la implementación
+- Arquitectura modular y desacoplada
+- Separación clara entre dominio, aplicación, infraestructura y delivery
+- Independencia de frameworks y servicios externos
+- Diseño orientado a escalabilidad y mantenibilidad

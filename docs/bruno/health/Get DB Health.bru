@@ -1,0 +1,25 @@
+meta {
+  name: Get DB Health
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api_base_url}}/health/db
+  body: none
+  auth: inherit
+}
+
+headers {
+  Accept: application/json
+}
+
+docs {
+  ## Get DB Health
+  
+  Comprueba la conexión con la base de datos.
+  
+  ### Respuesta:
+  - 200 → base de datos disponible
+  - 503 → base de datos no disponible
+}
