@@ -124,10 +124,16 @@ func (h *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 			errors.Is(err, domain.ErrEmptyFile),
 			errors.Is(err, domain.ErrMimeTypeNotAllowed):
 			httpresponse.Error(w, http.StatusBadRequest, err.Error())
+
 		case errors.Is(err, domain.ErrFileTooLarge):
 			httpresponse.Error(w, http.StatusRequestEntityTooLarge, err.Error())
+
+		case errors.Is(err, application.ErrFileAlreadyExists):
+			httpresponse.Error(w, http.StatusConflict, err.Error())
+
 		case errors.Is(err, application.ErrStorageUnavailable):
 			httpresponse.Error(w, http.StatusInternalServerError, "storage unavailable")
+
 		default:
 			slog.ErrorContext(r.Context(), "failed to upload file",
 				"user_id", user.ID,

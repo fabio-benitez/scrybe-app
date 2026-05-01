@@ -20,13 +20,15 @@ func (s UploadStatus) IsValid() bool {
 }
 
 type File struct {
-	ID           string
-	UserID       string
-	Bucket       string
-	ObjectPath   string
-	OriginalName string
-	MimeType     string
-	SizeBytes    int64
-	UploadStatus UploadStatus
-	CreatedAt    time.Time
+	ID             string
+	UserID         string
+	Bucket         string
+	ObjectPath     string
+	OriginalName   string
+	MimeType       string
+	SizeBytes      int64
+	UploadStatus   UploadStatus
+	ChecksumSHA256 *string
+	CreatedAt      time.Time
+	UploadedAt     *time.Time
 }

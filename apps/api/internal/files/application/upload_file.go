@@ -2,10 +2,14 @@ package application
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"errors"
 	"fmt"
 	"io"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/files/domain"
 	"github.com/google/uuid"
@@ -44,7 +48,6 @@ func NewUploadFileUseCase(
 	}
 
 	bucket = strings.TrimSpace(bucket)
-
 	if bucket == "" {
 		return nil, newConfigError("bucket is required")
 	}
@@ -58,7 +61,6 @@ func NewUploadFileUseCase(
 	}
 
 	normalizedMIMEs := make([]string, 0, len(allowedMIMETypes))
-
 	for _, m := range allowedMIMETypes {
 		m = normalizeMIME(m)
 		if m != "" {
@@ -103,15 +105,16 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 		return nil, err
 	}
 
-	err = uc.storage.Upload(ctx, domain.UploadInput{
+	hasher := sha256.New()
+	body := io.TeeReader(input.Body, hasher)
+
+	if err := uc.storage.Upload(ctx, domain.UploadInput{
 		Bucket:      createdFile.Bucket,
 		ObjectPath:  createdFile.ObjectPath,
 		ContentType: createdFile.MimeType,
 		SizeBytes:   createdFile.SizeBytes,
-		Body:        input.Body,
-	})
-
-	if err != nil {
+		Body:        body,
+	}); err != nil {
 		slog.ErrorContext(ctx, "failed to upload file to storage",
 			"file_id", createdFile.ID,
 			"user_id", createdFile.UserID,
@@ -120,34 +123,50 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 			"error", err,
 		)
 
-		if updateErr := uc.repo.UpdateStatus(ctx, createdFile.UserID, createdFile.ID, domain.UploadStatusFailed); updateErr != nil {
-			slog.ErrorContext(ctx, "failed to mark file upload as failed",
-				"file_id", createdFile.ID,
-				"user_id", createdFile.UserID,
-				"error", updateErr,
-			)
-		}
+		uc.markFailed(ctx, createdFile)
 
 		return nil, ErrStorageUnavailable
 	}
 
-	if err := uc.repo.UpdateStatus(ctx, createdFile.UserID, createdFile.ID, domain.UploadStatusUploaded); err != nil {
-		if deleteErr := uc.storage.Delete(ctx, domain.DeleteInput{
-			Bucket:     createdFile.Bucket,
-			ObjectPath: createdFile.ObjectPath,
-		}); deleteErr != nil {
-			slog.ErrorContext(ctx, "failed to delete uploaded file after DB status update failed",
-				"file_id", createdFile.ID,
-				"user_id", createdFile.UserID,
-				"object_path", createdFile.ObjectPath,
-				"error", deleteErr,
-			)
-		}
+	checksum := hex.EncodeToString(hasher.Sum(nil))
 
-		return nil, fmt.Errorf("confirming file upload status: %w", err)
+	existingFile, err := uc.repo.FindUploadedByChecksum(ctx, createdFile.UserID, checksum)
+	if err != nil {
+		if !errors.Is(err, domain.ErrFileNotFound) {
+			uc.deleteUploadedObject(ctx, createdFile)
+			uc.markFailed(ctx, createdFile)
+
+			return nil, fmt.Errorf("checking existing file by checksum: %w", err)
+		}
+	} else {
+		uc.deleteUploadedObject(ctx, createdFile)
+		uc.markFailed(ctx, createdFile)
+
+		slog.InfoContext(ctx, "duplicate file upload rejected",
+			"user_id", createdFile.UserID,
+			"file_id", createdFile.ID,
+			"existing_file_id", existingFile.ID,
+			"checksum_sha256", checksum,
+		)
+
+		return nil, ErrFileAlreadyExists
 	}
 
+	if err := uc.repo.MarkUploaded(ctx, createdFile.UserID, createdFile.ID, checksum); err != nil {
+		uc.deleteUploadedObject(ctx, createdFile)
+		uc.markFailed(ctx, createdFile)
+
+		if errors.Is(err, domain.ErrFileConflict) {
+			return nil, ErrFileAlreadyExists
+		}
+
+		return nil, fmt.Errorf("marking file as uploaded: %w", err)
+	}
+
+	now := time.Now().UTC()
 	createdFile.UploadStatus = domain.UploadStatusUploaded
+	createdFile.ChecksumSHA256 = &checksum
+	createdFile.UploadedAt = &now
 
 	return createdFile, nil
 }
@@ -197,4 +216,30 @@ func (uc *UploadFileUseCase) isAllowedMIME(declaredMIME string, detectedMIME str
 	}
 
 	return detectedMIME == declaredMIME || isKnownMIMEDetectionMismatch(declaredMIME, detectedMIME)
+}
+
+func (uc *UploadFileUseCase) markFailed(ctx context.Context, file *domain.File) {
+	cleanupCtx := context.WithoutCancel(ctx)
+	if err := uc.repo.MarkFailed(cleanupCtx, file.UserID, file.ID); err != nil {
+		slog.ErrorContext(cleanupCtx, "failed to mark file upload as failed",
+			"file_id", file.ID,
+			"user_id", file.UserID,
+			"error", err,
+		)
+	}
+}
+
+func (uc *UploadFileUseCase) deleteUploadedObject(ctx context.Context, file *domain.File) {
+	cleanupCtx := context.WithoutCancel(ctx)
+	if err := uc.storage.Delete(cleanupCtx, domain.DeleteInput{
+		Bucket:     file.Bucket,
+		ObjectPath: file.ObjectPath,
+	}); err != nil {
+		slog.ErrorContext(cleanupCtx, "failed to delete uploaded file",
+			"file_id", file.ID,
+			"user_id", file.UserID,
+			"object_path", file.ObjectPath,
+			"error", err,
+		)
+	}
 }
