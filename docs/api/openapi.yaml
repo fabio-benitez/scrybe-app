@@ -95,6 +95,43 @@ paths:
         "404":
           description: Perfil no encontrado
 
+  /files:
+    post:
+      summary: Sube un archivo
+      tags:
+        - Files
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Archivo subido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileUploadResponse"
+        "400":
+          description: Archivo inválido, vacío o MIME no permitido
+        "401":
+          description: No autenticado
+        "409":
+          description: Archivo duplicado
+        "413":
+          description: Archivo demasiado grande
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components
@@ -154,5 +191,28 @@ components:
           type: string
           format: date-time
         updated_at:
+          type: string
+          format: date-time
+
+    # =========================
+    # Files
+    # =========================
+    FileUploadResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        original_name:
+          type: string
+        mime_type:
+          type: string
+        size_bytes:
+          type: integer
+          format: int64
+        upload_status:
+          type: string
+          enum: [pending, uploaded, failed]
+        created_at:
           type: string
           format: date-time

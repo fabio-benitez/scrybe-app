@@ -20,3 +20,7 @@ func Error(w http.ResponseWriter, status int, message string) {
 		Error: message,
 	})
 }
+
+func Unauthorized(w http.ResponseWriter, message string) {
+	Error(w, http.StatusUnauthorized, message)
+}

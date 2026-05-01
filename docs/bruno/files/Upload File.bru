@@ -1,0 +1,41 @@
+meta {
+  name: Upload File
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{api_base_url}}/files
+  body: multipartForm
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:multipart-form {
+  file: @file(./fixtures/profile.png)
+}
+
+docs {
+  ## Upload File
+  
+  Sube un archivo autenticado a Scrybe.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  - multipart/form-data
+  - campo file
+  
+  ### Respuestas:
+  - 201 → archivo subido
+  - 400 → archivo inválido, vacío o MIME no permitido
+  - 401 → no autenticado
+  - 413 → archivo demasiado grande
+  - 500 → error interno/storage
+}

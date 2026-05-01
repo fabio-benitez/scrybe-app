@@ -6,6 +6,9 @@ import (
 
 	authhttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/auth/delivery/http"
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/config"
+	filesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/application"
+	fileshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/delivery/http"
+	filesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/infrastructure"
 	healthhttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/health/delivery/http"
 	platformauth "github.com/fabio-benitez/scrybe-app/apps/api/internal/platform/auth"
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/platform/database"
@@ -37,6 +40,20 @@ func RunAPI(cfg *config.APIConfig) error {
 	updateProfileUC := profileapp.NewUpdateProfileUseCase(profileRepo)
 	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC)
 
+	filesRepo := filesinfra.NewPostgresRepository(dbPool)
+	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
+	uploadFileUC, err := filesapp.NewUploadFileUseCase(
+		filesRepo,
+		filesStorage,
+		cfg.Storage.Bucket,
+		cfg.Storage.MaxUploadBytes,
+		cfg.Storage.AllowedMimeTypes,
+	)
+	if err != nil {
+		return err
+	}
+	filesHandler := fileshttp.NewHandler(uploadFileUC, cfg.Storage.MaxUploadBytes)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -51,6 +68,7 @@ func RunAPI(cfg *config.APIConfig) error {
 			r.Use(authMiddleware.RequireAuth)
 
 			r.Mount("/profile", profileHandler.Routes())
+			r.Mount("/files", filesHandler.Routes())
 		})
 	})
 
