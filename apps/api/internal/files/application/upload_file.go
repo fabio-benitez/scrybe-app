@@ -110,7 +110,16 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 		SizeBytes:   createdFile.SizeBytes,
 		Body:        input.Body,
 	})
+
 	if err != nil {
+		slog.ErrorContext(ctx, "failed to upload file to storage",
+			"file_id", createdFile.ID,
+			"user_id", createdFile.UserID,
+			"bucket", createdFile.Bucket,
+			"object_path", createdFile.ObjectPath,
+			"error", err,
+		)
+
 		if updateErr := uc.repo.UpdateStatus(ctx, createdFile.UserID, createdFile.ID, domain.UploadStatusFailed); updateErr != nil {
 			slog.ErrorContext(ctx, "failed to mark file upload as failed",
 				"file_id", createdFile.ID,
@@ -187,9 +196,5 @@ func (uc *UploadFileUseCase) isAllowedMIME(declaredMIME string, detectedMIME str
 		return true
 	}
 
-	return detectedMIME == declaredMIME || mimeTypesCompatible(declaredMIME, detectedMIME)
-}
-
-func newConfigError(msg string) error {
-	return fmt.Errorf("files/application: %s", msg)
+	return detectedMIME == declaredMIME || isKnownMIMEDetectionMismatch(declaredMIME, detectedMIME)
 }

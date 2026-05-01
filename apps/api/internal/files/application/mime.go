@@ -23,6 +23,6 @@ func containsMIME(allowed []string, mimeType string) bool {
 	return false
 }
 
-func mimeTypesCompatible(declaredMIME string, detectedMIME string) bool {
+func isKnownMIMEDetectionMismatch(declaredMIME string, detectedMIME string) bool {
 	return declaredMIME == "text/markdown" && detectedMIME == "text/plain"
 }
