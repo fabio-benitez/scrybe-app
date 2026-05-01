@@ -68,6 +68,7 @@ func (s *SupabaseStorage) Upload(ctx context.Context, input domain.UploadInput) 
 	}
 
 	req.Header.Set("Authorization", "Bearer "+s.secretKey)
+	req.Header.Set("apikey", s.secretKey)
 	req.Header.Set("Content-Type", contentType)
 	req.Header.Set("x-upsert", "false")
 	req.ContentLength = input.SizeBytes
@@ -122,6 +123,7 @@ func (s *SupabaseStorage) Delete(ctx context.Context, input domain.DeleteInput) 
 	}
 
 	req.Header.Set("Authorization", "Bearer "+s.secretKey)
+	req.Header.Set("apikey", s.secretKey)
 	req.Header.Set("Content-Type", "application/json")
 
 	resp, err := s.httpClient.Do(req)

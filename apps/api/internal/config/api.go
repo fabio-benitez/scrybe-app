@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"strings"
 )
 
 type APIConfig struct {
@@ -80,6 +81,28 @@ func (c *APIConfig) validate() error {
 
 	if c.Auth.JWKSURL == "" {
 		return errors.New("AUTH_JWKS_URL is required")
+	}
+
+	if strings.EqualFold(c.Storage.Provider, "supabase") {
+		if c.Storage.BaseURL == "" {
+			return errors.New("STORAGE_BASE_URL is required when STORAGE_PROVIDER is supabase")
+		}
+
+		if c.Storage.SecretKey == "" {
+			return errors.New("STORAGE_SECRET_KEY is required when STORAGE_PROVIDER is supabase")
+		}
+
+		if c.Storage.Bucket == "" {
+			return errors.New("STORAGE_BUCKET is required when STORAGE_PROVIDER is supabase")
+		}
+
+		if c.Storage.MaxUploadBytes <= 0 {
+			return errors.New("STORAGE_MAX_UPLOAD_BYTES must be greater than zero when STORAGE_PROVIDER is supabase")
+		}
+
+		if len(c.Storage.AllowedMimeTypes) == 0 {
+			return errors.New("STORAGE_ALLOWED_MIME_TYPES is required when STORAGE_PROVIDER is supabase")
+		}
 	}
 
 	return nil
