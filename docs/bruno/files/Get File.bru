@@ -1,0 +1,35 @@
+meta {
+  name: Get File
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api_base_url}}/files/{{file_id}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get File
+  
+  Obtiene la metadata de un archivo autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  - file_id
+  
+  ### Respuesta:
+  - 200 → metadata del archivo
+  - 401 → no autenticado
+  - 404 → archivo no encontrado
+  - 500 → error interno
+}

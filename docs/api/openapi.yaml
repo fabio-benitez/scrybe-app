@@ -120,7 +120,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FileUploadResponse"
+                $ref: "#/components/schemas/FileResponse"
         "400":
           description: Archivo inválido, vacío o MIME no permitido
         "401":
@@ -129,6 +129,35 @@ paths:
           description: Archivo duplicado
         "413":
           description: Archivo demasiado grande
+        "500":
+          description: Error interno
+
+  /files/{file_id}:
+    get:
+      summary: Obtiene la metadata de un archivo
+      tags:
+        - Files
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del archivo
+      responses:
+        "200":
+          description: Metadata del archivo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Archivo no encontrado
         "500":
           description: Error interno
 
@@ -197,7 +226,7 @@ components:
     # =========================
     # Files
     # =========================
-    FileUploadResponse:
+    FileResponse:
       type: object
       properties:
         id:
@@ -216,3 +245,7 @@ components:
         created_at:
           type: string
           format: date-time
+        uploaded_at:
+          type: string
+          format: date-time
+          nullable: true
