@@ -1,0 +1,53 @@
+meta {
+  name: Update Tag
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{api_base_url}}/tags/{{tag_id}}
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "new tag updated"
+  }
+}
+
+docs {
+  ## Update Tag
+  
+  Actualiza parcialmente un tag del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `tag_id`
+  
+  ### Comportamiento por campo:
+  - name: si cambia → slug se regenera automáticamente
+  
+  ### Notas:
+  - {} vacío → devuelve el estado actual sin modificar updated_at
+  - UUID inválido → 404
+  - Nombre o slug duplicado → 409
+  
+  ### Respuestas:
+  - 200 → tag actualizado
+  - 400 → datos inválidos
+  - 401 → no autenticado
+  - 404 → tag no encontrado
+  - 409 → nombre o slug ya existe
+  - 500 → error interno
+}

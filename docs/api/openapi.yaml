@@ -344,6 +344,44 @@ paths:
         "500":
           description: Error interno
 
+    patch:
+      summary: Actualiza parcialmente un tag
+      tags:
+        - Tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tag_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del tag
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTagRequest"
+      responses:
+        "200":
+          description: Tag actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "404":
+          description: Tag no encontrado
+        "409":
+          description: Ya existe un tag con ese nombre
+        "500":
+          description: Error interno
+
 
   /categories:
     get:
@@ -682,6 +720,18 @@ components:
           minLength: 1
           maxLength: 50
           example: golang
+
+    UpdateTagRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: |
+            Omitido → sin cambio (devuelve el tag actual).
+            Si se envía → trim, requerido, máx. 50 chars, slug regenerado.
+          example: rust
 
     TagResponse:
       type: object

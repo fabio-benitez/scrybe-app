@@ -78,7 +78,8 @@ func RunAPI(cfg *config.APIConfig) error {
 	createTagUC := tagsapp.NewCreateTagUseCase(tagsRepo)
 	listTagsUC := tagsapp.NewListTagsUseCase(tagsRepo)
 	getTagUC := tagsapp.NewGetTagUseCase(tagsRepo)
-	tagsHandler := tagshttp.NewHandler(createTagUC, listTagsUC, getTagUC)
+	updateTagUC := tagsapp.NewUpdateTagUseCase(tagsRepo)
+	tagsHandler := tagshttp.NewHandler(createTagUC, listTagsUC, getTagUC, updateTagUC)
 
 	// Router
 	r := chi.NewRouter()

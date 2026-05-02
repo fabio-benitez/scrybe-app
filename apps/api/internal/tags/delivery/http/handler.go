@@ -26,21 +26,28 @@ type getTagUseCase interface {
 	Execute(ctx context.Context, userID string, tagID string) (*domain.Tag, error)
 }
 
+type updateTagUseCase interface {
+	Execute(ctx context.Context, input application.UpdateTagInput) (*domain.Tag, error)
+}
+
 type Handler struct {
 	createTagUC createTagUseCase
 	listTagsUC  listTagsUseCase
 	getTagUC    getTagUseCase
+	updateTagUC updateTagUseCase
 }
 
 func NewHandler(
 	createTagUC createTagUseCase,
 	listTagsUC listTagsUseCase,
 	getTagUC getTagUseCase,
+	updateTagUC updateTagUseCase,
 ) *Handler {
 	return &Handler{
 		createTagUC: createTagUC,
 		listTagsUC:  listTagsUC,
 		getTagUC:    getTagUC,
+		updateTagUC: updateTagUC,
 	}
 }
 
@@ -49,6 +56,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Get("/", h.ListTags)
 	r.Post("/", h.CreateTag)
 	r.Get("/{tag_id}", h.GetTag)
+	r.Patch("/{tag_id}", h.UpdateTag)
 	return r
 }
 
@@ -153,6 +161,54 @@ func (h *Handler) GetTag(w http.ResponseWriter, r *http.Request) {
 			"error", err,
 		)
 		httpresponse.Error(w, http.StatusInternalServerError, "failed to get tag")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toTagResponse(tag))
+}
+
+func (h *Handler) UpdateTag(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	tagID := chi.URLParam(r, "tag_id")
+
+	var req UpdateTagRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpresponse.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	tag, err := h.updateTagUC.Execute(r.Context(), application.UpdateTagInput{
+		UserID: user.ID,
+		TagID:  tagID,
+		Name:   req.Name,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, application.ErrTagNameRequired),
+			errors.Is(err, application.ErrTagNameTooLong):
+			httpresponse.Error(w, http.StatusBadRequest, err.Error())
+
+		case errors.Is(err, domain.ErrTagNotFound):
+			httpresponse.Error(w, http.StatusNotFound, "tag not found")
+
+		case errors.Is(err, domain.ErrTagAlreadyExists):
+			httpresponse.Error(w, http.StatusConflict, err.Error())
+
+		default:
+			slog.ErrorContext(r.Context(), "failed to update tag",
+				"user_id", user.ID,
+				"tag_id", tagID,
+				"error", err,
+			)
+			httpresponse.Error(w, http.StatusInternalServerError, "failed to update tag")
+		}
+
 		return
 	}
 
