@@ -30,11 +30,16 @@ type updateTagUseCase interface {
 	Execute(ctx context.Context, input application.UpdateTagInput) (*domain.Tag, error)
 }
 
+type deleteTagUseCase interface {
+	Execute(ctx context.Context, input application.DeleteTagInput) error
+}
+
 type Handler struct {
 	createTagUC createTagUseCase
 	listTagsUC  listTagsUseCase
 	getTagUC    getTagUseCase
 	updateTagUC updateTagUseCase
+	deleteTagUC deleteTagUseCase
 }
 
 func NewHandler(
@@ -42,12 +47,14 @@ func NewHandler(
 	listTagsUC listTagsUseCase,
 	getTagUC getTagUseCase,
 	updateTagUC updateTagUseCase,
+	deleteTagUC deleteTagUseCase,
 ) *Handler {
 	return &Handler{
 		createTagUC: createTagUC,
 		listTagsUC:  listTagsUC,
 		getTagUC:    getTagUC,
 		updateTagUC: updateTagUC,
+		deleteTagUC: deleteTagUC,
 	}
 }
 
@@ -57,6 +64,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Post("/", h.CreateTag)
 	r.Get("/{tag_id}", h.GetTag)
 	r.Patch("/{tag_id}", h.UpdateTag)
+	r.Delete("/{tag_id}", h.DeleteTag)
 	return r
 }
 
@@ -213,4 +221,35 @@ func (h *Handler) UpdateTag(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpresponse.JSON(w, http.StatusOK, toTagResponse(tag))
+}
+
+func (h *Handler) DeleteTag(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	tagID := chi.URLParam(r, "tag_id")
+
+	err := h.deleteTagUC.Execute(r.Context(), application.DeleteTagInput{
+		UserID: user.ID,
+		TagID:  tagID,
+	})
+	if err != nil {
+		if errors.Is(err, domain.ErrTagNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "tag not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to delete tag",
+			"user_id", user.ID,
+			"tag_id", tagID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to delete tag")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

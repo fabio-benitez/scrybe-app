@@ -382,6 +382,30 @@ paths:
         "500":
           description: Error interno
 
+    delete:
+      summary: Elimina un tag
+      tags:
+        - Tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tag_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del tag
+      responses:
+        "204":
+          description: Tag eliminado
+        "401":
+          description: No autenticado
+        "404":
+          description: Tag no encontrado
+        "500":
+          description: Error interno
+
 
   /categories:
     get:
