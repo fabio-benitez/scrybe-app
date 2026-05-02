@@ -43,6 +43,7 @@ func RunAPI(cfg *config.APIConfig) error {
 	filesRepo := filesinfra.NewPostgresRepository(dbPool)
 	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
 	getFileUC := filesapp.NewGetFileUseCase(filesRepo)
+	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage)
 	uploadFileUC, err := filesapp.NewUploadFileUseCase(
 		filesRepo,
 		filesStorage,
@@ -53,7 +54,7 @@ func RunAPI(cfg *config.APIConfig) error {
 	if err != nil {
 		return err
 	}
-	filesHandler := fileshttp.NewHandler(uploadFileUC, getFileUC, cfg.Storage.MaxUploadBytes)
+	filesHandler := fileshttp.NewHandler(uploadFileUC, getFileUC, deleteFileUC, cfg.Storage.MaxUploadBytes)
 
 	// Router
 	r := chi.NewRouter()

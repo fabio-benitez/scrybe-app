@@ -25,20 +25,27 @@ type getFileUseCase interface {
 	Execute(ctx context.Context, userID string, fileID string) (*domain.File, error)
 }
 
+type deleteFileUseCase interface {
+	Execute(ctx context.Context, userID string, fileID string) error
+}
+
 type Handler struct {
 	uploadFileUC   uploadFileUseCase
 	getFileUC      getFileUseCase
+	deleteFileUC   deleteFileUseCase
 	maxUploadBytes int64
 }
 
 func NewHandler(
 	uc uploadFileUseCase,
 	gfc getFileUseCase,
+	dfc deleteFileUseCase,
 	maxUploadBytes int64,
 ) *Handler {
 	return &Handler{
 		uploadFileUC:   uc,
 		getFileUC:      gfc,
+		deleteFileUC:   dfc,
 		maxUploadBytes: maxUploadBytes,
 	}
 }
@@ -47,6 +54,7 @@ func (h *Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Post("/", h.UploadFile)
 	r.Get("/{file_id}", h.GetFile)
+	r.Delete("/{file_id}", h.DeleteFile)
 	return r
 }
 
@@ -187,4 +195,33 @@ func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpresponse.JSON(w, http.StatusOK, toFileResponse(file))
+}
+
+func (h *Handler) DeleteFile(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	fileID := chi.URLParam(r, "file_id")
+
+	if err := h.deleteFileUC.Execute(r.Context(), user.ID, fileID); err != nil {
+		switch {
+		case errors.Is(err, domain.ErrFileNotFound):
+			httpresponse.Error(w, http.StatusNotFound, "file not found")
+
+		default:
+			slog.ErrorContext(r.Context(), "failed to delete file",
+				"user_id", user.ID,
+				"file_id", fileID,
+				"error", err,
+			)
+			httpresponse.Error(w, http.StatusInternalServerError, "failed to delete file")
+		}
+
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

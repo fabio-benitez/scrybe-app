@@ -8,4 +8,5 @@ type Repository interface {
 	FindUploadedByChecksum(ctx context.Context, userID string, checksumSHA256 string) (*File, error)
 	MarkUploaded(ctx context.Context, userID string, fileID string, checksumSHA256 string) error
 	MarkFailed(ctx context.Context, userID string, fileID string) error
+	Delete(ctx context.Context, userID string, fileID string) error
 }
