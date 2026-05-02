@@ -1,0 +1,38 @@
+meta {
+  name: Delete Avatar
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{api_base_url}}/profile/avatar
+  body: none
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Delete Avatar
+  
+  Elimina el avatar del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Comportamiento:
+  - Si el usuario tenía avatar, lo elimina y borra el archivo asociado
+  - Si el usuario no tenía avatar, devuelve 200 igualmente
+  
+  ### Respuesta:
+  - 200 → perfil actualizado con avatar_file_id null
+  - 401 → no autenticado
+  - 404 → perfil no encontrado
+  - 500 → error interno
+}
