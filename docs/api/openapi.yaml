@@ -266,6 +266,26 @@ paths:
           description: Error interno al generar la URL
 
   /tags:
+    get:
+      summary: Lista todos los tags del usuario autenticado
+      tags:
+        - Tags
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de tags (vacía si no hay ninguno)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponse"
+        "401":
+          description: No autenticado
+        "500":
+          description: Error interno
+
     post:
       summary: Crea un nuevo tag
       tags:
@@ -291,6 +311,36 @@ paths:
           description: No autenticado
         "409":
           description: Ya existe un tag con ese nombre
+        "500":
+          description: Error interno
+
+
+  /tags/{tag_id}:
+    get:
+      summary: Obtiene un tag por ID
+      tags:
+        - Tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: tag_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del tag
+      responses:
+        "200":
+          description: Tag encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Tag no encontrado
         "500":
           description: Error interno
 

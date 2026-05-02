@@ -18,21 +18,37 @@ type createTagUseCase interface {
 	Execute(ctx context.Context, input application.CreateTagInput) (*domain.Tag, error)
 }
 
+type listTagsUseCase interface {
+	Execute(ctx context.Context, userID string) ([]*domain.Tag, error)
+}
+
+type getTagUseCase interface {
+	Execute(ctx context.Context, userID string, tagID string) (*domain.Tag, error)
+}
+
 type Handler struct {
 	createTagUC createTagUseCase
+	listTagsUC  listTagsUseCase
+	getTagUC    getTagUseCase
 }
 
 func NewHandler(
 	createTagUC createTagUseCase,
+	listTagsUC listTagsUseCase,
+	getTagUC getTagUseCase,
 ) *Handler {
 	return &Handler{
 		createTagUC: createTagUC,
+		listTagsUC:  listTagsUC,
+		getTagUC:    getTagUC,
 	}
 }
 
 func (h *Handler) Routes() http.Handler {
 	r := chi.NewRouter()
+	r.Get("/", h.ListTags)
 	r.Post("/", h.CreateTag)
+	r.Get("/{tag_id}", h.GetTag)
 	return r
 }
 
@@ -85,4 +101,60 @@ func toTagResponse(t *domain.Tag) TagResponse {
 		CreatedAt: t.CreatedAt,
 		UpdatedAt: t.UpdatedAt,
 	}
+}
+
+func toTagResponseList(tags []*domain.Tag) []TagResponse {
+	result := make([]TagResponse, len(tags))
+	for i, t := range tags {
+		result[i] = toTagResponse(t)
+	}
+	return result
+}
+
+func (h *Handler) ListTags(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	tags, err := h.listTagsUC.Execute(r.Context(), user.ID)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "failed to list tags",
+			"user_id", user.ID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to list tags")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toTagResponseList(tags))
+}
+
+func (h *Handler) GetTag(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	tagID := chi.URLParam(r, "tag_id")
+
+	tag, err := h.getTagUC.Execute(r.Context(), user.ID, tagID)
+	if err != nil {
+		if errors.Is(err, domain.ErrTagNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "tag not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to get tag",
+			"user_id", user.ID,
+			"tag_id", tagID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to get tag")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toTagResponse(tag))
 }

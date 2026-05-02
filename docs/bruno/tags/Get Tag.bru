@@ -1,0 +1,41 @@
+meta {
+  name: Get Tag
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{api_base_url}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get Tag
+  
+  Obtiene un tag concreto del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `tag_id`
+  
+  ### Notas:
+  - UUID inválido devuelve 404 (no 400)
+  - No distingue entre "no existe" y "no es tuyo"
+  
+  ### Respuestas:
+  - 200 → tag encontrado
+  - 401 → no autenticado
+  - 404 → tag no encontrado
+  - 500 → error interno
+}

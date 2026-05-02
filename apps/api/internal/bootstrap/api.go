@@ -76,7 +76,9 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	tagsRepo := tagsinfra.NewPostgresRepository(dbPool)
 	createTagUC := tagsapp.NewCreateTagUseCase(tagsRepo)
-	tagsHandler := tagshttp.NewHandler(createTagUC)
+	listTagsUC := tagsapp.NewListTagsUseCase(tagsRepo)
+	getTagUC := tagsapp.NewGetTagUseCase(tagsRepo)
+	tagsHandler := tagshttp.NewHandler(createTagUC, listTagsUC, getTagUC)
 
 	// Router
 	r := chi.NewRouter()
