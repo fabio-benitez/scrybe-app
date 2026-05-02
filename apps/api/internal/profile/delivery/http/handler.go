@@ -26,21 +26,28 @@ type updateAvatarUseCase interface {
 	Execute(ctx context.Context, input application.UpdateAvatarInput) (*domain.Profile, error)
 }
 
+type deleteAvatarUseCase interface {
+	Execute(ctx context.Context, userID string) (*domain.Profile, error)
+}
+
 type Handler struct {
 	getProfileUC    getProfileUseCase
 	updateProfileUC updateProfileUseCase
 	updateAvatarUC  updateAvatarUseCase
+	deleteAvatarUC  deleteAvatarUseCase
 }
 
 func NewHandler(
 	getProfileUC getProfileUseCase,
 	updateProfileUC updateProfileUseCase,
 	updateAvatarUC updateAvatarUseCase,
+	deleteAvatarUC deleteAvatarUseCase,
 ) *Handler {
 	return &Handler{
 		getProfileUC:    getProfileUC,
 		updateProfileUC: updateProfileUC,
 		updateAvatarUC:  updateAvatarUC,
+		deleteAvatarUC:  deleteAvatarUC,
 	}
 }
 
@@ -50,6 +57,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Get("/", h.GetProfile)
 	r.Patch("/", h.UpdateProfile)
 	r.Patch("/avatar", h.UpdateAvatar)
+	r.Delete("/avatar", h.DeleteAvatar)
 
 	return r
 }
@@ -159,6 +167,29 @@ func (h *Handler) UpdateAvatar(w http.ResponseWriter, r *http.Request) {
 
 		log.Printf("failed to update avatar for user %s: %v", user.ID, err)
 		httpresponse.Error(w, http.StatusInternalServerError, "failed to update avatar")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toProfileResponse(profile))
+}
+
+func (h *Handler) DeleteAvatar(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	profile, err := h.deleteAvatarUC.Execute(r.Context(), user.ID)
+
+	if err != nil {
+		if errors.Is(err, domain.ErrProfileNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "profile not found")
+			return
+		}
+
+		log.Printf("failed to delete avatar for user %s: %v", user.ID, err)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to delete avatar")
 		return
 	}
 

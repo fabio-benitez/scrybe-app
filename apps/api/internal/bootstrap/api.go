@@ -43,7 +43,8 @@ func RunAPI(cfg *config.APIConfig) error {
 	getProfileUC := profileapp.NewGetProfileUseCase(profileRepo)
 	updateProfileUC := profileapp.NewUpdateProfileUseCase(profileRepo)
 	updateAvatarUC := profileapp.NewUpdateAvatarUseCase(profileRepo, filesRepo, deleteFileUC)
-	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC, updateAvatarUC)
+	deleteAvatarUC := profileapp.NewDeleteAvatarUseCase(profileRepo, deleteFileUC)
+	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC, updateAvatarUC, deleteAvatarUC)
 
 	getFileUC := filesapp.NewGetFileUseCase(filesRepo)
 	getFileURLUC := filesapp.NewGetFileURLUseCase(filesRepo, filesStorage)
