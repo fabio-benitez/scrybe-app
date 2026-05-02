@@ -68,8 +68,34 @@ func (r *PostgresRepository) FindAllByUserID(
 	ctx context.Context,
 	userID string,
 ) ([]*domain.Category, error) {
-	// Implemented in GET /categories phase.
-	return nil, errors.New("not implemented")
+	query := `
+		SELECT id, user_id, name, slug, description, color, created_at, updated_at
+		FROM categories
+		WHERE user_id = $1
+		ORDER BY LOWER(name) ASC
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	categories := make([]*domain.Category, 0)
+
+	for rows.Next() {
+		var c domain.Category
+		if err := scanCategory(rows, &c); err != nil {
+			return nil, err
+		}
+		categories = append(categories, &c)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return categories, nil
 }
 
 func (r *PostgresRepository) FindByID(
@@ -77,8 +103,24 @@ func (r *PostgresRepository) FindByID(
 	userID string,
 	categoryID string,
 ) (*domain.Category, error) {
-	// Implemented in GET /categories/{id} phase.
-	return nil, errors.New("not implemented")
+	query := `
+		SELECT id, user_id, name, slug, description, color, created_at, updated_at
+		FROM categories
+		WHERE id = $1
+		  AND user_id = $2
+	`
+
+	var c domain.Category
+
+	if err := scanCategory(r.db.QueryRow(ctx, query, categoryID, userID), &c); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrCategoryNotFound
+		}
+
+		return nil, err
+	}
+
+	return &c, nil
 }
 
 func (r *PostgresRepository) Update(

@@ -65,7 +65,9 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	categoriesRepo := categoriesinfra.NewPostgresRepository(dbPool)
 	createCategoryUC := categoriesapp.NewCreateCategoryUseCase(categoriesRepo)
-	categoriesHandler := categorieshttp.NewHandler(createCategoryUC)
+	listCategoriesUC := categoriesapp.NewListCategoriesUseCase(categoriesRepo)
+	getCategoryUC := categoriesapp.NewGetCategoryUseCase(categoriesRepo)
+	categoriesHandler := categorieshttp.NewHandler(createCategoryUC, listCategoriesUC, getCategoryUC)
 
 	// Router
 	r := chi.NewRouter()

@@ -18,19 +18,37 @@ type createCategoryUseCase interface {
 	Execute(ctx context.Context, input application.CreateCategoryInput) (*domain.Category, error)
 }
 
-type Handler struct {
-	createCategoryUC createCategoryUseCase
+type listCategoriesUseCase interface {
+	Execute(ctx context.Context, userID string) ([]*domain.Category, error)
 }
 
-func NewHandler(createCategoryUC createCategoryUseCase) *Handler {
+type getCategoryUseCase interface {
+	Execute(ctx context.Context, userID string, categoryID string) (*domain.Category, error)
+}
+
+type Handler struct {
+	createCategoryUC createCategoryUseCase
+	listCategoriesUC listCategoriesUseCase
+	getCategoryUC    getCategoryUseCase
+}
+
+func NewHandler(
+	createCategoryUC createCategoryUseCase,
+	listCategoriesUC listCategoriesUseCase,
+	getCategoryUC getCategoryUseCase,
+) *Handler {
 	return &Handler{
 		createCategoryUC: createCategoryUC,
+		listCategoriesUC: listCategoriesUC,
+		getCategoryUC:    getCategoryUC,
 	}
 }
 
 func (h *Handler) Routes() http.Handler {
 	r := chi.NewRouter()
+	r.Get("/", h.ListCategories)
 	r.Post("/", h.CreateCategory)
+	r.Get("/{category_id}", h.GetCategory)
 	return r
 }
 
@@ -79,6 +97,54 @@ func (h *Handler) CreateCategory(w http.ResponseWriter, r *http.Request) {
 	httpresponse.JSON(w, http.StatusCreated, toCategoryResponse(category))
 }
 
+func (h *Handler) ListCategories(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	categories, err := h.listCategoriesUC.Execute(r.Context(), user.ID)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "failed to list categories",
+			"user_id", user.ID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to list categories")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toCategoryResponseList(categories))
+}
+
+func (h *Handler) GetCategory(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	categoryID := chi.URLParam(r, "category_id")
+
+	category, err := h.getCategoryUC.Execute(r.Context(), user.ID, categoryID)
+	if err != nil {
+		if errors.Is(err, domain.ErrCategoryNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "category not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to get category",
+			"user_id", user.ID,
+			"category_id", categoryID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to get category")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toCategoryResponse(category))
+}
+
 func toCategoryResponse(c *domain.Category) CategoryResponse {
 	return CategoryResponse{
 		ID:          c.ID,
@@ -89,4 +155,12 @@ func toCategoryResponse(c *domain.Category) CategoryResponse {
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 	}
+}
+
+func toCategoryResponseList(categories []*domain.Category) []CategoryResponse {
+	result := make([]CategoryResponse, len(categories))
+	for i, c := range categories {
+		result[i] = toCategoryResponse(c)
+	}
+	return result
 }
