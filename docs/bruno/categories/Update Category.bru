@@ -1,0 +1,63 @@
+meta {
+  name: Update Category
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{api_base_url}}/categories/{{category_id}}
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "Work updated",
+    "description": "Nueva descripción",
+    "color": "purple"
+  }
+}
+
+docs {
+  ## Update Category
+
+  Actualiza parcialmente una categoría del usuario autenticado.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Variables usadas:
+  - `category_id`
+
+  ### Comportamiento por campo:
+  - name: si cambia → slug se regenera automáticamente
+  - description:
+    - omitido → sin cambio
+    - null → sin cambio
+    - "" → se guarda como NULL
+  - color:
+    - omitido → sin cambio
+    - "" → se convierte en "gray"
+    - siempre se normaliza a lowercase
+
+  ### Notas:
+  - {} vacío → devuelve el estado actual sin modificar updated_at
+  - UUID inválido → 404
+  - Nombre o slug duplicado → 409
+
+  ### Respuestas:
+  - 200 → categoría actualizada
+  - 400 → datos inválidos
+  - 401 → no autenticado
+  - 404 → categoría no encontrada
+  - 409 → nombre ya existe
+  - 500 → error interno
+}

@@ -1,0 +1,41 @@
+meta {
+  name: Get Category
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{api_base_url}}/categories/{{category_id}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get Category
+  
+  Obtiene una categoría concreta del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `category_id`
+  
+  ### Notas:
+  - UUID inválido devuelve 404 (no 400)
+  - No distingue entre "no existe" y "no es tuya"
+  
+  ### Respuestas:
+  - 200 → categoría encontrada
+  - 401 → no autenticado
+  - 404 → categoría no encontrada
+  - 500 → error interno
+}

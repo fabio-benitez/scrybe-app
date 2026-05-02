@@ -5,6 +5,9 @@ import (
 	"net/http"
 
 	authhttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/auth/delivery/http"
+	categoriesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/application"
+	categorieshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/delivery/http"
+	categoriesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/infrastructure"
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/config"
 	filesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/application"
 	fileshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/delivery/http"
@@ -60,6 +63,14 @@ func RunAPI(cfg *config.APIConfig) error {
 	}
 	filesHandler := fileshttp.NewHandler(uploadFileUC, getFileUC, deleteFileUC, getFileURLUC, cfg.Storage.MaxUploadBytes)
 
+	categoriesRepo := categoriesinfra.NewPostgresRepository(dbPool)
+	createCategoryUC := categoriesapp.NewCreateCategoryUseCase(categoriesRepo)
+	listCategoriesUC := categoriesapp.NewListCategoriesUseCase(categoriesRepo)
+	getCategoryUC := categoriesapp.NewGetCategoryUseCase(categoriesRepo)
+	updateCategoryUC := categoriesapp.NewUpdateCategoryUseCase(categoriesRepo)
+	deleteCategoryUC := categoriesapp.NewDeleteCategoryUseCase(categoriesRepo)
+	categoriesHandler := categorieshttp.NewHandler(createCategoryUC, listCategoriesUC, getCategoryUC, updateCategoryUC, deleteCategoryUC)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -75,6 +86,7 @@ func RunAPI(cfg *config.APIConfig) error {
 
 			r.Mount("/profile", profileHandler.Routes())
 			r.Mount("/files", filesHandler.Routes())
+			r.Mount("/categories", categoriesHandler.Routes())
 		})
 	})
 

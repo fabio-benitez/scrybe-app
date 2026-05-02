@@ -1,0 +1,33 @@
+meta {
+  name: Delete Category
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{api_base_url}}/categories/{{category_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Delete Category
+  
+  Elimina una categoría del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `category_id`
+  
+  ### Respuestas:
+  - 204 → categoría eliminada (sin body)
+  - 401 → no autenticado
+  - 404 → categoría no encontrada (UUID inválido o no existe o no pertenece al usuario)
+  - 500 → error interno
+}

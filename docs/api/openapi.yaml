@@ -265,6 +265,147 @@ paths:
         "500":
           description: Error interno al generar la URL
 
+  /categories:
+    get:
+      summary: Lista todas las categorías del usuario autenticado
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de categorías (vacía si no hay ninguna)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryResponse"
+        "401":
+          description: No autenticado
+        "500":
+          description: Error interno
+
+    post:
+      summary: Crea una nueva categoría
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryRequest"
+      responses:
+        "201":
+          description: Categoría creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "409":
+          description: Ya existe una categoría con ese nombre
+        "500":
+          description: Error interno
+
+
+  /categories/{category_id}:
+    get:
+      summary: Obtiene una categoría por ID
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID de la categoría
+      responses:
+        "200":
+          description: Categoría encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Categoría no encontrada
+        "500":
+          description: Error interno
+
+    patch:
+      summary: Actualiza parcialmente una categoría
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID de la categoría
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCategoryRequest"
+      responses:
+        "200":
+          description: Categoría actualizada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "404":
+          description: Categoría no encontrada
+        "409":
+          description: Ya existe una categoría con ese nombre
+        "500":
+          description: Error interno
+
+    delete:
+      summary: Elimina una categoría
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID de la categoría
+      responses:
+        "204":
+          description: Categoría eliminada
+        "401":
+          description: No autenticado
+        "404":
+          description: Categoría no encontrada
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components
@@ -372,3 +513,78 @@ components:
           type: string
           format: uri
           example: "https://example.supabase.co/storage/v1/object/sign/files/user-id/file-name.png?token=..."
+
+    # =========================
+    # Categories
+    # =========================
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: Work
+        description:
+          type: string
+          maxLength: 500
+          example: Notas de trabajo
+        color:
+          type: string
+          enum: [gray, red, orange, yellow, green, blue, purple, pink]
+          default: gray
+          example: blue
+
+    UpdateCategoryRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: Work updated
+        description:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: |
+            Omitido o null → sin cambio.
+            "" → se guarda como NULL.
+          example: Nueva descripción
+        color:
+          type: string
+          enum: [gray, red, orange, yellow, green, blue, purple, pink]
+          description: |
+            Omitido → sin cambio.
+            "" → se convierte en "gray".
+          example: purple
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a1b2c3d4-0000-4000-8000-000000000001
+        name:
+          type: string
+          example: Work
+        slug:
+          type: string
+          example: work
+        description:
+          type: string
+          nullable: true
+          example: Notas de trabajo
+        color:
+          type: string
+          enum: [gray, red, orange, yellow, green, blue, purple, pink]
+          example: blue
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
