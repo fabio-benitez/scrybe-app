@@ -14,16 +14,26 @@ docs {
   1. Sign Up (`/auth/v1/signup`)
   2. Login (`/auth/v1/token`)
   3. Guardar `access_token`
-  4. Usar endpoints protegidos (`/profile`)
+  4. Usar endpoints protegidos (`/profile`, `/files`)
+  
+  ## Módulos
+  
+  - `auth` → registro y login mediante Supabase Auth
+  - `health` → comprobación de API y base de datos
+  - `profile` → consulta y actualización del perfil
+  - `files` → subida y consulta de archivos
   
   ## Variables
   
   - `api_base_url`
   - `auth_base_url`
+  - `supabase_anon_key`
   - `access_token`
+  - `file_id`
   
   ## Notas
   
   - Los endpoints de auth pertenecen a Supabase
   - La API de Scrybe solo valida JWT
+  - El contrato oficial de la API está en `docs/api/openapi.yaml`
 }
