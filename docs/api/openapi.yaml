@@ -185,6 +185,35 @@ paths:
         "500":
           description: Error interno
 
+  /files/{file_id}/url:
+    get:
+      summary: Genera una URL firmada temporal para acceder al archivo
+      tags:
+        - Files
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: file_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del archivo
+      responses:
+        "200":
+          description: URL firmada generada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FileURLResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Archivo no encontrado o no disponible
+        "500":
+          description: Error interno al generar la URL
+
 
 # =========================
 # Components
@@ -273,3 +302,11 @@ components:
           type: string
           format: date-time
           nullable: true
+
+    FileURLResponse:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          example: "https://example.supabase.co/storage/v1/object/sign/files/user-id/file-name.png?token=..."

@@ -1,0 +1,35 @@
+meta {
+  name: Get File URL
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{api_base_url}}/files/{{file_id}}/url
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get File URL
+  
+  Genera una URL firmada temporal (30 minutos) para acceder al archivo almacenado en storage privado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  - file_id (archivo con upload_status = uploaded)
+  
+  ### Respuestas:
+  - 200 → { "url": "https://..." }
+  - 401 → no autenticado
+  - 404 → archivo no encontrado o no disponible (pending/failed)
+  - 500 → error interno al generar la URL
+}

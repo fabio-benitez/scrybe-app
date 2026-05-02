@@ -143,3 +143,70 @@ func (s *SupabaseStorage) Delete(ctx context.Context, input domain.DeleteInput) 
 
 	return nil
 }
+
+func (s *SupabaseStorage) CreateSignedURL(ctx context.Context, input domain.SignedURLInput) (string, error) {
+	bucket := strings.TrimSpace(input.Bucket)
+	if bucket == "" {
+		return "", fmt.Errorf("create signed url: bucket is required")
+	}
+
+	objectPath := strings.TrimSpace(input.ObjectPath)
+	if objectPath == "" {
+		return "", fmt.Errorf("create signed url: object path is required")
+	}
+
+	payload, err := json.Marshal(struct {
+		ExpiresIn int `json:"expiresIn"`
+	}{
+		ExpiresIn: input.ExpiresIn,
+	})
+	if err != nil {
+		return "", fmt.Errorf("marshal signed url request body: %w", err)
+	}
+
+	url := fmt.Sprintf(
+		"%s/storage/v1/object/sign/%s/%s",
+		s.baseURL,
+		bucket,
+		objectPath,
+	)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(payload))
+	if err != nil {
+		return "", fmt.Errorf("create signed url request: %w", err)
+	}
+
+	req.Header.Set("Authorization", "Bearer "+s.secretKey)
+	req.Header.Set("apikey", s.secretKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	resp, err := s.httpClient.Do(req)
+	if err != nil {
+		return "", fmt.Errorf("request signed url from storage: %w", err)
+	}
+
+	defer func() {
+		_, _ = io.Copy(io.Discard, resp.Body)
+		_ = resp.Body.Close()
+	}()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		errBody, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
+		return "", fmt.Errorf("create signed url: unexpected status %d: %s", resp.StatusCode, strings.TrimSpace(string(errBody)))
+	}
+
+	var result struct {
+		SignedURL string `json:"signedURL"`
+	}
+
+	if err := json.NewDecoder(resp.Body).Decode(&result); err != nil {
+		return "", fmt.Errorf("decode signed url response: %w", err)
+	}
+
+	if result.SignedURL == "" {
+		return "", fmt.Errorf("create signed url: empty signedURL in response")
+	}
+
+	baseURL := strings.TrimRight(s.baseURL, "/")
+	return baseURL + "/storage/v1" + result.SignedURL, nil
+}

@@ -27,3 +27,7 @@ func toFileResponse(f *domain.File) FileResponse {
 		UploadedAt:   f.UploadedAt,
 	}
 }
+
+type FileURLResponse struct {
+	URL string `json:"url"`
+}
