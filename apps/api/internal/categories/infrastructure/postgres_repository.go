@@ -3,6 +3,8 @@ package infrastructure
 import (
 	"context"
 	"errors"
+	"fmt"
+	"strings"
 
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/domain"
 	"github.com/jackc/pgx/v5"
@@ -129,8 +131,61 @@ func (r *PostgresRepository) Update(
 	categoryID string,
 	fields domain.UpdateCategoryFields,
 ) (*domain.Category, error) {
-	// Implemented in PATCH /categories/{id} phase.
-	return nil, errors.New("not implemented")
+	args := []any{categoryID, userID}
+	setClauses := make([]string, 0)
+	i := 3
+
+	if fields.Name != nil {
+		setClauses = append(setClauses, fmt.Sprintf("name = $%d", i))
+		args = append(args, *fields.Name)
+		i++
+		setClauses = append(setClauses, fmt.Sprintf("slug = $%d", i))
+		args = append(args, *fields.Slug)
+		i++
+	}
+
+	if fields.Description != nil {
+		setClauses = append(setClauses, fmt.Sprintf("description = $%d", i))
+		if *fields.Description == "" {
+			args = append(args, nil) // write NULL
+		} else {
+			args = append(args, *fields.Description)
+		}
+		i++
+	}
+
+	if fields.Color != nil {
+		setClauses = append(setClauses, fmt.Sprintf("color = $%d", i))
+		args = append(args, *fields.Color)
+		i++
+	}
+
+	setClauses = append(setClauses, "updated_at = NOW()")
+
+	query := fmt.Sprintf(`
+		UPDATE categories
+		SET %s
+		WHERE id = $1
+		  AND user_id = $2
+		RETURNING id, user_id, name, slug, description, color, created_at, updated_at
+	`, strings.Join(setClauses, ", "))
+
+	var c domain.Category
+
+	if err := scanCategory(r.db.QueryRow(ctx, query, args...), &c); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrCategoryNotFound
+		}
+
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return nil, domain.ErrCategoryAlreadyExists
+		}
+
+		return nil, err
+	}
+
+	return &c, nil
 }
 
 func (r *PostgresRepository) Delete(

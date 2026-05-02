@@ -26,21 +26,28 @@ type getCategoryUseCase interface {
 	Execute(ctx context.Context, userID string, categoryID string) (*domain.Category, error)
 }
 
+type updateCategoryUseCase interface {
+	Execute(ctx context.Context, input application.UpdateCategoryInput) (*domain.Category, error)
+}
+
 type Handler struct {
 	createCategoryUC createCategoryUseCase
 	listCategoriesUC listCategoriesUseCase
 	getCategoryUC    getCategoryUseCase
+	updateCategoryUC updateCategoryUseCase
 }
 
 func NewHandler(
 	createCategoryUC createCategoryUseCase,
 	listCategoriesUC listCategoriesUseCase,
 	getCategoryUC getCategoryUseCase,
+	updateCategoryUC updateCategoryUseCase,
 ) *Handler {
 	return &Handler{
 		createCategoryUC: createCategoryUC,
 		listCategoriesUC: listCategoriesUC,
 		getCategoryUC:    getCategoryUC,
+		updateCategoryUC: updateCategoryUC,
 	}
 }
 
@@ -49,6 +56,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Get("/", h.ListCategories)
 	r.Post("/", h.CreateCategory)
 	r.Get("/{category_id}", h.GetCategory)
+	r.Patch("/{category_id}", h.UpdateCategory)
 	return r
 }
 
@@ -139,6 +147,58 @@ func (h *Handler) GetCategory(w http.ResponseWriter, r *http.Request) {
 			"error", err,
 		)
 		httpresponse.Error(w, http.StatusInternalServerError, "failed to get category")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toCategoryResponse(category))
+}
+
+func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	categoryID := chi.URLParam(r, "category_id")
+
+	var req UpdateCategoryRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpresponse.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	category, err := h.updateCategoryUC.Execute(r.Context(), application.UpdateCategoryInput{
+		UserID:      user.ID,
+		CategoryID:  categoryID,
+		Name:        req.Name,
+		Description: req.Description,
+		Color:       req.Color,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, application.ErrCategoryNameRequired),
+			errors.Is(err, application.ErrCategoryNameTooLong),
+			errors.Is(err, application.ErrCategoryDescriptionTooLong),
+			errors.Is(err, application.ErrCategoryColorNotAllowed):
+			httpresponse.Error(w, http.StatusBadRequest, err.Error())
+
+		case errors.Is(err, domain.ErrCategoryNotFound):
+			httpresponse.Error(w, http.StatusNotFound, "category not found")
+
+		case errors.Is(err, domain.ErrCategoryAlreadyExists):
+			httpresponse.Error(w, http.StatusConflict, err.Error())
+
+		default:
+			slog.ErrorContext(r.Context(), "failed to update category",
+				"user_id", user.ID,
+				"category_id", categoryID,
+				"error", err,
+			)
+			httpresponse.Error(w, http.StatusInternalServerError, "failed to update category")
+		}
+
 		return
 	}
 

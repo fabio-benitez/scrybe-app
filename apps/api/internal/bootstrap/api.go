@@ -67,7 +67,8 @@ func RunAPI(cfg *config.APIConfig) error {
 	createCategoryUC := categoriesapp.NewCreateCategoryUseCase(categoriesRepo)
 	listCategoriesUC := categoriesapp.NewListCategoriesUseCase(categoriesRepo)
 	getCategoryUC := categoriesapp.NewGetCategoryUseCase(categoriesRepo)
-	categoriesHandler := categorieshttp.NewHandler(createCategoryUC, listCategoriesUC, getCategoryUC)
+	updateCategoryUC := categoriesapp.NewUpdateCategoryUseCase(categoriesRepo)
+	categoriesHandler := categorieshttp.NewHandler(createCategoryUC, listCategoriesUC, getCategoryUC, updateCategoryUC)
 
 	// Router
 	r := chi.NewRouter()
