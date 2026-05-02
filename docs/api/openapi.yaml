@@ -265,6 +265,35 @@ paths:
         "500":
           description: Error interno al generar la URL
 
+  /categories:
+    post:
+      summary: Crea una nueva categoría
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCategoryRequest"
+      responses:
+        "201":
+          description: Categoría creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "409":
+          description: Ya existe una categoría con ese nombre
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components
@@ -372,3 +401,54 @@ components:
           type: string
           format: uri
           example: "https://example.supabase.co/storage/v1/object/sign/files/user-id/file-name.png?token=..."
+
+    # =========================
+    # Categories
+    # =========================
+    CreateCategoryRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 80
+          example: Work
+        description:
+          type: string
+          maxLength: 500
+          example: Notas de trabajo
+        color:
+          type: string
+          enum: [gray, red, orange, yellow, green, blue, purple, pink]
+          default: gray
+          example: blue
+
+    CategoryResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: a1b2c3d4-0000-4000-8000-000000000001
+        name:
+          type: string
+          example: Work
+        slug:
+          type: string
+          example: work
+        description:
+          type: string
+          nullable: true
+          example: Notas de trabajo
+        color:
+          type: string
+          enum: [gray, red, orange, yellow, green, blue, purple, pink]
+          example: blue
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
