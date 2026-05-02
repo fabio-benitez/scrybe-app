@@ -1,0 +1,37 @@
+meta {
+  name: List Tags
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{api_base_url}}/tags
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## List Tags
+  
+  Lista todos los tags del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Notas:
+  - Si no hay tags → devuelve []
+  - Ordenados alfabéticamente por name (case-insensitive)
+  
+  ### Respuestas:
+  - 200 → lista de tags
+  - 401 → no autenticado
+  - 500 → error interno
+}

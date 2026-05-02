@@ -1,0 +1,33 @@
+meta {
+  name: Delete Tag
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{api_base_url}}/tags/{{tag_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Delete Tag
+  
+  Elimina un tag del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `tag_id`
+  
+  ### Respuestas:
+  - 204 → tag eliminado (sin body)
+  - 401 → no autenticado
+  - 404 → tag no encontrado (UUID inválido o no existe o no pertenece al usuario)
+  - 500 → error interno
+}
