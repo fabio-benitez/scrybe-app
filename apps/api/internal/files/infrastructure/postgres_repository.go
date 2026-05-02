@@ -248,3 +248,26 @@ func (r *PostgresRepository) MarkFailed(
 
 	return nil
 }
+
+func (r *PostgresRepository) Delete(
+	ctx context.Context,
+	userID string,
+	fileID string,
+) error {
+	query := `
+		DELETE FROM files
+		WHERE user_id = $1
+		  AND id = $2
+	`
+
+	tag, err := r.db.Exec(ctx, query, userID, fileID)
+	if err != nil {
+		return err
+	}
+
+	if tag.RowsAffected() == 0 {
+		return domain.ErrFileNotFound
+	}
+
+	return nil
+}
