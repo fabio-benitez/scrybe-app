@@ -1,0 +1,54 @@
+meta {
+  name: Create Tag
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{api_base_url}}/tags
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "name": "golang"
+  }
+}
+
+tests {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("tag_id", res.body.id);
+  }
+}
+
+docs {
+  ## Create Tag
+  
+  Crea un nuevo tag para el usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Body:
+  - name (string, requerido, 1-50 chars)
+  
+  ### Notas:
+  - El slug se genera automáticamente desde el name.
+  - Si name o slug ya existen para el usuario → 409.
+  
+  ### Respuestas:
+  - 201 → tag creado
+  - 400 → datos inválidos
+  - 401 → no autenticado
+  - 409 → nombre o slug ya existe
+  - 500 → error interno
+}

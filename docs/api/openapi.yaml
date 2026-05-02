@@ -265,6 +265,36 @@ paths:
         "500":
           description: Error interno al generar la URL
 
+  /tags:
+    post:
+      summary: Crea un nuevo tag
+      tags:
+        - Tags
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTagRequest"
+      responses:
+        "201":
+          description: Tag creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: Datos inválidos
+        "401":
+          description: No autenticado
+        "409":
+          description: Ya existe un tag con ese nombre
+        "500":
+          description: Error interno
+
+
   /categories:
     get:
       summary: Lista todas las categorías del usuario autenticado
@@ -582,6 +612,40 @@ components:
           type: string
           enum: [gray, red, orange, yellow, green, blue, purple, pink]
           example: blue
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    # =========================
+    # Tags
+    # =========================
+    CreateTagRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 50
+          example: golang
+
+    TagResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: b2c3d4e5-0000-4000-8000-000000000002
+        name:
+          type: string
+          example: golang
+        slug:
+          type: string
+          example: golang
         created_at:
           type: string
           format: date-time

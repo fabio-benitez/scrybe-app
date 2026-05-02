@@ -19,6 +19,9 @@ import (
 	profileapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/profile/application"
 	profilehttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/profile/delivery/http"
 	profileinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/profile/infrastructure"
+	tagsapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/tags/application"
+	tagshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/tags/delivery/http"
+	tagsinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/tags/infrastructure"
 	"github.com/go-chi/chi/v5"
 	middlewareChi "github.com/go-chi/chi/v5/middleware"
 )
@@ -71,6 +74,10 @@ func RunAPI(cfg *config.APIConfig) error {
 	deleteCategoryUC := categoriesapp.NewDeleteCategoryUseCase(categoriesRepo)
 	categoriesHandler := categorieshttp.NewHandler(createCategoryUC, listCategoriesUC, getCategoryUC, updateCategoryUC, deleteCategoryUC)
 
+	tagsRepo := tagsinfra.NewPostgresRepository(dbPool)
+	createTagUC := tagsapp.NewCreateTagUseCase(tagsRepo)
+	tagsHandler := tagshttp.NewHandler(createTagUC)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -87,6 +94,7 @@ func RunAPI(cfg *config.APIConfig) error {
 			r.Mount("/profile", profileHandler.Routes())
 			r.Mount("/files", filesHandler.Routes())
 			r.Mount("/categories", categoriesHandler.Routes())
+			r.Mount("/tags", tagsHandler.Routes())
 		})
 	})
 
