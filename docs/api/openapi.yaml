@@ -382,6 +382,30 @@ paths:
         "500":
           description: Error interno
 
+    delete:
+      summary: Elimina una categoría
+      tags:
+        - Categories
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: category_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID de la categoría
+      responses:
+        "204":
+          description: Categoría eliminada
+        "401":
+          description: No autenticado
+        "404":
+          description: Categoría no encontrada
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components

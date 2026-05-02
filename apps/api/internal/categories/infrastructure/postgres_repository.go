@@ -193,8 +193,22 @@ func (r *PostgresRepository) Delete(
 	userID string,
 	categoryID string,
 ) error {
-	// Implemented in DELETE /categories/{id} phase.
-	return errors.New("not implemented")
+	query := `
+		DELETE FROM categories
+		WHERE id = $1
+		  AND user_id = $2
+	`
+
+	result, err := r.db.Exec(ctx, query, categoryID, userID)
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return domain.ErrCategoryNotFound
+	}
+
+	return nil
 }
 
 // scanCategory reads a category row into a domain.Category.

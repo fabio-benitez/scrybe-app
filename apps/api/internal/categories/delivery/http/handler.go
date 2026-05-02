@@ -30,11 +30,16 @@ type updateCategoryUseCase interface {
 	Execute(ctx context.Context, input application.UpdateCategoryInput) (*domain.Category, error)
 }
 
+type deleteCategoryUseCase interface {
+	Execute(ctx context.Context, input application.DeleteCategoryInput) error
+}
+
 type Handler struct {
 	createCategoryUC createCategoryUseCase
 	listCategoriesUC listCategoriesUseCase
 	getCategoryUC    getCategoryUseCase
 	updateCategoryUC updateCategoryUseCase
+	deleteCategoryUC deleteCategoryUseCase
 }
 
 func NewHandler(
@@ -42,12 +47,14 @@ func NewHandler(
 	listCategoriesUC listCategoriesUseCase,
 	getCategoryUC getCategoryUseCase,
 	updateCategoryUC updateCategoryUseCase,
+	deleteCategoryUC deleteCategoryUseCase,
 ) *Handler {
 	return &Handler{
 		createCategoryUC: createCategoryUC,
 		listCategoriesUC: listCategoriesUC,
 		getCategoryUC:    getCategoryUC,
 		updateCategoryUC: updateCategoryUC,
+		deleteCategoryUC: deleteCategoryUC,
 	}
 }
 
@@ -57,6 +64,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Post("/", h.CreateCategory)
 	r.Get("/{category_id}", h.GetCategory)
 	r.Patch("/{category_id}", h.UpdateCategory)
+	r.Delete("/{category_id}", h.DeleteCategory)
 	return r
 }
 
@@ -203,6 +211,37 @@ func (h *Handler) UpdateCategory(w http.ResponseWriter, r *http.Request) {
 	}
 
 	httpresponse.JSON(w, http.StatusOK, toCategoryResponse(category))
+}
+
+func (h *Handler) DeleteCategory(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	categoryID := chi.URLParam(r, "category_id")
+
+	err := h.deleteCategoryUC.Execute(r.Context(), application.DeleteCategoryInput{
+		UserID:     user.ID,
+		CategoryID: categoryID,
+	})
+	if err != nil {
+		if errors.Is(err, domain.ErrCategoryNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "category not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to delete category",
+			"user_id", user.ID,
+			"category_id", categoryID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to delete category")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func toCategoryResponse(c *domain.Category) CategoryResponse {
