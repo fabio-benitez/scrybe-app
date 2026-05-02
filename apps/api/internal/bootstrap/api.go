@@ -44,6 +44,7 @@ func RunAPI(cfg *config.APIConfig) error {
 	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
 	getFileUC := filesapp.NewGetFileUseCase(filesRepo)
 	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage)
+	getFileURLUC := filesapp.NewGetFileURLUseCase(filesRepo, filesStorage)
 	uploadFileUC, err := filesapp.NewUploadFileUseCase(
 		filesRepo,
 		filesStorage,
@@ -54,7 +55,7 @@ func RunAPI(cfg *config.APIConfig) error {
 	if err != nil {
 		return err
 	}
-	filesHandler := fileshttp.NewHandler(uploadFileUC, getFileUC, deleteFileUC, cfg.Storage.MaxUploadBytes)
+	filesHandler := fileshttp.NewHandler(uploadFileUC, getFileUC, deleteFileUC, getFileURLUC, cfg.Storage.MaxUploadBytes)
 
 	// Router
 	r := chi.NewRouter()
