@@ -1,0 +1,43 @@
+meta {
+  name: Update Avatar
+  type: http
+  seq: 3
+}
+
+patch {
+  url: {{api_base_url}}/profile/avatar
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "file_id": "{{file_id}}"
+  }
+}
+
+docs {
+  ## Update Avatar
+  
+  Establece el avatar del usuario autenticado a partir de un archivo ya subido.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Body:
+  - file_id (uuid, requerido): ID de un archivo con upload_status = uploaded y MIME image/jpeg, image/png o image/webp.
+  
+  ### Respuestas:
+  - 200: perfil actualizado
+  - 400: file_id vacío o UUID inválido
+  - 404: archivo no encontrado o sin acceso
+  - 422: archivo no listo o MIME no permitido
+}

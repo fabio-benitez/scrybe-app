@@ -14,3 +14,7 @@ type ProfileResponse struct {
 type UpdateProfileRequest struct {
 	DisplayName string `json:"display_name"`
 }
+
+type UpdateAvatarRequest struct {
+	FileID string `json:"file_id"`
+}

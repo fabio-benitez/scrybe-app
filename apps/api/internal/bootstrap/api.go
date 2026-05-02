@@ -35,15 +35,17 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	authMiddleware := authhttp.NewMiddleware(jwtValidator)
 
+	filesRepo := filesinfra.NewPostgresRepository(dbPool)
+	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
+	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage)
+
 	profileRepo := profileinfra.NewPostgresRepository(dbPool)
 	getProfileUC := profileapp.NewGetProfileUseCase(profileRepo)
 	updateProfileUC := profileapp.NewUpdateProfileUseCase(profileRepo)
-	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC)
+	updateAvatarUC := profileapp.NewUpdateAvatarUseCase(profileRepo, filesRepo, deleteFileUC)
+	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC, updateAvatarUC)
 
-	filesRepo := filesinfra.NewPostgresRepository(dbPool)
-	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
 	getFileUC := filesapp.NewGetFileUseCase(filesRepo)
-	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage)
 	getFileURLUC := filesapp.NewGetFileURLUseCase(filesRepo, filesStorage)
 	uploadFileUC, err := filesapp.NewUploadFileUseCase(
 		filesRepo,
