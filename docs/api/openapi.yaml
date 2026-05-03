@@ -691,6 +691,40 @@ paths:
         "500":
           description: Error interno
 
+  /contents/{content_id}/files:
+    get:
+      summary: Lista los archivos asociados a un contenido
+      description: |
+        Devuelve los archivos asociados al contenido ordenados por position ASC, created_at ASC.
+        Si el contenido no tiene archivos → devuelve [].
+      tags:
+        - Content Files
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      responses:
+        "200":
+          description: Lista de archivos del contenido (vacía si no tiene ninguno)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentFileResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido no encontrado o no pertenece al usuario
+        "500":
+          description: Error interno
+
   /contents/{content_id}/tags:
     get:
       summary: Lista los tags asociados a un contenido
@@ -997,6 +1031,36 @@ components:
         updated_at:
           type: string
           format: date-time
+
+    # =========================
+    # Content Files
+    # =========================
+    ContentFileResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        original_name:
+          type: string
+        mime_type:
+          type: string
+        size_bytes:
+          type: integer
+          format: int64
+        upload_status:
+          type: string
+          enum: [uploaded]
+        created_at:
+          type: string
+          format: date-time
+        uploaded_at:
+          type: string
+          format: date-time
+          nullable: true
+        position:
+          type: integer
+          minimum: 0
 
     # =========================
     # Content Tags

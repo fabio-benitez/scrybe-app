@@ -9,6 +9,9 @@ import (
 	categorieshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/delivery/http"
 	categoriesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/infrastructure"
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/config"
+	contentfilesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contentfiles/application"
+	contentfileshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contentfiles/delivery/http"
+	contentfilesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/contentfiles/infrastructure"
 	contentsapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/application"
 	contentshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/delivery/http"
 	contentsinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/infrastructure"
@@ -101,6 +104,10 @@ func RunAPI(cfg *config.APIConfig) error {
 	replaceContentTagsUC := contenttagsapp.NewReplaceContentTagsUseCase(contentTagsRepo)
 	contentTagsHandler := contenttagshttp.NewHandler(listContentTagsUC, replaceContentTagsUC)
 
+	contentFilesRepo := contentfilesinfra.NewPostgresRepository(dbPool)
+	listContentFilesUC := contentfilesapp.NewListContentFilesUseCase(contentFilesRepo)
+	contentFilesHandler := contentfileshttp.NewHandler(listContentFilesUC)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -126,6 +133,7 @@ func RunAPI(cfg *config.APIConfig) error {
 					r.Patch("/", contentsHandler.UpdateContent)
 					r.Delete("/", contentsHandler.DeleteContent)
 					r.Mount("/tags", contentTagsHandler.Routes())
+					r.Mount("/files", contentFilesHandler.Routes())
 				})
 			})
 		})
