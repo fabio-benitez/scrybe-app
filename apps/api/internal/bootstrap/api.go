@@ -98,7 +98,8 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	contentTagsRepo := contenttagsinfra.NewPostgresRepository(dbPool)
 	listContentTagsUC := contenttagsapp.NewListContentTagsUseCase(contentTagsRepo)
-	contentTagsHandler := contenttagshttp.NewHandler(listContentTagsUC)
+	replaceContentTagsUC := contenttagsapp.NewReplaceContentTagsUseCase(contentTagsRepo)
+	contentTagsHandler := contenttagshttp.NewHandler(listContentTagsUC, replaceContentTagsUC)
 
 	// Router
 	r := chi.NewRouter()

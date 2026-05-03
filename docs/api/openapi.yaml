@@ -694,6 +694,9 @@ paths:
   /contents/{content_id}/tags:
     get:
       summary: Lista los tags asociados a un contenido
+      description: |
+        Devuelve los tags asociados al contenido ordenados por nombre (LOWER ASC).
+        Si el contenido no tiene tags → devuelve [].
       tags:
         - Content Tags
       security:
@@ -719,6 +722,50 @@ paths:
           description: No autenticado
         "404":
           description: Contenido no encontrado o no pertenece al usuario
+        "500":
+          description: Error interno
+
+    put:
+      summary: Reemplaza completamente los tags asociados a un contenido
+      description: |
+        Reemplaza de forma atómica todos los tags del contenido con la lista proporcionada.
+        - `tag_ids: []` → elimina todos los tags del contenido.
+        - `tag_ids: null` o campo ausente → 400.
+        - IDs duplicados en la lista se ignoran (deduplicación interna).
+        - Devuelve la lista final de tags ordenada por nombre (LOWER ASC).
+      tags:
+        - Content Tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetContentTagsRequest"
+      responses:
+        "200":
+          description: Lista final de tags asociados al contenido (vacía si tag_ids era [])
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponse"
+        "400":
+          description: tag_ids ausente, null, o contiene un UUID con formato inválido
+        "401":
+          description: No autenticado
+        "404":
+          description: Recurso no encontrado (contenido o tag)
         "500":
           description: Error interno
 
@@ -950,6 +997,25 @@ components:
         updated_at:
           type: string
           format: date-time
+
+    # =========================
+    # Content Tags
+    # =========================
+    SetContentTagsRequest:
+      type: object
+      required:
+        - tag_ids
+      properties:
+        tag_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: |
+            Lista completa de tag IDs a asociar al contenido.
+            [] → elimina todos los tags del contenido.
+            null o campo ausente → 400.
+          example: ["b2c3d4e5-0000-4000-8000-000000000002"]
 
     # =========================
     # Contents

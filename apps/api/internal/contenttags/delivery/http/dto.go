@@ -14,6 +14,10 @@ type TagResponse struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
+type SetContentTagsRequest struct {
+	TagIDs *[]string `json:"tag_ids"`
+}
+
 func toTagResponse(t *domain.Tag) TagResponse {
 	return TagResponse{
 		ID:        t.ID,
