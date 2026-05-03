@@ -14,7 +14,12 @@ docs {
   1. Sign Up (`/auth/v1/signup`)
   2. Login (`/auth/v1/token`)
   3. Guardar `access_token`
-  4. Usar endpoints protegidos (`/profile`, `/files`, `/categories`, `/tags`, `/contents`)
+  4. Crear recursos base:
+     - category
+     - tag
+     - file
+     - content
+  5. Usar endpoints protegidos y relaciones
   
   ## Módulos
   
@@ -25,6 +30,8 @@ docs {
   - `categories` → gestión de categorías del usuario
   - `tags` → gestión de tags del usuario
   - `contents` → gestión de contenidos/notas del usuario
+  - `content_tags` → gestión de tags asociados a un contenido
+  - `content_files` → gestión de archivos asociados a un contenido
   
   ## Variables
   
@@ -42,4 +49,6 @@ docs {
   - Los endpoints de auth pertenecen a Supabase
   - La API de Scrybe solo valida JWT
   - El contrato oficial de la API está en `docs/api/openapi.yaml`
+  - Los endpoints de `content_tags` y `content_files` usan replace completo (PUT)
+  - Para eliminar una relación individual, enviar el array sin ese ID
 }
