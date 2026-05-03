@@ -1,0 +1,73 @@
+meta {
+  name: Create Content
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{api_base_url}}/contents
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Mi primer contenido",
+    "summary": "Un resumen breve del contenido.",
+    "content": {
+      "type": "doc",
+      "content": []
+    },
+    "category_id": null,
+    "status": "draft",
+    "visibility": "private",
+    "is_favorite": false
+  }
+}
+
+tests {
+  if (res.status === 201 && res.body.id) {
+    bru.setEnvVar("content_id", res.body.id);
+  }
+}
+
+docs {
+  ## Create Content
+  
+  Crea un nuevo contenido para el usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Body:
+  - title (string, requerido, 1-200 chars)
+  - summary (string, opcional, máx. 500 chars). "" → se guarda como NULL.
+  - content (object JSON, requerido). Debe ser un objeto JSON válido (TipTap/ProseMirror).
+  - status (string, opcional): draft | published | archived. Default: draft.
+  - visibility (string, opcional): private | public. Default: private.
+  - is_favorite (boolean, opcional). Default: false.
+  - category_id (UUID string, opcional). Omitido o null → sin categoría.
+  
+  ### Notas:
+  - El slug se genera automáticamente desde el title. Si el title no produce slug válido → slug null.
+  - Si status es published → published_at se establece al momento de la creación.
+  - UUID inválido en category_id → 400.
+  - Categoría inexistente o de otro usuario → 404.
+  - Si el slug generado desde title ya existe para el usuario → 409.
+  
+  ### Respuestas:
+  - 201 → contenido creado
+  - 400 → datos inválidos
+  - 401 → no autenticado
+  - 404 → categoría no encontrada
+  - 409 → slug duplicado
+  - 500 → error interno
+}

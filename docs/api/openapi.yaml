@@ -549,6 +549,149 @@ paths:
           description: Error interno
 
 
+  /contents:
+    get:
+      summary: Lista todos los contenidos del usuario autenticado
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Lista de contenidos (vacía si no hay ninguno)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentResponse"
+        "401":
+          description: No autenticado
+        "500":
+          description: Error interno
+
+    post:
+      summary: Crea un nuevo contenido
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateContentRequest"
+      responses:
+        "201":
+          description: Contenido creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentResponse"
+        "400":
+          description: Datos inválidos (título, content, status, visibility o category_id)
+        "401":
+          description: No autenticado
+        "404":
+          description: Categoría no encontrada o no pertenece al usuario
+        "409":
+          description: Ya existe un contenido con ese slug
+        "500":
+          description: Error interno
+
+  /contents/{content_id}:
+    get:
+      summary: Obtiene un contenido por ID
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      responses:
+        "200":
+          description: Contenido encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido no encontrado
+        "500":
+          description: Error interno
+
+    patch:
+      summary: Actualiza parcialmente un contenido
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContentRequest"
+      responses:
+        "200":
+          description: Contenido actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentResponse"
+        "400":
+          description: Datos inválidos (título vacío, content no-objeto, status/visibility inválido, category_id mal formado)
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido o categoría no encontrados
+        "409":
+          description: Ya existe un contenido con ese slug
+        "500":
+          description: Error interno
+
+    delete:
+      summary: Elimina un contenido
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      responses:
+        "204":
+          description: Contenido eliminado correctamente
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido no encontrado
+        "500":
+          description: Error interno
+
+
 # =========================
 # Components
 # =========================
@@ -776,3 +919,154 @@ components:
         updated_at:
           type: string
           format: date-time
+
+    # =========================
+    # Contents
+    # =========================
+    CreateContentRequest:
+      type: object
+      required:
+        - title
+        - content
+      properties:
+        category_id:
+          type: string
+          format: uuid
+          nullable: true
+          description: |
+            Omitido o null → sin categoría.
+            UUID inválido → 400.
+            Categoría inexistente o de otro usuario → 404.
+          example: null
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: Mi primer contenido
+        summary:
+          type: string
+          maxLength: 500
+          description: Omitido o "" → se guarda como NULL.
+          example: Un resumen breve del contenido.
+        content:
+          type: object
+          description: Documento JSON del editor (TipTap/ProseMirror). Debe ser un objeto JSON.
+          example: {"type": "doc", "content": []}
+        status:
+          type: string
+          enum: [draft, published, archived]
+          default: draft
+          description: Omitido → draft.
+          example: draft
+        visibility:
+          type: string
+          enum: [private, public]
+          default: private
+          description: Omitido → private.
+          example: private
+        is_favorite:
+          type: boolean
+          default: false
+          example: false
+
+    UpdateContentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Omitido → sin cambio. "" o solo espacios → 400.
+          example: Título actualizado
+        summary:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: |
+            Omitido o null → sin cambio.
+            "" → se guarda como NULL.
+          example: Nuevo resumen.
+        content:
+          type: object
+          nullable: true
+          description: |
+            Omitido → sin cambio.
+            null, array, string → 400.
+            Debe ser un objeto JSON.
+          example: {"type": "doc", "content": []}
+        category_id:
+          nullable: true
+          description: |
+            Omitido → sin cambio.
+            null → desasociar categoría.
+            string UUID → asignar categoría.
+            UUID inválido → 400.
+            Categoría inexistente o de otro usuario → 404.
+          example: null
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: |
+            Omitido → sin cambio.
+            published → published_at se establece si era null (idempotente).
+            draft/archived → published_at se mantiene como historial.
+          example: published
+        visibility:
+          type: string
+          enum: [private, public]
+          description: Omitido → sin cambio.
+          example: public
+        is_favorite:
+          type: boolean
+          description: Omitido → sin cambio. false explícito actualiza correctamente.
+          example: true
+
+    ContentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: c1d2e3f4-0000-4000-8000-000000000003
+        category_id:
+          type: string
+          format: uuid
+          nullable: true
+          example: null
+        title:
+          type: string
+          example: Mi primer contenido
+        slug:
+          type: string
+          nullable: true
+          example: mi-primer-contenido
+        summary:
+          type: string
+          nullable: true
+          example: Un resumen breve del contenido.
+        content:
+          type: object
+          description: Documento JSON del editor.
+          example: {"type": "doc", "content": []}
+        status:
+          type: string
+          enum: [draft, published, archived]
+          example: draft
+        visibility:
+          type: string
+          enum: [private, public]
+          example: private
+        is_favorite:
+          type: boolean
+          example: false
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        published_at:
+          type: string
+          format: date-time
+          nullable: true
+          example: null

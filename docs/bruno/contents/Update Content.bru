@@ -1,0 +1,81 @@
+meta {
+  name: Update Content
+  type: http
+  seq: 4
+}
+
+patch {
+  url: {{api_base_url}}/contents/{{content_id}}
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "title": "Título actualizado",
+    "summary": "Nuevo resumen del contenido.",
+    "content": {
+      "type": "doc",
+      "content": []
+    },
+    "status": "draft",
+    "visibility": "private",
+    "is_favorite": false
+  }
+}
+
+docs {
+  ## Update Content
+  
+  Actualiza parcialmente un contenido del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `content_id`
+  
+  ### Comportamiento por campo:
+  - title: omitido → sin cambio; "" o solo espacios → 400; si cambia → slug regenerado
+  - summary:
+    - omitido o null → sin cambio
+    - "" → se guarda como NULL
+    - máx. 500 chars
+  - content:
+    - omitido → sin cambio
+    - null, array, string → 400
+    - debe ser un objeto JSON
+  - status:
+    - omitido → sin cambio
+    - published → published_at se establece si era null (COALESCE idempotente)
+    - draft/archived → published_at se mantiene como historial
+  - visibility: omitido → sin cambio
+  - is_favorite: omitido → sin cambio; false explícito actualiza correctamente
+  - category_id:
+    - omitido → sin cambio
+    - null → desasociar categoría
+    - string UUID → asignar categoría
+    - UUID inválido → 400
+    - categoría inexistente o de otro usuario → 404
+  
+  ### Notas:
+  - {} vacío → devuelve el estado actual sin modificar updated_at
+  - UUID inválido en path → 404
+  - Slug duplicado (por cambio de title) → 409
+  
+  ### Respuestas:
+  - 200 → contenido actualizado
+  - 400 → datos inválidos
+  - 401 → no autenticado
+  - 404 → contenido o categoría no encontrados
+  - 409 → slug duplicado
+  - 500 → error interno
+}
