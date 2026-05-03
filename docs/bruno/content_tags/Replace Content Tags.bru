@@ -1,0 +1,44 @@
+meta {
+  name: Replace Content Tags
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{api_base_url}}/contents/{{content_id}}/tags
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "tag_ids": ["{{tag_id}}"]
+  }
+}
+
+docs {
+  ## Replace Content Tags
+
+  Reemplaza completamente los tags asociados a un contenido.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Notas:
+  - tag_ids: [] → elimina todos los tags del contenido
+  - tag_ids: null o campo ausente → 400
+  - IDs duplicados en la lista se ignoran (deduplicación interna)
+  - UUID de tag inválido → 400
+  - Tag inexistente o de otro usuario → 404
+  - Contenido inexistente o de otro usuario → 404
+  - Devuelve la lista final de tags ordenada por nombre (LOWER ASC)
+}

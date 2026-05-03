@@ -12,6 +12,9 @@ import (
 	contentsapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/application"
 	contentshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/delivery/http"
 	contentsinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/infrastructure"
+	contenttagsapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contenttags/application"
+	contenttagshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contenttags/delivery/http"
+	contenttagsinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/contenttags/infrastructure"
 	filesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/application"
 	fileshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/delivery/http"
 	filesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/infrastructure"
@@ -93,6 +96,11 @@ func RunAPI(cfg *config.APIConfig) error {
 	deleteContentUC := contentsapp.NewDeleteContentUseCase(contentsRepo)
 	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, updateContentUC, deleteContentUC)
 
+	contentTagsRepo := contenttagsinfra.NewPostgresRepository(dbPool)
+	listContentTagsUC := contenttagsapp.NewListContentTagsUseCase(contentTagsRepo)
+	replaceContentTagsUC := contenttagsapp.NewReplaceContentTagsUseCase(contentTagsRepo)
+	contentTagsHandler := contenttagshttp.NewHandler(listContentTagsUC, replaceContentTagsUC)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -110,7 +118,16 @@ func RunAPI(cfg *config.APIConfig) error {
 			r.Mount("/files", filesHandler.Routes())
 			r.Mount("/categories", categoriesHandler.Routes())
 			r.Mount("/tags", tagsHandler.Routes())
-			r.Mount("/contents", contentsHandler.Routes())
+			r.Route("/contents", func(r chi.Router) {
+				r.Get("/", contentsHandler.ListContents)
+				r.Post("/", contentsHandler.CreateContent)
+				r.Route("/{content_id}", func(r chi.Router) {
+					r.Get("/", contentsHandler.GetContent)
+					r.Patch("/", contentsHandler.UpdateContent)
+					r.Delete("/", contentsHandler.DeleteContent)
+					r.Mount("/tags", contentTagsHandler.Routes())
+				})
+			})
 		})
 	})
 

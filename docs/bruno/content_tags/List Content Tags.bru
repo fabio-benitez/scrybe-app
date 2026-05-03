@@ -1,0 +1,33 @@
+meta {
+  name: List Content Tags
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api_base_url}}/contents/{{content_id}}/tags
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## List Content Tags
+
+  Lista todos los tags asociados a un contenido del usuario autenticado.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Notas:
+  - Si el contenido no tiene tags → devuelve []
+  - Si el content_id no existe o no pertenece al usuario → 404
+  - Si el content_id es un UUID inválido → 404
+}
