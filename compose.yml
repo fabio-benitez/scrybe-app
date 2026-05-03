@@ -29,7 +29,7 @@ services:
     environment:
       SWAGGER_JSON: /spec/openapi.yaml
     volumes:
-      - ./docs/api/openapi.yaml:/spec/openapi.yaml:ro
+      - ./docs/api/src:/spec:ro
     ports:
       - "8082:8080"
     restart: unless-stopped

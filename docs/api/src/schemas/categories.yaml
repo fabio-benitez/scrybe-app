@@ -1,0 +1,65 @@
+CreateCategoryRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 80
+      example: Work
+    description:
+      type: string
+      maxLength: 500
+      example: Notas de trabajo
+    color:
+      allOf:
+        - $ref: "./common.yaml#/Color"
+      default: gray
+      example: blue
+
+UpdateCategoryRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 80
+      example: Work updated
+    description:
+      type: string
+      maxLength: 500
+      nullable: true
+      description: |
+        Omitido o null → sin cambio.
+        "" → se guarda como NULL.
+      example: Nueva descripción
+    color:
+      allOf:
+        - $ref: "./common.yaml#/Color"
+      description: |
+        Omitido → sin cambio.
+        "" → se convierte en "gray".
+      example: purple
+
+CategoryResponse:
+  type: object
+  properties:
+    id:
+      $ref: "./common.yaml#/UUID"
+    name:
+      type: string
+      example: Work
+    slug:
+      type: string
+      example: work
+    description:
+      type: string
+      nullable: true
+      example: Notas de trabajo
+    color:
+      $ref: "./common.yaml#/Color"
+    created_at:
+      $ref: "./common.yaml#/DateTime"
+    updated_at:
+      $ref: "./common.yaml#/DateTime"

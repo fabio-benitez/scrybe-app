@@ -1,0 +1,118 @@
+openapi: 3.0.3
+
+info:
+  title: Scrybe API
+  version: 0.1.0
+  description: API REST para la aplicación Scrybe.
+
+servers:
+  - url: http://localhost:8081/api/v1
+    description: Entorno local
+
+paths:
+  /health:
+    $ref: "./paths/health.yaml#/health"
+  /health/db:
+    $ref: "./paths/health.yaml#/health-db"
+
+  /profile:
+    $ref: "./paths/profile.yaml#/profile"
+  /profile/avatar:
+    $ref: "./paths/profile.yaml#/profile-avatar"
+
+  /files:
+    $ref: "./paths/files.yaml#/files"
+  /files/{file_id}:
+    $ref: "./paths/files.yaml#/file-by-id"
+  /files/{file_id}/url:
+    $ref: "./paths/files.yaml#/file-url"
+
+  /categories:
+    $ref: "./paths/categories.yaml#/categories"
+  /categories/{category_id}:
+    $ref: "./paths/categories.yaml#/category-by-id"
+
+  /tags:
+    $ref: "./paths/tags.yaml#/tags"
+  /tags/{tag_id}:
+    $ref: "./paths/tags.yaml#/tag-by-id"
+
+  /contents:
+    $ref: "./paths/contents.yaml#/contents"
+  /contents/{content_id}:
+    $ref: "./paths/contents.yaml#/content-by-id"
+
+  /contents/{content_id}/tags:
+    $ref: "./paths/content-tags.yaml#/content-tags"
+
+  /contents/{content_id}/files:
+    $ref: "./paths/content-files.yaml#/content-files"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UUID:
+      $ref: "./schemas/common.yaml#/UUID"
+    DateTime:
+      $ref: "./schemas/common.yaml#/DateTime"
+    NullableDateTime:
+      $ref: "./schemas/common.yaml#/NullableDateTime"
+    Color:
+      $ref: "./schemas/common.yaml#/Color"
+    ContentStatus:
+      $ref: "./schemas/common.yaml#/ContentStatus"
+    ContentVisibility:
+      $ref: "./schemas/common.yaml#/ContentVisibility"
+    UploadStatus:
+      $ref: "./schemas/common.yaml#/UploadStatus"
+    UploadedOnlyStatus:
+      $ref: "./schemas/common.yaml#/UploadedOnlyStatus"
+      
+    HealthResponse:
+      $ref: "./schemas/health.yaml#/HealthResponse"
+
+    UpdateProfileRequest:
+      $ref: "./schemas/profile.yaml#/UpdateProfileRequest"
+    UpdateAvatarRequest:
+      $ref: "./schemas/profile.yaml#/UpdateAvatarRequest"
+    ProfileResponse:
+      $ref: "./schemas/profile.yaml#/ProfileResponse"
+
+    FileResponse:
+      $ref: "./schemas/files.yaml#/FileResponse"
+    FileURLResponse:
+      $ref: "./schemas/files.yaml#/FileURLResponse"
+
+    CreateCategoryRequest:
+      $ref: "./schemas/categories.yaml#/CreateCategoryRequest"
+    UpdateCategoryRequest:
+      $ref: "./schemas/categories.yaml#/UpdateCategoryRequest"
+    CategoryResponse:
+      $ref: "./schemas/categories.yaml#/CategoryResponse"
+
+    CreateTagRequest:
+      $ref: "./schemas/tags.yaml#/CreateTagRequest"
+    UpdateTagRequest:
+      $ref: "./schemas/tags.yaml#/UpdateTagRequest"
+    TagResponse:
+      $ref: "./schemas/tags.yaml#/TagResponse"
+
+    CreateContentRequest:
+      $ref: "./schemas/contents.yaml#/CreateContentRequest"
+    UpdateContentRequest:
+      $ref: "./schemas/contents.yaml#/UpdateContentRequest"
+    ContentResponse:
+      $ref: "./schemas/contents.yaml#/ContentResponse"
+
+    SetContentTagsRequest:
+      $ref: "./schemas/content-tags.yaml#/SetContentTagsRequest"
+
+    ContentFileResponse:
+      $ref: "./schemas/content-files.yaml#/ContentFileResponse"
+    SetContentFilesRequest:
+      $ref: "./schemas/content-files.yaml#/SetContentFilesRequest"

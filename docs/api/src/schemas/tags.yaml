@@ -1,0 +1,38 @@
+CreateTagRequest:
+  type: object
+  required:
+    - name
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 50
+      example: golang
+
+UpdateTagRequest:
+  type: object
+  properties:
+    name:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: |
+        Omitido → sin cambio (devuelve el tag actual).
+        Si se envía → trim, requerido, máx. 50 chars, slug regenerado.
+      example: rust
+
+TagResponse:
+  type: object
+  properties:
+    id:
+      $ref: "./common.yaml#/UUID"
+    name:
+      type: string
+      example: golang
+    slug:
+      type: string
+      example: golang
+    created_at:
+      $ref: "./common.yaml#/DateTime"
+    updated_at:
+      $ref: "./common.yaml#/DateTime"

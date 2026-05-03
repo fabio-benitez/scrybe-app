@@ -1,0 +1,14 @@
+SetContentTagsRequest:
+  type: object
+  required:
+    - tag_ids
+  properties:
+    tag_ids:
+      type: array
+      items:
+        $ref: "./common.yaml#/UUID"
+      description: |
+        Lista completa de tag IDs a asociar al contenido.
+        [] → elimina todos los tags del contenido.
+        null o campo ausente → 400.
+      example: ["b2c3d4e5-0000-4000-8000-000000000002"]

@@ -1,0 +1,32 @@
+UUID:
+  type: string
+  format: uuid
+
+DateTime:
+  type: string
+  format: date-time
+
+NullableDateTime:
+  type: string
+  format: date-time
+  nullable: true
+
+Color:
+  type: string
+  enum: [gray, red, orange, yellow, green, blue, purple, pink]
+
+ContentStatus:
+  type: string
+  enum: [draft, published, archived]
+
+ContentVisibility:
+  type: string
+  enum: [private, public]
+
+UploadStatus:
+  type: string
+  enum: [pending, uploaded, failed]
+
+UploadedOnlyStatus:
+  type: string
+  enum: [uploaded]

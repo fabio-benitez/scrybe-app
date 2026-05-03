@@ -1,0 +1,26 @@
+FileResponse:
+  type: object
+  properties:
+    id:
+      $ref: "./common.yaml#/UUID"
+    original_name:
+      type: string
+    mime_type:
+      type: string
+    size_bytes:
+      type: integer
+      format: int64
+    upload_status:
+      $ref: "./common.yaml#/UploadStatus"
+    created_at:
+      $ref: "./common.yaml#/DateTime"
+    uploaded_at:
+      $ref: "./common.yaml#/NullableDateTime"
+
+FileURLResponse:
+  type: object
+  properties:
+    url:
+      type: string
+      format: uri
+      example: "https://example.supabase.co/storage/v1/object/sign/files/user-id/file-name.png?token=..."
