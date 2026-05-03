@@ -89,7 +89,8 @@ func RunAPI(cfg *config.APIConfig) error {
 	createContentUC := contentsapp.NewCreateContentUseCase(contentsRepo)
 	listContentsUC := contentsapp.NewListContentsUseCase(contentsRepo)
 	getContentUC := contentsapp.NewGetContentUseCase(contentsRepo)
-	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, nil, nil)
+	updateContentUC := contentsapp.NewUpdateContentUseCase(contentsRepo)
+	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, updateContentUC, nil)
 
 	// Router
 	r := chi.NewRouter()

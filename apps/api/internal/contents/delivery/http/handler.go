@@ -63,6 +63,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Get("/", h.ListContents)
 	r.Post("/", h.CreateContent)
 	r.Get("/{content_id}", h.GetContent)
+	r.Patch("/{content_id}", h.UpdateContent)
 	return r
 }
 
@@ -163,6 +164,97 @@ func (h *Handler) GetContent(w http.ResponseWriter, r *http.Request) {
 			"error", err,
 		)
 		httpresponse.Error(w, http.StatusInternalServerError, "failed to get content")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toContentResponse(content))
+}
+
+func (h *Handler) UpdateContent(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	contentID := chi.URLParam(r, "content_id")
+
+	var req UpdateContentRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httpresponse.Error(w, http.StatusBadRequest, "invalid request body")
+		return
+	}
+
+	// Parse content: NullableRawMessage distinguishes absent / null / value.
+	var contentInput *json.RawMessage
+	if req.Content.Present {
+		if req.Content.Null {
+			httpresponse.Error(w, http.StatusBadRequest, application.ErrContentInvalidJSON.Error())
+			return
+		}
+		contentInput = &req.Content.Value
+	}
+
+	// Parse category_id: NullableRawMessage → **string.
+	var categoryIDInput **string
+
+	if req.CategoryID.Present {
+		if req.CategoryID.Null {
+			var nilStr *string
+			categoryIDInput = &nilStr
+		} else {
+			var uuidStr string
+			if err := json.Unmarshal(req.CategoryID.Value, &uuidStr); err != nil || uuidStr == "" {
+				httpresponse.Error(w, http.StatusBadRequest, application.ErrContentCategoryIDInvalid.Error())
+				return
+			}
+			value := uuidStr
+			valuePtr := &value
+			categoryIDInput = &valuePtr
+		}
+	}
+
+	content, err := h.updateContentUC.Execute(r.Context(), application.UpdateContentInput{
+		UserID:     user.ID,
+		ContentID:  contentID,
+		Title:      req.Title,
+		Summary:    req.Summary,
+		Content:    contentInput,
+		CategoryID: categoryIDInput,
+		Status:     req.Status,
+		Visibility: req.Visibility,
+		IsFavorite: req.IsFavorite,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, domain.ErrContentNotFound):
+			httpresponse.Error(w, http.StatusNotFound, "content not found")
+
+		case errors.Is(err, application.ErrContentTitleRequired),
+			errors.Is(err, application.ErrContentTitleTooLong),
+			errors.Is(err, application.ErrContentSummaryTooLong),
+			errors.Is(err, application.ErrContentInvalidJSON),
+			errors.Is(err, application.ErrContentStatusNotAllowed),
+			errors.Is(err, application.ErrContentVisibilityNotAllowed),
+			errors.Is(err, application.ErrContentCategoryIDInvalid):
+			httpresponse.Error(w, http.StatusBadRequest, err.Error())
+
+		case errors.Is(err, domain.ErrContentCategoryNotFound):
+			httpresponse.Error(w, http.StatusNotFound, err.Error())
+
+		case errors.Is(err, domain.ErrContentAlreadyExists):
+			httpresponse.Error(w, http.StatusConflict, err.Error())
+
+		default:
+			slog.ErrorContext(r.Context(), "failed to update content",
+				"user_id", user.ID,
+				"content_id", contentID,
+				"error", err,
+			)
+			httpresponse.Error(w, http.StatusInternalServerError, "failed to update content")
+		}
+
 		return
 	}
 

@@ -629,6 +629,44 @@ paths:
         "500":
           description: Error interno
 
+    patch:
+      summary: Actualiza parcialmente un contenido
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateContentRequest"
+      responses:
+        "200":
+          description: Contenido actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ContentResponse"
+        "400":
+          description: Datos inválidos (título vacío, content no-objeto, status/visibility inválido, category_id mal formado)
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido o categoría no encontrados
+        "409":
+          description: Ya existe un contenido con ese slug
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components
@@ -906,6 +944,58 @@ components:
           type: boolean
           default: false
           example: false
+
+    UpdateContentRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          description: Omitido → sin cambio. "" o solo espacios → 400.
+          example: Título actualizado
+        summary:
+          type: string
+          maxLength: 500
+          nullable: true
+          description: |
+            Omitido o null → sin cambio.
+            "" → se guarda como NULL.
+          example: Nuevo resumen.
+        content:
+          type: object
+          nullable: true
+          description: |
+            Omitido → sin cambio.
+            null, array, string → 400.
+            Debe ser un objeto JSON.
+          example: {"type": "doc", "content": []}
+        category_id:
+          nullable: true
+          description: |
+            Omitido → sin cambio.
+            null → desasociar categoría.
+            string UUID → asignar categoría.
+            UUID inválido → 400.
+            Categoría inexistente o de otro usuario → 404.
+          example: null
+        status:
+          type: string
+          enum: [draft, published, archived]
+          description: |
+            Omitido → sin cambio.
+            published → published_at se establece si era null (idempotente).
+            draft/archived → published_at se mantiene como historial.
+          example: published
+        visibility:
+          type: string
+          enum: [private, public]
+          description: Omitido → sin cambio.
+          example: public
+        is_favorite:
+          type: boolean
+          description: Omitido → sin cambio. false explícito actualiza correctamente.
+          example: true
 
     ContentResponse:
       type: object
