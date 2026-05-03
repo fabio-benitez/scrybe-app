@@ -691,6 +691,37 @@ paths:
         "500":
           description: Error interno
 
+  /contents/{content_id}/tags:
+    get:
+      summary: Lista los tags asociados a un contenido
+      tags:
+        - Content Tags
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      responses:
+        "200":
+          description: Lista de tags del contenido (vacía si no tiene ninguno)
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagResponse"
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido no encontrado o no pertenece al usuario
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components
