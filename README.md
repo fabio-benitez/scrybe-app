@@ -1,29 +1,32 @@
+
 # Scrybe
 
 ## Descripción
 
-Scrybe es una aplicación web en desarrollo orientada a la gestión estructurada de contenido personal (notas, archivos, enlaces, etc.).
+Scrybe es una aplicación web orientada a la gestión estructurada de contenido personal, como notas, archivos y otros recursos, permitiendo organizar la información de forma flexible y mantenible.
 
-Actualmente el proyecto se centra en la construcción de una base sólida a nivel de backend, incluyendo API, autenticación, base de datos y arquitectura, con el objetivo de evolucionar hacia una herramienta escalable y mantenible.
-
----
+El proyecto está diseñado con un enfoque en escalabilidad, mantenibilidad y separación clara de responsabilidades, priorizando una base sólida antes de añadir funcionalidades avanzadas.
 
 ## Estado del proyecto
 
-- El proyecto se encuentra en fase activa de desarrollo
-- API en Go operativa
-- Supabase configurado en entorno local
+- Desarrollo activo
+- API REST en Go operativa
 - Autenticación JWT integrada (Supabase Auth + JWKS)
-- Perfil de usuario (`user_profiles`) sincronizado con `auth.users`
-- Endpoints de health disponibles
-- Módulo `profile`:
-  - `GET /profile`
-  - `PATCH /profile`
-- Módulo `files`:
-  - `POST /files` → subida de archivos
-  - `GET /files/{file_id}` → obtención de metadata
-- Documentación mediante OpenAPI
-- Colección Bruno para pruebas manuales
+- Base de datos PostgreSQL gestionada con Supabase
+- Documentación OpenAPI disponible
+- Colección Bruno para testing manual
+
+### Funcionalidad actual
+
+| Módulo          | Descripción |
+|-----------------|------------|
+| profile         | Consulta y actualización de perfil |
+| files           | Subida y gestión de archivos |
+| categories      | CRUD de categorías |
+| tags            | CRUD de etiquetas |
+| contents        | CRUD de contenidos/notas |
+| content_tags    | Asociación contenido ↔ tags (replace completo) |
+| content_files   | Asociación contenido ↔ archivos (replace completo) |
 
 ---
 
@@ -36,16 +39,16 @@ Actualmente el proyecto se centra en la construcción de una base sólida a nive
 - Storage: Supabase Storage
 - Documentación API: OpenAPI (Swagger UI)
 - Testing manual: Bruno
-- Infraestructura local: Docker + Supabase CLI (vía npx)
+- Infraestructura local: Docker + Supabase CLI
 
 ---
 
 ## Requisitos
 
-- Node.js: https://nodejs.org
-- Docker Desktop: https://www.docker.com/products/docker-desktop/
-- Go (>= 1.22): https://go.dev/
-- Supabase CLI: https://supabase.com/docs/guides/local-development/cli/getting-started?queryGroups=platform&platform=npm&queryGroups=access-method&access-method=studio
+- Node.js: https://nodejs.org  
+- Docker Desktop: https://www.docker.com/products/docker-desktop/  
+- Go (>= 1.22): https://go.dev/  
+- Supabase CLI: https://supabase.com/docs/guides/local-development/cli/getting-started  
 
 ---
 
@@ -66,45 +69,32 @@ npx supabase start
 
 ### 3. Configurar variables de entorno
 
-Crear un archivo `.env` a partir de `.env.example`.
-
-Algunas variables cambian según ejecutes la API dentro de Docker o directamente en tu máquina.
-
-Ejemplo importante (dependiendo de cómo ejecutes la API):
+Crear `.env` a partir de `.env.example`.
 
 ```env
-# Para ejecución en Docker
+# Docker
 DATABASE_URL=postgresql://postgres:postgres@host.docker.internal:54322/postgres?sslmode=disable
 
-# Si ejecutas la API con go run
+# Local
 # DATABASE_URL=postgresql://postgres:postgres@localhost:54322/postgres?sslmode=disable
 ```
 
 ### 4. Levantar la API
 
-Opción recomendada (Docker):
-
 ```bash
 docker compose up --build -d
 ```
 
-Opción alternativa:
+o:
 
 ```bash
 cd apps/api
 go run ./cmd/api
 ```
 
-### 5. (Opcional) Sincronizar dependencias
-
-```bash
-cd apps/api
-go mod tidy
-```
-
 ---
 
-## Uso de la API en desarrollo
+## Uso de la API
 
 Colección Bruno:
 
@@ -116,25 +106,9 @@ docs/bruno
 
 1. Sign Up (`/auth/v1/signup`)
 2. Login (`/auth/v1/token`)
-3. El `access_token` se guarda automáticamente
-4. Uso de endpoints (`/profile`, `/files`)
-
-### Variables
-
-Definidas en:
-
-```text
-docs/bruno/environments/local.bru
-```
-
-| Variable           | Descripción                                      | Ejemplo                                      |
-|--------------------|--------------------------------------------------|----------------------------------------------|
-| api_base_url       | URL base de la API                               | http://localhost:8081/api/v1                 |
-| auth_base_url      | URL base de Supabase Auth                        | http://localhost:54321/auth/v1               |
-| supabase_anon_key  | Clave pública de Supabase                        | sb_publishable_xxxxxxxxxxxxxxxxx             |
-| access_token       | JWT de autenticación                             | eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...      |
-| file_id            | ID de archivo para endpoints de files            | 76661000-7cf1-4bdb-9a59-66b80b17209f         |
-
+3. Guardar `access_token`
+4. Crear recursos base (categories, tags, files, contents)
+5. Usar relaciones (`content_tags`, `content_files`)
 
 ---
 
@@ -147,30 +121,29 @@ docs/bruno/environments/local.bru
 
 ## Servicios disponibles
 
-- API: http://localhost:8081
-- Health: http://localhost:8081/api/v1/health
-- Health DB: http://localhost:8081/api/v1/health/db
-- Swagger: http://localhost:8082
-- Supabase Studio: http://127.0.0.1:54323
+- API: http://localhost:8081  
+- Health: http://localhost:8081/api/v1/health  
+- Swagger: http://localhost:8082  
+- Supabase Studio: http://127.0.0.1:54323  
 
 ---
 
 ## Arquitectura
 
-Arquitectura modular basada en hexagonal ligera.
+Arquitectura modular basada en un enfoque hexagonal ligero.
 
-Cada módulo sigue esta estructura:
+### Capas
 
-- domain
-- application
-- infrastructure
-- delivery
+- domain → lógica de negocio
+- application → casos de uso
+- infrastructure → DB, storage, servicios externos
+- delivery → HTTP (handlers)
 
-Supabase se usa como infraestructura.
+Supabase se utiliza exclusivamente como infraestructura.
 
 ---
 
-## Estructura
+## Estructura del proyecto
 
 ```text
 apps/
@@ -191,9 +164,9 @@ supabase/
 
 ---
 
-## Filosofía del proyecto
+## Filosofía
 
-- Arquitectura modular y desacoplada
-- Separación clara entre dominio, aplicación, infraestructura y delivery
-- Independencia de frameworks y servicios externos
-- Diseño orientado a escalabilidad y mantenibilidad
+- Código limpio y desacoplado
+- Sin lógica en handlers ni infraestructura
+- Contratos claros entre capas
+- Diseño preparado para escalar sin refactorizaciones agresivas
