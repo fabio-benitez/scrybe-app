@@ -64,6 +64,7 @@ func (h *Handler) Routes() http.Handler {
 	r.Post("/", h.CreateContent)
 	r.Get("/{content_id}", h.GetContent)
 	r.Patch("/{content_id}", h.UpdateContent)
+	r.Delete("/{content_id}", h.DeleteContent)
 	return r
 }
 
@@ -186,7 +187,6 @@ func (h *Handler) UpdateContent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse content: NullableRawMessage distinguishes absent / null / value.
 	var contentInput *json.RawMessage
 	if req.Content.Present {
 		if req.Content.Null {
@@ -196,7 +196,6 @@ func (h *Handler) UpdateContent(w http.ResponseWriter, r *http.Request) {
 		contentInput = &req.Content.Value
 	}
 
-	// Parse category_id: NullableRawMessage → **string.
 	var categoryIDInput **string
 
 	if req.CategoryID.Present {
@@ -267,6 +266,37 @@ func toContentResponseList(contents []*domain.Content) []ContentResponse {
 		result[i] = toContentResponse(c)
 	}
 	return result
+}
+
+func (h *Handler) DeleteContent(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	contentID := chi.URLParam(r, "content_id")
+
+	err := h.deleteContentUC.Execute(r.Context(), application.DeleteContentInput{
+		UserID:    user.ID,
+		ContentID: contentID,
+	})
+	if err != nil {
+		if errors.Is(err, domain.ErrContentNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "content not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to delete content",
+			"user_id", user.ID,
+			"content_id", contentID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to delete content")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func toContentResponse(c *domain.Content) ContentResponse {

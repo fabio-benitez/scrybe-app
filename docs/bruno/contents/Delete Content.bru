@@ -1,0 +1,38 @@
+meta {
+  name: Delete Content
+  type: http
+  seq: 5
+}
+
+delete {
+  url: {{api_base_url}}/contents/{{content_id}}
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Delete Content
+  
+  Elimina permanentemente un contenido del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `content_id`
+  
+  ### Notas:
+  - Hard delete (no soft delete).
+  - UUID inválido en path → 404.
+  - Contenido inexistente o de otro usuario → 404.
+  
+  ### Respuestas:
+  - 204 → contenido eliminado (sin body)
+  - 401 → no autenticado
+  - 404 → contenido no encontrado
+  - 500 → error interno
+}

@@ -667,6 +667,30 @@ paths:
         "500":
           description: Error interno
 
+    delete:
+      summary: Elimina un contenido
+      tags:
+        - Contents
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      responses:
+        "204":
+          description: Contenido eliminado correctamente
+        "401":
+          description: No autenticado
+        "404":
+          description: Contenido no encontrado
+        "500":
+          description: Error interno
+
 
 # =========================
 # Components

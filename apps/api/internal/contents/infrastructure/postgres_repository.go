@@ -276,3 +276,26 @@ func (r *PostgresRepository) Update(
 
 	return &c, nil
 }
+
+func (r *PostgresRepository) Delete(
+	ctx context.Context,
+	userID string,
+	contentID string,
+) error {
+	query := `
+		DELETE FROM contents
+		WHERE id = $1
+		  AND user_id = $2
+	`
+
+	result, err := r.db.Exec(ctx, query, contentID, userID)
+	if err != nil {
+		return err
+	}
+
+	if result.RowsAffected() == 0 {
+		return domain.ErrContentNotFound
+	}
+
+	return nil
+}
