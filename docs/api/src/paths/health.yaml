@@ -1,0 +1,35 @@
+health:
+  get:
+    summary: Comprueba el estado de la API
+    tags:
+      - Health
+    responses:
+      "200":
+        description: API operativa
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/health.yaml#/HealthResponse"
+
+health-db:
+  get:
+    summary: Comprueba la conexión con la base de datos
+    tags:
+      - Health
+    responses:
+      "200":
+        description: Base de datos disponible
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/health.yaml#/HealthResponse"
+            example:
+              status: "database connection ok"
+      "503":
+        description: Base de datos no disponible
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/health.yaml#/HealthResponse"
+            example:
+              status: "database connection failed"

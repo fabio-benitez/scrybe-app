@@ -1,0 +1,138 @@
+CreateContentRequest:
+  type: object
+  required:
+    - title
+    - content
+  properties:
+    category_id:
+      allOf:
+        - $ref: "./common.yaml#/UUID"
+      nullable: true
+      description: |
+        Omitido o null → sin categoría.
+        UUID inválido → 400.
+        Categoría inexistente o de otro usuario → 404.
+      example: null
+    title:
+      type: string
+      minLength: 1
+      maxLength: 200
+      example: Mi primer contenido
+    summary:
+      type: string
+      maxLength: 500
+      description: Omitido o "" → se guarda como NULL.
+      example: Un resumen breve del contenido.
+    content:
+      type: object
+      description: Documento JSON del editor (TipTap/ProseMirror). Debe ser un objeto JSON.
+      example: {"type": "doc", "content": []}
+    status:
+      allOf:
+        - $ref: "./common.yaml#/ContentStatus"
+      default: draft
+      description: Omitido → draft.
+      example: draft
+    visibility:
+      allOf:
+        - $ref: "./common.yaml#/ContentVisibility"
+      default: private
+      description: Omitido → private.
+      example: private
+    is_favorite:
+      type: boolean
+      default: false
+      example: false
+
+UpdateContentRequest:
+  type: object
+  properties:
+    title:
+      type: string
+      minLength: 1
+      maxLength: 200
+      description: Omitido → sin cambio. "" o solo espacios → 400.
+      example: Título actualizado
+    summary:
+      type: string
+      maxLength: 500
+      nullable: true
+      description: |
+        Omitido o null → sin cambio.
+        "" → se guarda como NULL.
+      example: Nuevo resumen.
+    content:
+      type: object
+      nullable: true
+      description: |
+        Omitido → sin cambio.
+        null, array, string → 400.
+        Debe ser un objeto JSON.
+      example: {"type": "doc", "content": []}
+    category_id:
+      allOf:
+        - $ref: "./common.yaml#/UUID"
+      nullable: true
+      description: |
+        Omitido → sin cambio.
+        null → desasociar categoría.
+        string UUID → asignar categoría.
+        UUID inválido → 400.
+        Categoría inexistente o de otro usuario → 404.
+      example: null
+    status:
+      allOf:
+        - $ref: "./common.yaml#/ContentStatus"
+      description: |
+        Omitido → sin cambio.
+        published → published_at se establece si era null (idempotente).
+        draft/archived → published_at se mantiene como historial.
+      example: published
+    visibility:
+      allOf:
+        - $ref: "./common.yaml#/ContentVisibility"
+      description: Omitido → sin cambio.
+      example: public
+    is_favorite:
+      type: boolean
+      description: Omitido → sin cambio. false explícito actualiza correctamente.
+      example: true
+
+ContentResponse:
+  type: object
+  properties:
+    id:
+      $ref: "./common.yaml#/UUID"
+    category_id:
+      allOf:
+        - $ref: "./common.yaml#/UUID"
+      nullable: true
+      example: null
+    title:
+      type: string
+      example: Mi primer contenido
+    slug:
+      type: string
+      nullable: true
+      example: mi-primer-contenido
+    summary:
+      type: string
+      nullable: true
+      example: Un resumen breve del contenido.
+    content:
+      type: object
+      description: Documento JSON del editor.
+      example: {"type": "doc", "content": []}
+    status:
+      $ref: "./common.yaml#/ContentStatus"
+    visibility:
+      $ref: "./common.yaml#/ContentVisibility"
+    is_favorite:
+      type: boolean
+      example: false
+    created_at:
+      $ref: "./common.yaml#/DateTime"
+    updated_at:
+      $ref: "./common.yaml#/DateTime"
+    published_at:
+      $ref: "./common.yaml#/NullableDateTime"

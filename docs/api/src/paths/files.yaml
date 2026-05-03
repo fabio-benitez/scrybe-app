@@ -1,0 +1,115 @@
+files:
+  post:
+    summary: Sube un archivo
+    tags:
+      - Files
+    security:
+      - bearerAuth: []
+    requestBody:
+      required: true
+      content:
+        multipart/form-data:
+          schema:
+            type: object
+            required:
+              - file
+            properties:
+              file:
+                type: string
+                format: binary
+    responses:
+      "201":
+        description: Archivo subido correctamente
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/files.yaml#/FileResponse"
+      "400":
+        description: Archivo inválido, vacío o MIME no permitido
+      "401":
+        description: No autenticado
+      "409":
+        description: Archivo duplicado
+      "413":
+        description: Archivo demasiado grande
+      "500":
+        description: Error interno
+
+file-by-id:
+  get:
+    summary: Obtiene la metadata de un archivo
+    tags:
+      - Files
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          $ref: "../schemas/common.yaml#/UUID"
+        description: ID del archivo
+    responses:
+      "200":
+        description: Metadata del archivo
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/files.yaml#/FileResponse"
+      "401":
+        description: No autenticado
+      "404":
+        description: Archivo no encontrado
+      "500":
+        description: Error interno
+
+  delete:
+    summary: Elimina un archivo del usuario autenticado
+    tags:
+      - Files
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          $ref: "../schemas/common.yaml#/UUID"
+        description: ID del archivo
+    responses:
+      "204":
+        description: Archivo eliminado correctamente
+      "401":
+        description: No autenticado
+      "404":
+        description: Archivo no encontrado
+      "500":
+        description: Error interno
+
+file-url:
+  get:
+    summary: Genera una URL firmada temporal para acceder al archivo
+    tags:
+      - Files
+    security:
+      - bearerAuth: []
+    parameters:
+      - name: file_id
+        in: path
+        required: true
+        schema:
+          $ref: "../schemas/common.yaml#/UUID"
+        description: ID del archivo
+    responses:
+      "200":
+        description: URL firmada generada correctamente
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/files.yaml#/FileURLResponse"
+      "401":
+        description: No autenticado
+      "404":
+        description: Archivo no encontrado o no disponible
+      "500":
+        description: Error interno al generar la URL

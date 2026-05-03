@@ -1,0 +1,36 @@
+ContentFileResponse:
+  type: object
+  properties:
+    id:
+      $ref: "./common.yaml#/UUID"
+    original_name:
+      type: string
+    mime_type:
+      type: string
+    size_bytes:
+      type: integer
+      format: int64
+    upload_status:
+      $ref: "./common.yaml#/UploadedOnlyStatus"
+    created_at:
+      $ref: "./common.yaml#/DateTime"
+    uploaded_at:
+      $ref: "./common.yaml#/NullableDateTime"
+    position:
+      type: integer
+      minimum: 0
+
+SetContentFilesRequest:
+  type: object
+  required:
+    - file_ids
+  properties:
+    file_ids:
+      type: array
+      items:
+        $ref: "./common.yaml#/UUID"
+      description: |
+        Lista completa de file IDs a asociar al contenido.
+        [] → elimina todos los archivos del contenido.
+        null o campo ausente → 400.
+      example: ["a1b2c3d4-0000-4000-8000-000000000001"]
