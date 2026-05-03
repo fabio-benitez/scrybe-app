@@ -67,6 +67,70 @@ func (r *PostgresRepository) Create(
 	return &created, nil
 }
 
+func (r *PostgresRepository) FindAllByUserID(
+	ctx context.Context,
+	userID string,
+) ([]*domain.Content, error) {
+	query := `
+		SELECT
+			id, user_id, category_id, title, slug, summary,
+			content, status, visibility, is_favorite,
+			created_at, updated_at, published_at, deleted_at, delete_after
+		FROM contents
+		WHERE user_id = $1
+		ORDER BY updated_at DESC
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	contents := make([]*domain.Content, 0)
+
+	for rows.Next() {
+		var c domain.Content
+		if err := scanContent(rows, &c); err != nil {
+			return nil, err
+		}
+		contents = append(contents, &c)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return contents, nil
+}
+
+func (r *PostgresRepository) FindByID(
+	ctx context.Context,
+	userID string,
+	contentID string,
+) (*domain.Content, error) {
+	query := `
+		SELECT
+			id, user_id, category_id, title, slug, summary,
+			content, status, visibility, is_favorite,
+			created_at, updated_at, published_at, deleted_at, delete_after
+		FROM contents
+		WHERE id = $1
+		  AND user_id = $2
+	`
+
+	var c domain.Content
+
+	if err := scanContent(r.db.QueryRow(ctx, query, contentID, userID), &c); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrContentNotFound
+		}
+		return nil, err
+	}
+
+	return &c, nil
+}
+
 func scanContent(row pgx.Row, c *domain.Content) error {
 	var (
 		rawContent    string

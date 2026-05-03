@@ -1,0 +1,41 @@
+meta {
+  name: Get Content
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{api_base_url}}/contents/{{content_id}}
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Get Content
+  
+  Obtiene un contenido concreto del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Variables usadas:
+  - `content_id`
+  
+  ### Notas:
+  - UUID inválido devuelve 404 (no 400)
+  - No distingue entre "no existe" y "no es tuyo"
+  
+  ### Respuestas:
+  - 200 → contenido encontrado
+  - 401 → no autenticado
+  - 404 → contenido no encontrado
+  - 500 → error interno
+}

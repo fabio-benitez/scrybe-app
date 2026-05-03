@@ -87,7 +87,9 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	contentsRepo := contentsinfra.NewPostgresRepository(dbPool)
 	createContentUC := contentsapp.NewCreateContentUseCase(contentsRepo)
-	contentsHandler := contentshttp.NewHandler(createContentUC, nil, nil, nil, nil)
+	listContentsUC := contentsapp.NewListContentsUseCase(contentsRepo)
+	getContentUC := contentsapp.NewGetContentUseCase(contentsRepo)
+	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, nil, nil)
 
 	// Router
 	r := chi.NewRouter()
