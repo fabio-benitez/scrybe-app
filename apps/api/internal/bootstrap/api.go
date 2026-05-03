@@ -9,6 +9,9 @@ import (
 	categorieshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/delivery/http"
 	categoriesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/categories/infrastructure"
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/config"
+	contentsapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/application"
+	contentshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/delivery/http"
+	contentsinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/contents/infrastructure"
 	filesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/application"
 	fileshttp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/delivery/http"
 	filesinfra "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/infrastructure"
@@ -82,6 +85,10 @@ func RunAPI(cfg *config.APIConfig) error {
 	deleteTagUC := tagsapp.NewDeleteTagUseCase(tagsRepo)
 	tagsHandler := tagshttp.NewHandler(createTagUC, listTagsUC, getTagUC, updateTagUC, deleteTagUC)
 
+	contentsRepo := contentsinfra.NewPostgresRepository(dbPool)
+	createContentUC := contentsapp.NewCreateContentUseCase(contentsRepo)
+	contentsHandler := contentshttp.NewHandler(createContentUC, nil, nil, nil, nil)
+
 	// Router
 	r := chi.NewRouter()
 	r.Use(middlewareChi.Recoverer)
@@ -99,6 +106,7 @@ func RunAPI(cfg *config.APIConfig) error {
 			r.Mount("/files", filesHandler.Routes())
 			r.Mount("/categories", categoriesHandler.Routes())
 			r.Mount("/tags", tagsHandler.Routes())
+			r.Mount("/contents", contentsHandler.Routes())
 		})
 	})
 
