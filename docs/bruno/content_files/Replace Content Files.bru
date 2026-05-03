@@ -1,0 +1,45 @@
+meta {
+  name: Replace Content Files
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{api_base_url}}/contents/{{content_id}}/files
+  body: json
+  auth: bearer
+}
+
+headers {
+  Content-Type: application/json
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+body:json {
+  {
+    "file_ids": ["{{file_id}}"]
+  }
+}
+
+docs {
+  ## Replace Content Files
+  
+  Reemplaza completamente los archivos asociados a un contenido del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Notas:
+  - file_ids: [] → elimina todos los archivos del contenido
+  - file_ids: null o campo ausente → 400
+  - IDs duplicados se deduplicarán manteniendo el orden
+  - Solo se aceptan archivos con upload_status = 'uploaded'; pending/failed → 404
+  - La posición se asigna según el orden del array (primer ID → 0, segundo → 1, etc.)
+  - Si el content_id no existe o no pertenece al usuario → 404
+  - Si algún file_id no existe o no pertenece al usuario → 404
+  - Si algún file_id es un UUID inválido → 400
+}

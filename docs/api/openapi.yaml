@@ -725,6 +725,52 @@ paths:
         "500":
           description: Error interno
 
+    put:
+      summary: Reemplaza completamente los archivos asociados a un contenido
+      description: |
+        Reemplaza de forma atómica todos los archivos del contenido con la lista proporcionada.
+        - `file_ids: []` → elimina todos los archivos del contenido.
+        - `file_ids: null` o campo ausente → 400.
+        - IDs duplicados en la lista se ignoran (deduplicación interna).
+        - Solo se aceptan archivos con upload_status = 'uploaded'; pending/failed → 404.
+        - La posición se asigna automáticamente según el orden del array (0-based).
+        - Devuelve la lista final de archivos ordenada por position ASC, created_at ASC.
+      tags:
+        - Content Files
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: content_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          description: ID del contenido
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetContentFilesRequest"
+      responses:
+        "200":
+          description: Lista final de archivos asociados al contenido (vacía si file_ids era [])
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ContentFileResponse"
+        "400":
+          description: file_ids ausente, null, o contiene un UUID con formato inválido
+        "401":
+          description: No autenticado
+        "404":
+          description: Recurso no encontrado (contenido o archivo)
+        "500":
+          description: Error interno
+
   /contents/{content_id}/tags:
     get:
       summary: Lista los tags asociados a un contenido
@@ -1061,6 +1107,22 @@ components:
         position:
           type: integer
           minimum: 0
+
+    SetContentFilesRequest:
+      type: object
+      required:
+        - file_ids
+      properties:
+        file_ids:
+          type: array
+          items:
+            type: string
+            format: uuid
+          description: |
+            Lista completa de file IDs a asociar al contenido.
+            [] → elimina todos los archivos del contenido.
+            null o campo ausente → 400.
+          example: ["a1b2c3d4-0000-4000-8000-000000000001"]
 
     # =========================
     # Content Tags

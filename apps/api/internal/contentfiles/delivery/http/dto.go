@@ -17,6 +17,10 @@ type ContentFileResponse struct {
 	Position     int        `json:"position"`
 }
 
+type SetContentFilesRequest struct {
+	FileIDs *[]string `json:"file_ids"`
+}
+
 func toContentFileResponse(f *domain.File) ContentFileResponse {
 	return ContentFileResponse{
 		ID:           f.ID,
