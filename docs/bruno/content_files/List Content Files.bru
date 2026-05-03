@@ -1,0 +1,35 @@
+meta {
+  name: List Content Files
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{api_base_url}}/contents/{{content_id}}/files
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## List Content Files
+  
+  Lista todos los archivos asociados a un contenido del usuario autenticado.
+  
+  ### Requiere:
+  - Authorization Bearer token
+  
+  ### Notas:
+  - Si el contenido no tiene archivos → devuelve []
+  - Ordenados por position ASC, created_at ASC
+  - Si el content_id no existe o no pertenece al usuario → 404
+  - Si el content_id es un UUID inválido → 404
+  - Solo se devuelven archivos con upload_status = 'uploaded'
+}
