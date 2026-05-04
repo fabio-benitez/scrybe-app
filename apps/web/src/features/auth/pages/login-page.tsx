@@ -18,7 +18,7 @@ export default function LoginPage() {
   const { session, isLoading } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
 
-  // Navigate once the session is confirmed after login
+  
   useEffect(() => {
     if (!isLoading && session) {
       navigate("/app", { replace: true })
@@ -33,7 +33,6 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  // Guard: already authenticated user visiting /login
   if (!isLoading && session) {
     return <Navigate to="/app" replace />
   }
@@ -43,7 +42,6 @@ export default function LoginPage() {
 
     try {
       await loginWithPassword(values)
-      // Navigation is handled by the useEffect above when session updates
     } catch {
       setFormError("Email o contraseña incorrectos")
     }
