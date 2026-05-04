@@ -1,8 +1,10 @@
 import { z } from "zod"
 
+import { emailField, passwordField } from "./fields"
+
 export const loginSchema = z.object({
-  email: z.email("Introduce un email válido"),
-  password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+  email: emailField,
+  password: passwordField,
 })
 
 export type LoginFormValues = z.infer<typeof loginSchema>
