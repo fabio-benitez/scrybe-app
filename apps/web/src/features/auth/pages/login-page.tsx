@@ -1,11 +1,12 @@
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { Navigate, useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { AuthShell } from "../components/auth-shell"
 import { loginSchema, type LoginFormValues } from "../schemas/login-schema"
 import { loginWithPassword } from "../services/auth-service"
+import { useAuth } from "../providers/auth-provider"
 
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
@@ -14,7 +15,15 @@ import { Label } from "@/shared/components/ui/label"
 
 export default function LoginPage() {
   const navigate = useNavigate()
+  const { session, isLoading } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
+
+  // Navigate once the session is confirmed after login
+  useEffect(() => {
+    if (!isLoading && session) {
+      navigate("/app", { replace: true })
+    }
+  }, [session, isLoading, navigate])
 
   const {
     register,
@@ -24,12 +33,17 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
+  // Guard: already authenticated user visiting /login
+  if (!isLoading && session) {
+    return <Navigate to="/app" replace />
+  }
+
   async function onSubmit(values: LoginFormValues) {
     setFormError(null)
 
     try {
       await loginWithPassword(values)
-      navigate("/app")
+      // Navigation is handled by the useEffect above when session updates
     } catch {
       setFormError("Email o contraseña incorrectos")
     }
