@@ -1,18 +1,23 @@
+import { useTranslation } from "react-i18next"
 import { BookOpenIcon, FolderIcon, TagsIcon } from "lucide-react"
+import { LanguageSwitcher } from "@/shared/i18n/language-switcher"
 
 type AuthShellProps = {
   children: React.ReactNode
 }
 
 export function AuthShell({ children }: AuthShellProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="min-h-screen grid bg-background text-foreground lg:grid-cols-2">
-      {/* Left — mini landing */}
+      
+      {/* Left - mini landing */}
       <div className="hidden lg:flex flex-col items-center justify-center bg-slate-900 p-12 gap-12">
         <div className="text-center space-y-3">
           <h1 className="text-4xl font-bold text-white tracking-tight">Scrybe</h1>
           <p className="text-slate-400 text-lg max-w-xs">
-            Organiza tu contenido de forma simple y eficiente
+            {t("auth.shell.tagline")}
           </p>
         </div>
 
@@ -20,29 +25,48 @@ export function AuthShell({ children }: AuthShellProps) {
           <li className="flex items-start gap-3">
             <BookOpenIcon className="size-5 text-slate-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-white text-sm font-medium">Contenidos estructurados</p>
-              <p className="text-slate-500 text-sm">Escribe y organiza tus contenidos con categorías y etiquetas.</p>
+              <p className="text-white text-sm font-medium">
+                {t("auth.shell.features.content.title")}
+              </p>
+              <p className="text-slate-500 text-sm">
+                {t("auth.shell.features.content.description")}
+              </p>
             </div>
           </li>
+
           <li className="flex items-start gap-3">
             <FolderIcon className="size-5 text-slate-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-white text-sm font-medium">Gestión de archivos</p>
-              <p className="text-slate-500 text-sm">Adjunta y gestiona archivos directamente en tus contenidos.</p>
+              <p className="text-white text-sm font-medium">
+                {t("auth.shell.features.files.title")}
+              </p>
+              <p className="text-slate-500 text-sm">
+                {t("auth.shell.features.files.description")}
+              </p>
             </div>
           </li>
+
           <li className="flex items-start gap-3">
             <TagsIcon className="size-5 text-slate-400 mt-0.5 shrink-0" />
             <div>
-              <p className="text-white text-sm font-medium">Etiquetas flexibles</p>
-              <p className="text-slate-500 text-sm">Clasifica con etiquetas personalizadas para encontrar todo al instante.</p>
+              <p className="text-white text-sm font-medium">
+                {t("auth.shell.features.tags.title")}
+              </p>
+              <p className="text-slate-500 text-sm">
+                {t("auth.shell.features.tags.description")}
+              </p>
             </div>
           </li>
         </ul>
       </div>
 
+
       {/* Right — form */}
-      <div className="flex items-center justify-center p-6 bg-background">
+      <div className="relative flex items-center justify-center p-6 bg-background">
+        <div className="absolute right-6 top-6">
+          <LanguageSwitcher />
+        </div>
+
         <div className="w-full max-w-md">
           {children}
         </div>

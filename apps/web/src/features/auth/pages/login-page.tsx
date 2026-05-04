@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Link, Navigate, useNavigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
 import { AuthShell } from "../components/auth-shell"
-import { loginSchema, type LoginFormValues } from "../schemas/login-schema"
+import { createLoginSchema, type LoginFormValues } from "../schemas/login-schema"
 import { loginWithPassword } from "../services/auth-service"
 import { useAuth } from "../providers/auth-provider"
 
@@ -24,6 +25,7 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const { session, isLoading } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
+  const { t, i18n } = useTranslation()
 
   useEffect(() => {
     if (!isLoading && session) {
@@ -32,9 +34,15 @@ export default function LoginPage() {
   }, [session, isLoading, navigate])
 
   const form = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(createLoginSchema(t)),
     defaultValues: { email: "", password: "" },
   })
+
+  useEffect(() => {
+    if (form.formState.isSubmitted) {
+      form.trigger()
+    }
+  }, [i18n.language, form])
 
   if (!isLoading && session) {
     return <Navigate to="/app" replace />
@@ -46,7 +54,7 @@ export default function LoginPage() {
     try {
       await loginWithPassword(values)
     } catch {
-      setFormError("Email o contraseña incorrectos")
+      setFormError(t("auth.login.error"))
     }
   }
 
@@ -54,8 +62,8 @@ export default function LoginPage() {
     <AuthShell>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Iniciar sesión</CardTitle>
-          <CardDescription>Accede a tu cuenta de Scrybe</CardDescription>
+          <CardTitle className="text-2xl">{t("auth.login.title")}</CardTitle>
+          <CardDescription>{t("auth.login.description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -70,11 +78,11 @@ export default function LoginPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("auth.fields.email")}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="tu@email.com"
+                        placeholder={t("auth.placeholders.email")}
                         autoComplete="email"
                         {...field}
                       />
@@ -90,18 +98,18 @@ export default function LoginPage() {
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>Contraseña</FormLabel>
+                      <FormLabel>{t("auth.fields.password")}</FormLabel>
                       <a
                         href="#"
                         className="text-sm text-muted-foreground underline underline-offset-4 hover:text-primary"
                       >
-                        ¿Olvidaste tu contraseña?
+                        {t("auth.login.forgotPassword")}
                       </a>
                     </div>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="tu contraseña"
+                        placeholder={t("auth.placeholders.password")}
                         autoComplete="current-password"
                         {...field}
                       />
@@ -116,16 +124,16 @@ export default function LoginPage() {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? "Iniciando sesión..." : "Iniciar sesión"}
+                {form.formState.isSubmitting ? t("auth.login.submitting") : t("auth.login.submit")}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
-                ¿No tienes cuenta?{" "}
+                {t("auth.login.noAccount")}{" "}
                 <Link
                   to="/register"
                   className="text-foreground underline underline-offset-4 hover:text-primary"
                 >
-                  Regístrate
+                  {t("auth.login.register")}
                 </Link>
               </p>
             </form>
@@ -134,12 +142,16 @@ export default function LoginPage() {
       </Card>
 
       <p className="text-center text-xs text-muted-foreground mt-4 px-2">
-        Al continuar, aceptas los{" "}
-        <a href="#" className="underline underline-offset-4 hover:text-foreground">Términos de uso</a>
-        {" "}y la{" "}
-        <a href="#" className="underline underline-offset-4 hover:text-foreground">Política de privacidad</a>
-        {" "}de Scrybe.
+        {t("auth.legal.prefix")}{" "}
+        <a href="#" className="underline underline-offset-4 hover:text-foreground">
+          {t("auth.legal.terms")}
+          </a>{" "}
+          {t("auth.legal.middle")}{" "}
+        <a href="#" className="underline underline-offset-4 hover:text-foreground">
+          {t("auth.legal.privacy")}
+          </a>{" "}
+          {t("auth.legal.suffix")}
       </p>
-    </AuthShell>
+    </AuthShell>  
   )
 }
