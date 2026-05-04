@@ -1,4 +1,3 @@
-
 # Scrybe
 
 ## Descripción
@@ -10,13 +9,16 @@ El proyecto está diseñado con un enfoque en escalabilidad, mantenibilidad y se
 ## Estado del proyecto
 
 - Desarrollo activo
-- API REST en Go operativa
+- API REST en Go operativa (módulos principales completados)
 - Autenticación JWT integrada (Supabase Auth + JWKS)
 - Base de datos PostgreSQL gestionada con Supabase
 - Documentación OpenAPI disponible
 - Colección Bruno para testing manual
+- Frontend en desarrollo (auth + i18n base implementados)
 
 ### Funcionalidad actual
+
+#### Backend
 
 | Módulo          | Descripción |
 |-----------------|------------|
@@ -28,11 +30,21 @@ El proyecto está diseñado con un enfoque en escalabilidad, mantenibilidad y se
 | content_tags    | Asociación contenido ↔ tags (replace completo) |
 | content_files   | Asociación contenido ↔ archivos (replace completo) |
 
+#### Frontend
+
+| Módulo | Descripción |
+|--------|------------|
+| auth   | Login / Register con validación |
+| i18n   | Soporte ES / EN con persistencia |
+
 ---
 
 ## Stack tecnológico
 
 - Backend: Go (API REST)
+- Frontend: React + TypeScript (Vite)
+- UI: Tailwind CSS + shadcn/ui
+- i18n: i18next + react-i18next
 - Base de datos: PostgreSQL (Supabase)
 - Autenticación: Supabase Auth (JWT + JWKS)
 - Router HTTP: chi
@@ -92,6 +104,14 @@ cd apps/api
 go run ./cmd/api
 ```
 
+### 5. Levantar el frontend
+
+```bash
+cd apps/web
+npm install
+npm run dev
+```
+
 ---
 
 ## Uso de la API
@@ -104,8 +124,8 @@ docs/bruno
 
 ### Flujo básico
 
-1. Sign Up (`/auth/v1/signup`)
-2. Login (`/auth/v1/token`)
+1. Sign Up (`/auth/v1/signup`) → Supabase Auth
+2. Login (`/auth/v1/token`) → Supabase Auth
 3. Guardar `access_token`
 4. Crear recursos base (categories, tags, files, contents)
 5. Usar relaciones (`content_tags`, `content_files`)
@@ -124,6 +144,7 @@ docs/bruno
 - API: http://localhost:8081  
 - Health: http://localhost:8081/api/v1/health  
 - Swagger: http://localhost:8082  
+- Frontend: http://localhost:5173  
 - Supabase Studio: http://127.0.0.1:54323  
 
 ---
@@ -132,7 +153,7 @@ docs/bruno
 
 Arquitectura modular basada en un enfoque hexagonal ligero.
 
-### Capas
+### Capas (backend)
 
 - domain → lógica de negocio
 - application → casos de uso
@@ -140,6 +161,8 @@ Arquitectura modular basada en un enfoque hexagonal ligero.
 - delivery → HTTP (handlers)
 
 Supabase se utiliza exclusivamente como infraestructura.
+
+El frontend sigue una estructura modular por features.
 
 ---
 
@@ -154,6 +177,7 @@ apps/
         application/
         infrastructure/
         delivery/
+  web/
 
 docs/
   api/
