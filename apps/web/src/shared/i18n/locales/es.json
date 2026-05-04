@@ -1,0 +1,65 @@
+{
+  "auth": {
+    "shell": {
+      "tagline": "Organiza tu contenido de forma simple y eficiente",
+      "features": {
+        "content": {
+          "title": "Contenidos estructurados",
+          "description": "Escribe y organiza tus contenidos con categorías y etiquetas."
+        },
+        "files": {
+          "title": "Gestión de archivos",
+          "description": "Adjunta y gestiona archivos directamente en tus contenidos."
+        },
+        "tags": {
+          "title": "Etiquetas flexibles",
+          "description": "Clasifica con etiquetas personalizadas para encontrar todo al instante."
+        }
+      }
+    },
+    "login": {
+      "title": "Iniciar sesión",
+      "description": "Accede a tu cuenta de Scrybe",
+      "forgotPassword": "¿Olvidaste tu contraseña?",
+      "submit": "Iniciar sesión",
+      "submitting": "Iniciando sesión...",
+      "noAccount": "¿No tienes cuenta?",
+      "register": "Regístrate",
+      "error": "Email o contraseña incorrectos"
+    },
+    "register": {
+      "title": "Crear cuenta",
+      "description": "Crea tu cuenta para empezar",
+      "submit": "Crear cuenta",
+      "submitting": "Creando cuenta...",
+      "hasAccount": "¿Ya tienes cuenta?",
+      "login": "Inicia sesión",
+      "success": "Cuenta creada correctamente. Ya puedes iniciar sesión.",
+      "error": "Error al crear la cuenta"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar contraseña"
+    },
+    "placeholders": {
+      "email": "tu@email.com",
+      "password": "tu contraseña",
+      "newPassword": "mínimo 6 caracteres",
+      "confirmPassword": "repite tu contraseña"
+    },
+    "legal": {
+      "prefix": "Al continuar, aceptas los",
+      "terms": "Términos de uso",
+      "middle": "y la",
+      "privacy": "Política de privacidad",
+      "suffix": "de Scrybe."
+    },
+    "validation": {
+      "email": "Introduce un email válido",
+      "passwordMin": "La contraseña debe tener al menos 6 caracteres",
+      "confirmPasswordRequired": "Confirma tu contraseña",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden"
+    }
+  }
+}

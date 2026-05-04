@@ -1,11 +1,12 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Link, Navigate } from "react-router-dom"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { toast } from "sonner"
 
 import { AuthShell } from "../components/auth-shell"
-import { registerSchema, type RegisterFormValues } from "../schemas/register-schema"
+import { createRegisterSchema, type RegisterFormValues } from "../schemas/register-schema"
 import { logout, registerWithPassword } from "../services/auth-service"
 import { useAuth } from "../providers/auth-provider"
 
@@ -24,11 +25,18 @@ import {
 export default function RegisterPage() {
   const { session, isLoading } = useAuth()
   const [formError, setFormError] = useState<string | null>(null)
+  const { t, i18n } = useTranslation()
 
   const form = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(createRegisterSchema(t)),
     defaultValues: { email: "", password: "", confirmPassword: "" },
   })
+
+  useEffect(() => {
+    if (form.formState.isSubmitted) {
+      form.trigger()
+    }
+  }, [i18n.language, form])
 
   if (!isLoading && session) {
     return <Navigate to="/app" replace />
@@ -40,10 +48,10 @@ export default function RegisterPage() {
     try {
       await registerWithPassword({ email: values.email, password: values.password })
       await logout()
-      toast.success("Cuenta creada correctamente. Ya puedes iniciar sesión.")
+      toast.success(t("auth.register.success"))
       form.reset()
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Error al crear la cuenta"
+      const message = err instanceof Error ? err.message : t("auth.register.error")
       setFormError(message)
     }
   }
@@ -52,8 +60,8 @@ export default function RegisterPage() {
     <AuthShell>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Crear cuenta</CardTitle>
-          <CardDescription>Crea tu cuenta para empezar</CardDescription>
+          <CardTitle className="text-2xl">{t("auth.register.title")}</CardTitle>
+          <CardDescription>{t("auth.register.description")}</CardDescription>
         </CardHeader>
 
         <CardContent>
@@ -68,11 +76,11 @@ export default function RegisterPage() {
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>{t("auth.fields.email")}</FormLabel>
                     <FormControl>
                       <Input
                         type="email"
-                        placeholder="tu@email.com"
+                        placeholder={t("auth.placeholders.email")}
                         autoComplete="email"
                         {...field}
                       />
@@ -87,11 +95,11 @@ export default function RegisterPage() {
                 name="password"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Contraseña</FormLabel>
+                    <FormLabel>{t("auth.fields.password")}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="mínimo 6 caracteres"
+                        placeholder={t("auth.placeholders.password")}
                         autoComplete="new-password"
                         {...field}
                       />
@@ -106,11 +114,11 @@ export default function RegisterPage() {
                 name="confirmPassword"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Confirmar contraseña</FormLabel>
+                    <FormLabel>{t("auth.fields.confirmPassword")}</FormLabel>
                     <FormControl>
                       <Input
                         type="password"
-                        placeholder="repite tu contraseña"
+                        placeholder={t("auth.placeholders.confirmPassword")}
                         autoComplete="new-password"
                         {...field}
                       />
@@ -125,16 +133,16 @@ export default function RegisterPage() {
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
-                {form.formState.isSubmitting ? "Creando cuenta..." : "Crear cuenta"}
+                {form.formState.isSubmitting ? t("auth.register.submitting") : t("auth.register.submit")}
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
-                ¿Ya tienes cuenta?{" "}
+                {t("auth.register.hasAccount")}{" "}
                 <Link
                   to="/login"
                   className="text-foreground underline underline-offset-4 hover:text-primary"
                 >
-                  Inicia sesión
+                  {t("auth.register.login")}
                 </Link>
               </p>
             </form>
@@ -143,11 +151,15 @@ export default function RegisterPage() {
       </Card>
 
       <p className="text-center text-xs text-muted-foreground mt-4 px-2">
-        Al continuar, aceptas los{" "}
-        <a href="#" className="underline underline-offset-4 hover:text-foreground">Términos de uso</a>
-        {" "}y la{" "}
-        <a href="#" className="underline underline-offset-4 hover:text-foreground">Política de privacidad</a>
-        {" "}de Scrybe.
+        {t("auth.legal.prefix")}{" "}
+        <a href="#" className="underline underline-offset-4 hover:text-foreground">
+          {t("auth.legal.terms")}
+        </a>{" "}
+        {t("auth.legal.middle")}{" "}
+        <a href="#" className="underline underline-offset-4 hover:text-foreground">
+          {t("auth.legal.privacy")}
+        </a>{" "}
+        {t("auth.legal.suffix")}
       </p>
     </AuthShell>
   )

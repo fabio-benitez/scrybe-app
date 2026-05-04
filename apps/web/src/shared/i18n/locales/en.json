@@ -1,0 +1,65 @@
+{
+  "auth": {
+    "shell": {
+      "tagline": "Organize your content simply and efficiently",
+      "features": {
+        "content": {
+          "title": "Structured content",
+          "description": "Write and organize your content with categories and tags."
+        },
+        "files": {
+          "title": "File management",
+          "description": "Attach and manage files directly in your content."
+        },
+        "tags": {
+          "title": "Flexible tags",
+          "description": "Classify with custom tags to find everything instantly."
+        }
+      }
+    },
+    "login": {
+      "title": "Sign in",
+      "description": "Access your Scrybe account",
+      "forgotPassword": "Forgot your password?",
+      "submit": "Sign in",
+      "submitting": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "register": "Sign up",
+      "error": "Invalid email or password"
+    },
+    "register": {
+      "title": "Create account",
+      "description": "Create your account to get started",
+      "submit": "Create account",
+      "submitting": "Creating account...",
+      "hasAccount": "Already have an account?",
+      "login": "Sign in",
+      "success": "Account created successfully. You can now sign in.",
+      "error": "Could not create account"
+    },
+    "fields": {
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Confirm password"
+    },
+    "placeholders": {
+      "email": "you@example.com",
+      "password": "your password",
+      "newPassword": "minimum 6 characters",
+      "confirmPassword": "repeat your password"
+    },
+    "legal": {
+      "prefix": "By continuing, you agree to the",
+      "terms": "Terms of Use",
+      "middle": "and the",
+      "privacy": "Privacy Policy",
+      "suffix": "of Scrybe."
+    },
+    "validation": {
+      "email": "Enter a valid email",
+      "passwordMin": "Password must be at least 6 characters",
+      "confirmPasswordRequired": "Confirm your password",
+      "passwordsDoNotMatch": "Passwords do not match"
+    }
+  }
+}
