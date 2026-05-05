@@ -4,7 +4,9 @@ import { useAuth } from "@/features/auth/hooks/use-auth"
 import { ProtectedRoute } from "@/features/auth/components/protected-route"
 import LoginPage from "@/features/auth/pages/login-page"
 import RegisterPage from "@/features/auth/pages/register-page"
-import DashboardPage from "@/features/profile/pages/dashboard-page"
+import DashboardPage from "@/features/dashboard/pages/dashboard-page"
+import { AppLayout } from "@/layouts/app-layout"
+
 
 function RootRedirect() {
   const { session, isLoading } = useAuth()
@@ -24,7 +26,9 @@ export function AppRouter() {
         <Route path="/register" element={<RegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/app" element={<DashboardPage />} />
+          <Route element={<AppLayout />}>
+            <Route path="/app" element={<DashboardPage />} />
+          </Route>
         </Route>
       </Routes>
     </BrowserRouter>
