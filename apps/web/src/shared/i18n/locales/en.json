@@ -67,5 +67,29 @@
     "forbidden": "You don't have permission to access this resource.",
     "serverError": "Server error. Please try again later.",
     "unknown": "An unexpected error occurred."
+  },
+  "app": {
+    "brand": {
+      "name": "Scrybe"
+    },
+    "navigation": {
+      "main": "Navigation",
+      "organization": "Organization",
+      "settings": "Settings",
+      "home": "Home",
+      "notes": "Notes",
+      "favorites": "Favorites",
+      "library": "Library",
+      "trash": "Trash",
+      "categories": "Categories",
+      "tags": "Tags"
+    },
+    "userMenu": {
+      "profile": "Profile",
+      "settings": "Settings",
+      "logout": "Log out",
+      "loading": "Loading...",
+      "fallbackName": "User"
+    }
   }
 }

@@ -1,6 +1,13 @@
 import { useTranslation } from "react-i18next"
+import { LanguagesIcon } from "lucide-react"
 
 import { Button } from "@/shared/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu"
 import { getPreferences, setPreferences } from "@/shared/preferences/preferences"
 
 export function LanguageSwitcher() {
@@ -9,34 +16,34 @@ export function LanguageSwitcher() {
 
   function changeLanguage(language: "es" | "en") {
     const preferences = getPreferences()
-
-    setPreferences({
-      ...preferences,
-      language,
-    })
-
+    setPreferences({ ...preferences, language })
     i18n.changeLanguage(language)
   }
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        type="button"
-        variant={currentLanguage === "es" ? "default" : "outline"}
-        size="sm"
-        onClick={() => changeLanguage("es")}
-      >
-        ES
-      </Button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <LanguagesIcon className="size-4" />
+          <span className="sr-only">Cambiar idioma</span>
+        </Button>
+      </DropdownMenuTrigger>
 
-      <Button
-        type="button"
-        variant={currentLanguage === "en" ? "default" : "outline"}
-        size="sm"
-        onClick={() => changeLanguage("en")}
-      >
-        EN
-      </Button>
-    </div>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem
+          onClick={() => changeLanguage("es")}
+          className={currentLanguage === "es" ? "font-medium" : ""}
+        >
+          Español
+        </DropdownMenuItem>
+
+        <DropdownMenuItem
+          onClick={() => changeLanguage("en")}
+          className={currentLanguage === "en" ? "font-medium" : ""}
+        >
+          English
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
