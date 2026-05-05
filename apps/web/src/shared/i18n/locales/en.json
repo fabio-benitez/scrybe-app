@@ -90,6 +90,11 @@
       "logout": "Log out",
       "loading": "Loading...",
       "fallbackName": "User"
+    },
+    "language": {
+      "change": "Change language",
+      "spanish": "Spanish",
+      "english": "English"
     }
   }
 }

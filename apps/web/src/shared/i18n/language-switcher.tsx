@@ -11,7 +11,7 @@ import {
 import { getPreferences, setPreferences } from "@/shared/preferences/preferences"
 
 export function LanguageSwitcher() {
-  const { i18n } = useTranslation()
+  const { i18n, t } = useTranslation()
   const currentLanguage = i18n.language === "en" ? "en" : "es"
 
   function changeLanguage(language: "es" | "en") {
@@ -25,7 +25,7 @@ export function LanguageSwitcher() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-8 w-8">
           <LanguagesIcon className="size-4" />
-          <span className="sr-only">Cambiar idioma</span>
+          <span className="sr-only">{t("app.language.change")}</span>
         </Button>
       </DropdownMenuTrigger>
 
@@ -34,14 +34,14 @@ export function LanguageSwitcher() {
           onClick={() => changeLanguage("es")}
           className={currentLanguage === "es" ? "font-medium" : ""}
         >
-          Español
+          {t("app.language.spanish")}
         </DropdownMenuItem>
 
         <DropdownMenuItem
           onClick={() => changeLanguage("en")}
           className={currentLanguage === "en" ? "font-medium" : ""}
         >
-          English
+          {t("app.language.english")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
