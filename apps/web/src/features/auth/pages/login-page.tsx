@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { AuthShell } from "../components/auth-shell"
 import { createLoginSchema, type LoginFormValues } from "../schemas/login-schema"
 import { loginWithPassword } from "../services/auth-service"
-import { useAuth } from "../providers/auth-provider"
+import { useAuth } from "../hooks/use-auth"
 
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/ui/card"
