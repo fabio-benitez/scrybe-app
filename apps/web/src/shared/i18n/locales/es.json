@@ -61,5 +61,11 @@
       "confirmPasswordRequired": "Confirma tu contraseña",
       "passwordsDoNotMatch": "Las contraseñas no coinciden"
     }
+  },
+  "errors": {
+    "unauthorized": "Tu sesión ha expirado. Inicia sesión de nuevo.",
+    "forbidden": "No tienes permiso para acceder a este recurso.",
+    "serverError": "Error en el servidor. Inténtalo de nuevo.",
+    "unknown": "Ha ocurrido un error inesperado."
   }
 }

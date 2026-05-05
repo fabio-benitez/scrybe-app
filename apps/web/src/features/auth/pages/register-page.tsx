@@ -8,7 +8,7 @@ import { toast } from "sonner"
 import { AuthShell } from "../components/auth-shell"
 import { createRegisterSchema, type RegisterFormValues } from "../schemas/register-schema"
 import { logout, registerWithPassword } from "../services/auth-service"
-import { useAuth } from "../providers/auth-provider"
+import { useAuth } from "../hooks/use-auth"
 
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/shared/components/ui/card"
