@@ -132,7 +132,13 @@
   },
   "notes": {
     "title": "Notas",
-    "description": "Crea, organiza y revisa tus notas desde aquí."
+    "description": "Crea, organiza y revisa tus notas desde aquí.",
+    "new": "Nueva nota",
+    "loading": "Cargando notas...",
+    "empty": {
+      "title": "No hay notas todavía",
+      "description": "Crea tu primera nota para empezar a organizar tu contenido."
+    }
   },
   "profileSettings": {
     "title": "Ajustes",
