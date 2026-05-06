@@ -1,36 +1,19 @@
-type Preferences = {
-  language: "es" | "en"
-  theme: "dark" | "light"
-}
+type Language = "es" | "en"
 
-const STORAGE_KEY = "scrybe.preferences"
+const LANGUAGE_STORAGE_KEY = "scrybe.language"
 
-const DEFAULT_PREFERENCES: Preferences = {
-  language: "es",
-  theme: "dark",
-}
+const DEFAULT_LANGUAGE: Language = "es"
 
-export function getPreferences(): Preferences {
-  const stored = localStorage.getItem(STORAGE_KEY)
+export function getLanguage(): Language {
+  const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY)
 
-  if (!stored) return DEFAULT_PREFERENCES
-
-  try {
-    return { ...DEFAULT_PREFERENCES, ...JSON.parse(stored) }
-  } catch {
-    return DEFAULT_PREFERENCES
+  if (stored === "es" || stored === "en") {
+    return stored
   }
+
+  return DEFAULT_LANGUAGE
 }
 
-export function setPreferences(prefs: Preferences) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs))
-}
-
-export function getLanguage(): Preferences["language"] {
-  return getPreferences().language
-}
-
-export function setLanguage(language: Preferences["language"]) {
-  const prefs = getPreferences()
-  setPreferences({ ...prefs, language })
+export function setLanguage(language: Language) {
+  localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
 }

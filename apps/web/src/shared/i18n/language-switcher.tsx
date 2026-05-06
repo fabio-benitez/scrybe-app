@@ -8,15 +8,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu"
-import { getPreferences, setPreferences } from "@/shared/preferences/preferences"
+import { setLanguage } from "@/shared/preferences/preferences"
 
 export function LanguageSwitcher() {
   const { i18n, t } = useTranslation()
   const currentLanguage = i18n.language === "en" ? "en" : "es"
 
   function changeLanguage(language: "es" | "en") {
-    const preferences = getPreferences()
-    setPreferences({ ...preferences, language })
+    setLanguage(language)
     i18n.changeLanguage(language)
   }
 

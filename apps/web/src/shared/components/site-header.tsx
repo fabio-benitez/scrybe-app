@@ -14,6 +14,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Separator } from "@/shared/components/ui/separator"
 import { useSidebar } from "@/shared/components/ui/sidebar"
 import { LanguageSwitcher } from "@/shared/i18n/language-switcher"
+import { ThemeToggle } from "@/shared/theme/theme-toggle"
 
 const routeLabels: Record<string, string> = {
   notes: "app.navigation.notes",
@@ -32,6 +33,11 @@ export function SiteHeader() {
 
   const segments = pathname.split("/").filter(Boolean).slice(1)
   const currentSegment = segments.at(-1)
+
+  const currentLabel =
+  segments.length === 0
+    ? "app.navigation.home"
+    : routeLabels[currentSegment ?? ""]
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
@@ -58,12 +64,12 @@ export function SiteHeader() {
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {currentSegment && (
+            {currentLabel && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage>
-                    {t(routeLabels[currentSegment] ?? currentSegment)}
+                    {t(currentLabel)}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>
@@ -72,6 +78,7 @@ export function SiteHeader() {
         </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-1">
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
       </div>

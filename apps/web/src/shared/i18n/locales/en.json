@@ -96,5 +96,46 @@
       "spanish": "Spanish",
       "english": "English"
     }
+  },
+  "dashboard": {
+    "title": "Home",
+    "description": "Overview of your personal space.",
+    "actions": {
+      "newNote": "New note"
+    },
+    "stats": {
+      "notes": {
+        "title": "Notes",
+        "description": "Created notes"
+      },
+      "categories": {
+        "title": "Categories",
+        "description": "Organized categories"
+      },
+      "tags": {
+        "title": "Tags",
+        "description": "Available tags"
+      },
+      "files": {
+        "title": "Files",
+        "description": "Stored files"
+      }
+    },
+    "recentNotes": {
+      "title": "Recent notes",
+      "empty": "There are no recent notes yet."
+    },
+    "topCategories": {
+      "title": "Top categories",
+      "empty": "Most used categories will appear here."
+    }
+  },
+  "notes": {
+    "title": "Notes",
+    "description": "Create, organize, and review your notes from here."
+  },
+  "profileSettings": {
+    "title": "Settings",
+    "description": "Manage your profile and account preferences."
   }
 }
