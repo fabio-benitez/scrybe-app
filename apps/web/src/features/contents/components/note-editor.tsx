@@ -2,6 +2,8 @@ import { Link } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { ArrowLeftIcon } from "lucide-react"
 
+import { SimpleEditor } from "@/shared/components/tiptap-templates/simple/simple-editor"
+
 import { useCategories } from "@/features/categories/hooks/use-categories"
 
 import { Button } from "@/shared/components/ui/button"
@@ -63,14 +65,10 @@ export function NoteEditor() {
                     className="h-auto border-0 bg-transparent px-2.5 py-2 text-4xl font-semibold leading-tight shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 md:text-4xl"
                     placeholder={t("notes.editor.titlePlaceholder")}
                 />
-
-                <p className="text-sm text-muted-foreground">
-                    {t("notes.editor.startWriting")}
-                </p>
             </div>
 
-            <div className="min-h-72 rounded-xl border border-dashed bg-muted/10 p-4 text-sm text-muted-foreground">
-              {t("notes.editor.contentPlaceholder")}
+            <div className="overflow-hidden rounded-xl border bg-muted/10">
+              <SimpleEditor placeholder={t("notes.editor.contentPlaceholder")} />
             </div>
           </CardContent>
         </Card>

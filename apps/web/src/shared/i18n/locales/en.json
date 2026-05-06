@@ -157,8 +157,7 @@
       "properties": "Properties",
       "category": "Category",
       "titlePlaceholder": "Note title",
-      "startWriting": "Start writing or select a block from the “/” menu.",
-      "contentPlaceholder": "The editor will appear here in the next step."
+      "contentPlaceholder": "Start writing your content."
     }
   },
   "profileSettings": {

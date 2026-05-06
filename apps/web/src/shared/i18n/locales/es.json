@@ -157,8 +157,7 @@
       "properties": "Propiedades",
       "category": "Categoría",
       "titlePlaceholder": "Título de la nota",
-      "startWriting": "Empieza a escribir o selecciona un bloque desde el menú “/”.",
-      "contentPlaceholder": "El editor aparecerá aquí en el siguiente paso."
+      "contentPlaceholder": "Empieza a escribir tu contenido."
     }
   },
   "profileSettings": {
