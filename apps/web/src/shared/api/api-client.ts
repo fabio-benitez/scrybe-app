@@ -19,10 +19,12 @@ export async function apiFetch<T>(
     throw new ApiError(401, "No active session")
   }
 
+  const isFormData = options?.body instanceof FormData
+
   const res = await fetch(`${BASE_URL}${path}`, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
+      ...(isFormData ? {} : { "Content-Type": "application/json" }),
       Authorization: `Bearer ${session.access_token}`,
       ...options?.headers,
     },
