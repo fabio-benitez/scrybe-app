@@ -132,7 +132,33 @@
   },
   "notes": {
     "title": "Notas",
-    "description": "Crea, organiza y revisa tus notas desde aquí."
+    "description": "Crea, organiza y revisa tus notas desde aquí.",
+    "new": "Nueva nota",
+    "loading": "Cargando notas...",
+    "empty": {
+      "title": "No hay notas todavía",
+      "description": "Crea tu primera nota para empezar a organizar tu contenido."
+    },
+    "uncategorized": "Sin categoría",
+    "group": {
+      "count": "{{count}} notas"
+    },
+    "updatedAt": {
+      "justNow": "Actualizada ahora",
+      "relative": "Actualizada {{time}}",
+      "date": "Actualizada el {{date}}"
+    },
+    "editor": {
+      "back": "Volver a notas",
+      "title": "Nueva nota",
+      "description": "Crea una nota y organízala dentro de tu espacio.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "properties": "Propiedades",
+      "category": "Categoría",
+      "titlePlaceholder": "Título de la nota",
+      "contentPlaceholder": "Empieza a escribir tu contenido."
+    }
   },
   "profileSettings": {
     "title": "Ajustes",
