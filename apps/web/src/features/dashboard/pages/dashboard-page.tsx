@@ -8,6 +8,7 @@ import {
 } from "lucide-react"
 
 import { Button } from "@/shared/components/ui/button"
+import { Link } from "react-router-dom"
 import {
   Card,
   CardContent,
@@ -31,9 +32,11 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <Button>
-          <PlusIcon className="size-4" />
-          {t("dashboard.actions.newNote")}
+        <Button asChild>
+          <Link to="/app/notes/new">
+            <PlusIcon className="size-4" />
+            {t("dashboard.actions.newNote")}
+          </Link>
         </Button>
       </div>
 
