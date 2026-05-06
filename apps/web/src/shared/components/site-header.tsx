@@ -14,6 +14,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Separator } from "@/shared/components/ui/separator"
 import { useSidebar } from "@/shared/components/ui/sidebar"
 import { LanguageSwitcher } from "@/shared/i18n/language-switcher"
+import { ThemeToggle } from "@/shared/theme/theme-toggle"
 
 const routeLabels: Record<string, string> = {
   notes: "app.navigation.notes",
@@ -72,6 +73,7 @@ export function SiteHeader() {
         </Breadcrumb>
 
         <div className="ml-auto flex items-center gap-1">
+          <ThemeToggle />
           <LanguageSwitcher />
         </div>
       </div>
