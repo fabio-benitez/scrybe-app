@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import type { Content as TiptapContent } from "@tiptap/core"
 import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
@@ -74,6 +75,8 @@ import "@/shared/components/tiptap-templates/simple/simple-editor.scss"
 
 interface SimpleEditorProps {
   placeholder: string
+  content?: unknown
+  onChange?: (content: unknown) => void
 }
 
 const MainToolbarContent = ({
@@ -179,16 +182,29 @@ const MobileToolbarContent = ({
   </>
 )
 
-export function SimpleEditor({ placeholder }: SimpleEditorProps) {
+export function SimpleEditor({
+  placeholder,
+  content,
+  onChange,
+}: SimpleEditorProps) {
   const isMobile = useIsBreakpoint()
   const { height } = useWindowSize()
   const [mobileView, setMobileView] = useState<"main" | "highlighter" | "link">(
     "main"
   )
   const toolbarRef = useRef<HTMLDivElement>(null)
+  const onChangeRef = useRef(onChange)
+
+  useEffect(() => {
+    onChangeRef.current = onChange
+  }, [onChange])
 
   const editor = useEditor({
     immediatelyRender: false,
+    content: content as TiptapContent | undefined,
+    onUpdate: ({ editor }) => {
+      onChangeRef.current?.(editor.getJSON())
+    },
     editorProps: {
       attributes: {
         autocomplete: "off",

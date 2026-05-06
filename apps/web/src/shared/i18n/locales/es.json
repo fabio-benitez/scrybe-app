@@ -148,16 +148,51 @@
       "relative": "Actualizada {{time}}",
       "date": "Actualizada el {{date}}"
     },
+    "status": {
+      "draft": "Borrador",
+      "published": "Publicada",
+      "archived": "Archivada"
+    },
+    "visibility": {
+      "private": "Privada",
+      "public": "Pública"
+    },
     "editor": {
       "back": "Volver a notas",
       "title": "Nueva nota",
       "description": "Crea una nota y organízala dentro de tu espacio.",
       "cancel": "Cancelar",
       "save": "Guardar",
+      "saving": "Guardando...",
       "properties": "Propiedades",
       "category": "Categoría",
       "titlePlaceholder": "Título de la nota",
-      "contentPlaceholder": "Empieza a escribir tu contenido."
+      "contentPlaceholder": "Empieza a escribir tu contenido.",
+      "validation": {
+        "titleRequired": "El título es obligatorio."
+      },
+      "toast": {
+        "created": "Nota creada correctamente.",
+        "createError": "No se pudo crear la nota."
+      }
+    },
+    "detail": {
+      "back": "Volver a notas",
+      "loading": "Cargando nota...",
+      "notFound": "No se pudo encontrar la nota.",
+      "information": "Información",
+      "category": "Categoría",
+      "tags": "Etiquetas",
+      "noTags": "Sin etiquetas",
+      "status": "Estado",
+      "visibility": "Visibilidad",
+      "dates": "Fechas",
+      "updatedAt": "Actualizada",
+      "createdAt": "Creada",
+      "edit": "Editar",
+      "favorite": "Marcar como favorita",
+      "uncategorized": "Sin categoría",
+      "emptyContent": "Esta nota no tiene contenido."
     }
   },
   "profileSettings": {

@@ -89,10 +89,11 @@ function NoteCard({ content }: { content: Content }) {
   const { t, i18n } = useTranslation()
 
   return (
-    <Link
-      to={`/app/notes/${content.id}`}
-      className="block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-    >
+      <Link
+        to={`/app/notes/${content.id}`}
+        state={{ breadcrumbLabel: content.title }}
+        className="block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      >
       <Card
         size="sm"
         className="h-full bg-muted/30 transition-colors hover:bg-muted/40"

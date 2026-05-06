@@ -29,17 +29,25 @@ const routeLabels: Record<string, string> = {
 
 export function SiteHeader() {
   const { toggleSidebar } = useSidebar()
-  const { pathname } = useLocation()
+  const { pathname, state } = useLocation()
   const { t } = useTranslation()
 
   const segments = pathname.split("/").filter(Boolean).slice(1)
 
+  const breadcrumbLabel =
+    typeof state?.breadcrumbLabel === "string" ? state.breadcrumbLabel : null
+
   const breadcrumbItems = segments.map((segment, index) => {
     const path = `/app/${segments.slice(0, index + 1).join("/")}`
+    const isLast = index === segments.length - 1
 
     return {
       path,
-      label: routeLabels[segment] ?? segment,
+      label:
+        isLast && breadcrumbLabel
+          ? breadcrumbLabel
+          : routeLabels[segment] ?? segment,
+      translate: !(isLast && breadcrumbLabel),
     }
   })
 
@@ -81,10 +89,14 @@ export function SiteHeader() {
 
                   <BreadcrumbItem>
                     {isLast ? (
-                      <BreadcrumbPage>{t(item.label)}</BreadcrumbPage>
+                      <BreadcrumbPage>
+                        {item.translate ? t(item.label) : item.label}
+                      </BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink asChild>
-                        <Link to={item.path}>{t(item.label)}</Link>
+                        <Link to={item.path}>
+                          {item.translate ? t(item.label) : item.label}
+                        </Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>

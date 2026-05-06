@@ -1,0 +1,14 @@
+.note-content-viewer {
+  width: 100%;
+}
+
+.note-content-viewer .tiptap.ProseMirror {
+  min-height: 24rem;
+  padding: 0;
+  outline: none;
+  font-family: inherit;
+}
+
+.note-content-viewer .tiptap.ProseMirror > * + * {
+  margin-top: 0.75rem;
+}

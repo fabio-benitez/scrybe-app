@@ -148,16 +148,51 @@
       "relative": "Updated {{time}}",
       "date": "Updated {{date}}"
     },
+    "status": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "visibility": {
+      "private": "Private",
+      "public": "Public"
+    },
     "editor": {
       "back": "Back to notes",
       "title": "New note",
       "description": "Create a note and organize it in your space.",
       "cancel": "Cancel",
       "save": "Save",
+      "saving": "Saving...",
       "properties": "Properties",
       "category": "Category",
       "titlePlaceholder": "Note title",
-      "contentPlaceholder": "Start writing your content."
+      "contentPlaceholder": "Start writing your content.",
+      "validation": {
+        "titleRequired": "Title is required."
+      },
+      "toast": {
+        "created": "Note created successfully.",
+        "createError": "Could not create note."
+      }
+    },
+    "detail": {
+      "back": "Back to notes",
+      "loading": "Loading note...",
+      "notFound": "Note could not be found.",
+      "information": "Information",
+      "category": "Category",
+      "tags": "Tags",
+      "noTags": "No tags",
+      "status": "Status",
+      "visibility": "Visibility",
+      "dates": "Dates",
+      "updatedAt": "Updated",
+      "createdAt": "Created",
+      "edit": "Edit",
+      "favorite": "Mark as favorite",
+      "uncategorized": "Uncategorized",
+      "emptyContent": "This note has no content."
     }
   },
   "profileSettings": {
