@@ -4,7 +4,6 @@ import { useQuery } from "@tanstack/react-query"
 import {
   ChevronsUpDownIcon,
   LogOutIcon,
-  SettingsIcon,
   UserIcon,
 } from "lucide-react"
 
@@ -126,10 +125,6 @@ export function NavUser() {
                 {t("app.userMenu.profile")}
               </DropdownMenuItem>
 
-              <DropdownMenuItem>
-                <SettingsIcon />
-                {t("app.userMenu.settings")}
-              </DropdownMenuItem>
             </DropdownMenuGroup>
 
             <DropdownMenuSeparator />

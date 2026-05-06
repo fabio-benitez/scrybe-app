@@ -34,6 +34,11 @@ export function SiteHeader() {
   const segments = pathname.split("/").filter(Boolean).slice(1)
   const currentSegment = segments.at(-1)
 
+  const currentLabel =
+  segments.length === 0
+    ? "app.navigation.home"
+    : routeLabels[currentSegment ?? ""]
+
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
       <div className="flex h-(--header-height) w-full items-center gap-2 px-4">
@@ -59,12 +64,12 @@ export function SiteHeader() {
               </BreadcrumbLink>
             </BreadcrumbItem>
 
-            {currentSegment && (
+            {currentLabel && (
               <>
                 <BreadcrumbSeparator />
                 <BreadcrumbItem>
                   <BreadcrumbPage>
-                    {t(routeLabels[currentSegment] ?? currentSegment)}
+                    {t(currentLabel)}
                   </BreadcrumbPage>
                 </BreadcrumbItem>
               </>

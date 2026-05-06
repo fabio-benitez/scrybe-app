@@ -5,6 +5,8 @@ import { ProtectedRoute } from "@/features/auth/components/protected-route"
 import LoginPage from "@/features/auth/pages/login-page"
 import RegisterPage from "@/features/auth/pages/register-page"
 import DashboardPage from "@/features/dashboard/pages/dashboard-page"
+import NotesPage from "@/features/notes/pages/notes-page"
+import ProfileSettingsPage from "@/features/profile/pages/profile-settings-page"
 import { AppLayout } from "@/layouts/app-layout"
 
 
@@ -28,6 +30,8 @@ export function AppRouter() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/app" element={<DashboardPage />} />
+            <Route path="/app/notes" element={<NotesPage />} />
+            <Route path="/app/settings" element={<ProfileSettingsPage />} />
           </Route>
         </Route>
       </Routes>
