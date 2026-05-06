@@ -147,6 +147,18 @@
       "justNow": "Updated just now",
       "relative": "Updated {{time}}",
       "date": "Updated {{date}}"
+    },
+    "editor": {
+      "back": "Back to notes",
+      "title": "New note",
+      "description": "Create a note and organize it in your space.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "properties": "Properties",
+      "category": "Category",
+      "titlePlaceholder": "Note title",
+      "startWriting": "Start writing or select a block from the “/” menu.",
+      "contentPlaceholder": "The editor will appear here in the next step."
     }
   },
   "profileSettings": {

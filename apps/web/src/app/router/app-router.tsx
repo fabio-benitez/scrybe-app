@@ -6,9 +6,9 @@ import LoginPage from "@/features/auth/pages/login-page"
 import RegisterPage from "@/features/auth/pages/register-page"
 import DashboardPage from "@/features/dashboard/pages/dashboard-page"
 import NotesPage from "@/features/contents/pages/notes-page"
+import NoteEditorPage from "@/features/contents/pages/note-editor-page"
 import ProfileSettingsPage from "@/features/profile/pages/profile-settings-page"
 import { AppLayout } from "@/layouts/app-layout"
-
 
 function RootRedirect() {
   const { session, isLoading } = useAuth()
@@ -31,6 +31,7 @@ export function AppRouter() {
           <Route element={<AppLayout />}>
             <Route path="/app" element={<DashboardPage />} />
             <Route path="/app/notes" element={<NotesPage />} />
+            <Route path="/app/notes/new" element={<NoteEditorPage />} />
             <Route path="/app/settings" element={<ProfileSettingsPage />} />
           </Route>
         </Route>

@@ -147,6 +147,18 @@
       "justNow": "Actualizada ahora",
       "relative": "Actualizada {{time}}",
       "date": "Actualizada el {{date}}"
+    },
+    "editor": {
+      "back": "Volver a notas",
+      "title": "Nueva nota",
+      "description": "Crea una nota y organízala dentro de tu espacio.",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "properties": "Propiedades",
+      "category": "Categoría",
+      "titlePlaceholder": "Título de la nota",
+      "startWriting": "Empieza a escribir o selecciona un bloque desde el menú “/”.",
+      "contentPlaceholder": "El editor aparecerá aquí en el siguiente paso."
     }
   },
   "profileSettings": {
