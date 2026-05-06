@@ -138,6 +138,15 @@
     "empty": {
       "title": "There are no notes yet",
       "description": "Create your first note to start organizing your content."
+    },
+    "uncategorized": "Uncategorized",
+    "group": {
+      "count": "{{count}} notes"
+    },
+    "updatedAt": {
+      "justNow": "Updated just now",
+      "relative": "Updated {{time}}",
+      "date": "Updated {{date}}"
     }
   },
   "profileSettings": {
