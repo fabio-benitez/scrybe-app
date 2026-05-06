@@ -24,6 +24,7 @@ const routeLabels: Record<string, string> = {
   categories: "app.navigation.categories",
   tags: "app.navigation.tags",
   settings: "app.navigation.settings",
+  new: "notes.editor.title",
 }
 
 export function SiteHeader() {
@@ -32,12 +33,15 @@ export function SiteHeader() {
   const { t } = useTranslation()
 
   const segments = pathname.split("/").filter(Boolean).slice(1)
-  const currentSegment = segments.at(-1)
 
-  const currentLabel =
-  segments.length === 0
-    ? "app.navigation.home"
-    : routeLabels[currentSegment ?? ""]
+  const breadcrumbItems = segments.map((segment, index) => {
+    const path = `/app/${segments.slice(0, index + 1).join("/")}`
+
+    return {
+      path,
+      label: routeLabels[segment] ?? segment,
+    }
+  })
 
   return (
     <header className="sticky top-0 z-50 flex w-full items-center border-b bg-background">
@@ -59,21 +63,34 @@ export function SiteHeader() {
         <Breadcrumb className="hidden sm:block">
           <BreadcrumbList>
             <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/app">{t("app.brand.name")}</Link>
-              </BreadcrumbLink>
+              {breadcrumbItems.length === 0 ? (
+                <BreadcrumbPage>{t("app.brand.name")}</BreadcrumbPage>
+              ) : (
+                <BreadcrumbLink asChild>
+                  <Link to="/app">{t("app.brand.name")}</Link>
+                </BreadcrumbLink>
+              )}
             </BreadcrumbItem>
 
-            {currentLabel && (
-              <>
-                <BreadcrumbSeparator />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>
-                    {t(currentLabel)}
-                  </BreadcrumbPage>
-                </BreadcrumbItem>
-              </>
-            )}
+            {breadcrumbItems.map((item, index) => {
+              const isLast = index === breadcrumbItems.length - 1
+
+              return (
+                <div key={item.path} className="flex items-center gap-1.5">
+                  <BreadcrumbSeparator />
+
+                  <BreadcrumbItem>
+                    {isLast ? (
+                      <BreadcrumbPage>{t(item.label)}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink asChild>
+                        <Link to={item.path}>{t(item.label)}</Link>
+                      </BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                </div>
+              )
+            })}
           </BreadcrumbList>
         </Breadcrumb>
 
