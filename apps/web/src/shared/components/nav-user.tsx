@@ -28,10 +28,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/shared/components/ui/sidebar"
-import {
-  getProfile,
-  getProfileAvatarUrl,
-} from "@/features/profile/services/profile-service"
+import { getProfile } from "@/features/profile/services/profile-service"
+import { getFileUrl } from "@/features/files/services/file-service"
 import { supabase } from "@/shared/lib/supabase"
 
 import { useTranslation } from "react-i18next"
@@ -49,7 +47,7 @@ export function NavUser() {
 
   const { data: avatar } = useQuery({
     queryKey: ["profile-avatar", profile?.avatar_file_id],
-    queryFn: () => getProfileAvatarUrl(profile!.avatar_file_id!),
+    queryFn: () => getFileUrl(profile!.avatar_file_id!),
     enabled: Boolean(profile?.avatar_file_id),
   })
 
