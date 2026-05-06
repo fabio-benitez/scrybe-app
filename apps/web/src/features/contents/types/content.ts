@@ -24,6 +24,9 @@ export interface CreateContentPayload {
   summary?: string | null
   content: unknown
   category_id?: string | null
+  status?: ContentStatus
+  visibility?: ContentVisibility
+  is_favorite?: boolean
 }
 
 export interface UpdateContentPayload {

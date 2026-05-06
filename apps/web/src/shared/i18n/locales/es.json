@@ -154,10 +154,18 @@
       "description": "Crea una nota y organízala dentro de tu espacio.",
       "cancel": "Cancelar",
       "save": "Guardar",
+      "saving": "Guardando...",
       "properties": "Propiedades",
       "category": "Categoría",
       "titlePlaceholder": "Título de la nota",
-      "contentPlaceholder": "Empieza a escribir tu contenido."
+      "contentPlaceholder": "Empieza a escribir tu contenido.",
+      "validation": {
+        "titleRequired": "El título es obligatorio."
+      },
+      "toast": {
+        "created": "Nota creada correctamente.",
+        "createError": "No se pudo crear la nota."
+      }
     }
   },
   "profileSettings": {

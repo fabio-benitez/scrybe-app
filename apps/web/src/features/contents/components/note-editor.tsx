@@ -1,10 +1,14 @@
-import { Link } from "react-router-dom"
+import { useState, type FormEvent } from "react"
+import type { JSONContent } from "@tiptap/core"
+import { Link, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { ArrowLeftIcon } from "lucide-react"
+import { toast } from "sonner"
 
 import { SimpleEditor } from "@/shared/components/tiptap-templates/simple/simple-editor"
 
 import { useCategories } from "@/features/categories/hooks/use-categories"
+import { useCreateContent } from "@/features/contents/hooks/use-contents"
 
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
@@ -18,12 +22,52 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select"
 
+const emptyContent: JSONContent = {
+  type: "doc",
+  content: [{ type: "paragraph" }],
+}
+
 export function NoteEditor() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { data: categories } = useCategories()
+  const createContent = useCreateContent()
+  const [title, setTitle] = useState("")
+  const [content, setContent] = useState<JSONContent>(emptyContent)
+  const [categoryId, setCategoryId] = useState("uncategorized")
+
+  async function handleSave(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    const trimmedTitle = title.trim()
+
+    if (!trimmedTitle) {
+      toast.warning(t("notes.editor.validation.titleRequired"))
+      return
+    }
+
+    try {
+      await createContent.mutateAsync({
+        title: trimmedTitle,
+        content,
+        category_id: categoryId === "uncategorized" ? null : categoryId,
+        status: "draft",
+        visibility: "private",
+        is_favorite: false,
+      })
+
+      toast.success(t("notes.editor.toast.created"))
+      navigate("/app/notes")
+    } catch {
+      toast.error(t("notes.editor.toast.createError"))
+    }
+  }
 
   return (
-    <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
+    <form
+      className="flex flex-1 flex-col gap-6 p-4 md:p-6"
+      onSubmit={handleSave}
+    >
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="space-y-2">
           <Button variant="ghost" size="sm" className="-ml-3" asChild>
@@ -51,8 +95,10 @@ export function NoteEditor() {
             </Link>
           </Button>
 
-          <Button disabled>
-            {t("notes.editor.save")}
+          <Button type="submit" disabled={createContent.isPending}>
+            {createContent.isPending
+              ? t("notes.editor.saving")
+              : t("notes.editor.save")}
           </Button>
         </div>
       </div>
@@ -61,14 +107,22 @@ export function NoteEditor() {
         <Card className="min-h-128">
           <CardContent className="space-y-6 p-6">
             <div className="space-y-3">
-                <Input
-                    className="h-auto border-0 bg-transparent px-2.5 py-2 text-4xl font-semibold leading-tight shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 md:text-4xl"
-                    placeholder={t("notes.editor.titlePlaceholder")}
-                />
+              <Input
+                className="h-auto border-0 bg-transparent px-2.5 py-2 text-4xl font-semibold leading-tight shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 md:text-4xl"
+                placeholder={t("notes.editor.titlePlaceholder")}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+              />
             </div>
 
             <div className="overflow-hidden rounded-xl border bg-muted/10">
-              <SimpleEditor placeholder={t("notes.editor.contentPlaceholder")} />
+              <SimpleEditor
+                placeholder={t("notes.editor.contentPlaceholder")}
+                content={content}
+                onChange={(nextContent) =>
+                  setContent(nextContent as JSONContent)
+                }
+              />
             </div>
           </CardContent>
         </Card>
@@ -86,36 +140,36 @@ export function NoteEditor() {
                 {t("notes.editor.category")}
               </Label>
 
-              <Select>
+              <Select value={categoryId} onValueChange={setCategoryId}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={t("notes.uncategorized")} />
                 </SelectTrigger>
 
                 <SelectContent
-                    position="popper"
-                    side="bottom"
-                    align="start"
-                    className="w-(--radix-select-trigger-width)"
+                  position="popper"
+                  side="bottom"
+                  align="start"
+                  className="w-(--radix-select-trigger-width)"
                 >
-                <SelectItem value="uncategorized" className="text-sm">
+                  <SelectItem value="uncategorized" className="text-sm">
                     {t("notes.uncategorized")}
-                </SelectItem>
+                  </SelectItem>
 
-                {categories?.map((category) => (
+                  {categories?.map((category) => (
                     <SelectItem
-                        key={category.id}
-                        value={category.id}
-                        className="text-sm"
+                      key={category.id}
+                      value={category.id}
+                      className="text-sm"
                     >
-                        {category.name}
+                      {category.name}
                     </SelectItem>
-                ))}
+                  ))}
                 </SelectContent>
               </Select>
             </div>
           </CardContent>
         </Card>
       </div>
-    </div>
+    </form>
   )
 }

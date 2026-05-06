@@ -154,10 +154,18 @@
       "description": "Create a note and organize it in your space.",
       "cancel": "Cancel",
       "save": "Save",
+      "saving": "Saving...",
       "properties": "Properties",
       "category": "Category",
       "titlePlaceholder": "Note title",
-      "contentPlaceholder": "Start writing your content."
+      "contentPlaceholder": "Start writing your content.",
+      "validation": {
+        "titleRequired": "Title is required."
+      },
+      "toast": {
+        "created": "Note created successfully.",
+        "createError": "Could not create note."
+      }
     }
   },
   "profileSettings": {
