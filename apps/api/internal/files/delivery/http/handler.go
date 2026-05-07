@@ -18,7 +18,7 @@ import (
 )
 
 type uploadFileUseCase interface {
-	Execute(ctx context.Context, input application.UploadFileInput) (*domain.File, error)
+	Execute(ctx context.Context, input application.UploadFileInput) (*application.UploadFileResult, error)
 }
 
 type getFileUseCase interface {
@@ -155,9 +155,6 @@ func (h *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, domain.ErrFileTooLarge):
 			httpresponse.Error(w, http.StatusRequestEntityTooLarge, err.Error())
 
-		case errors.Is(err, application.ErrFileAlreadyExists):
-			httpresponse.Error(w, http.StatusConflict, err.Error())
-
 		case errors.Is(err, application.ErrStorageUnavailable):
 			httpresponse.Error(w, http.StatusInternalServerError, "storage unavailable")
 
@@ -172,7 +169,12 @@ func (h *Handler) UploadFile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpresponse.JSON(w, http.StatusCreated, toFileResponse(result))
+	if result.AlreadyExisted {
+		httpresponse.JSON(w, http.StatusOK, toUploadFileResponse(result))
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusCreated, toUploadFileResponse(result))
 }
 
 func (h *Handler) GetFile(w http.ResponseWriter, r *http.Request) {

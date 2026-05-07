@@ -17,6 +17,18 @@ FileResponse:
     uploaded_at:
       $ref: "./common.yaml#/NullableDateTime"
 
+UploadFileResponse:
+  allOf:
+    - $ref: "./files.yaml#/FileResponse"
+    - type: object
+      properties:
+        already_existed:
+          type: boolean
+          description: true si el archivo ya existía para este usuario (deduplicado por checksum_sha256)
+          example: false
+      required:
+        - already_existed
+
 FileURLResponse:
   type: object
   properties:

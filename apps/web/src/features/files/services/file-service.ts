@@ -2,14 +2,15 @@ import { apiFetch } from "@/shared/api/api-client"
 import type {
   FileResource,
   FileUrlResponse,
+  UploadFileResponse,
 } from "@/features/files/types/file"
 
-export function uploadFile(file: File): Promise<FileResource> {
+export function uploadFile(file: File): Promise<UploadFileResponse> {
   const formData = new FormData()
 
   formData.append("file", file)
 
-  return apiFetch<FileResource>("/files", {
+  return apiFetch<UploadFileResponse>("/files", {
     method: "POST",
     body: formData,
   })

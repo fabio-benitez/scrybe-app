@@ -19,17 +19,21 @@ files:
                 format: binary
     responses:
       "201":
-        description: Archivo subido correctamente
+        description: Archivo subido correctamente (nuevo)
         content:
           application/json:
             schema:
-              $ref: "../schemas/files.yaml#/FileResponse"
+              $ref: "../schemas/files.yaml#/UploadFileResponse"
+      "200":
+        description: Archivo ya existía para este usuario (deduplicado por checksum)
+        content:
+          application/json:
+            schema:
+              $ref: "../schemas/files.yaml#/UploadFileResponse"
       "400":
         description: Archivo inválido, vacío o MIME no permitido
       "401":
         description: No autenticado
-      "409":
-        description: Archivo duplicado
       "413":
         description: Archivo demasiado grande
       "500":

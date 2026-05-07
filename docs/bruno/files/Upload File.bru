@@ -23,7 +23,7 @@ body:multipart-form {
 }
 
 tests {
-  if (res.status === 201 && res.body.id) {
+  if ((res.status === 201 || res.status === 200) && res.body.id) {
     bru.setEnvVar("file_id", res.body.id);
   }
 }
@@ -39,7 +39,8 @@ docs {
   - campo file
   
   ### Respuestas:
-  - 201 → archivo subido
+  - 201 → archivo subido correctamente (nuevo)
+  - 200 → archivo reutilizado (duplicado detectado por checksum)
   - 400 → archivo inválido, vacío o MIME no permitido
   - 401 → no autenticado
   - 413 → archivo demasiado grande
