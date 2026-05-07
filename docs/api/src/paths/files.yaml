@@ -87,6 +87,8 @@ file-by-id:
         description: No autenticado
       "404":
         description: Archivo no encontrado
+      "409":
+        description: El archivo está en uso y no puede eliminarse
       "500":
         description: Error interno
 

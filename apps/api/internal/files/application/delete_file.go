@@ -10,17 +10,24 @@ import (
 )
 
 type DeleteFileUseCase struct {
-	repo    domain.Repository
-	storage domain.Storage
+	repo       domain.Repository
+	storage    domain.Storage
+	refChecker fileReferenceChecker
+}
+
+type fileReferenceChecker interface {
+	IsReferenced(ctx context.Context, userID string, fileID string) (bool, error)
 }
 
 func NewDeleteFileUseCase(
 	repo domain.Repository,
 	storage domain.Storage,
+	refChecker fileReferenceChecker,
 ) *DeleteFileUseCase {
 	return &DeleteFileUseCase{
-		repo:    repo,
-		storage: storage,
+		repo:       repo,
+		storage:    storage,
+		refChecker: refChecker,
 	}
 }
 
@@ -42,6 +49,14 @@ func (uc *DeleteFileUseCase) Execute(
 	file, err := uc.repo.FindByID(ctx, userID, fileID)
 	if err != nil {
 		return err
+	}
+
+	referenced, err := uc.refChecker.IsReferenced(ctx, userID, fileID)
+	if err != nil {
+		return err
+	}
+	if referenced {
+		return ErrFileInUse
 	}
 
 	if err := uc.storage.Delete(ctx, domain.DeleteInput{

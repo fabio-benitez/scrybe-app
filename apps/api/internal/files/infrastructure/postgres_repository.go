@@ -271,3 +271,29 @@ func (r *PostgresRepository) Delete(
 
 	return nil
 }
+
+func (r *PostgresRepository) IsReferenced(
+	ctx context.Context,
+	userID string,
+	fileID string,
+) (bool, error) {
+	query := `
+		SELECT EXISTS (
+			SELECT 1 FROM content_files
+			WHERE user_id = $1
+			  AND file_id = $2
+			UNION ALL
+			SELECT 1 FROM user_profiles
+			WHERE id = $1
+			  AND avatar_file_id = $2
+		)
+	`
+
+	var referenced bool
+	err := r.db.QueryRow(ctx, query, userID, fileID).Scan(&referenced)
+	if err != nil {
+		return false, err
+	}
+
+	return referenced, nil
+}

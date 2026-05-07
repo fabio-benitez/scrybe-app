@@ -221,6 +221,9 @@ func (h *Handler) DeleteFile(w http.ResponseWriter, r *http.Request) {
 		case errors.Is(err, domain.ErrFileNotFound):
 			httpresponse.Error(w, http.StatusNotFound, "file not found")
 
+		case errors.Is(err, application.ErrFileInUse):
+			httpresponse.Error(w, http.StatusConflict, "file is in use")
+
 		default:
 			slog.ErrorContext(r.Context(), "failed to delete file",
 				"user_id", user.ID,

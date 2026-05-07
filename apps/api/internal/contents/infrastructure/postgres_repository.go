@@ -400,6 +400,12 @@ func (r *PostgresRepository) PermanentDelete(
 		      AND cf2.user_id    = $2
 		      AND cf2.content_id <> $1
 		  )
+		  AND NOT EXISTS (
+		    SELECT 1
+		    FROM user_profiles
+		    WHERE id             = $2
+		      AND avatar_file_id = cf.file_id
+		  )
 	`
 
 	rows, err := tx.Query(ctx, orphanQuery, contentID, userID)
