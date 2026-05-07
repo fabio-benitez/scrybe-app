@@ -13,13 +13,13 @@ import {
 } from "@/shared/components/ui/sidebar"
 
 import {
-  ArchiveIcon,
   FolderIcon,
   HomeIcon,
   LibraryIcon,
   SettingsIcon,
   StarIcon,
   TagsIcon,
+  Trash2Icon,
 } from "lucide-react"
 
 import { useTranslation } from "react-i18next"
@@ -49,7 +49,7 @@ const navMain = [
   {
     titleKey: "app.navigation.trash",
     url: "/app/trash",
-    icon: ArchiveIcon,
+    icon: Trash2Icon,
   },
 ]
 

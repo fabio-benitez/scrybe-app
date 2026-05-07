@@ -211,6 +211,28 @@
       }
     }
   },
+  "trash": {
+    "title": "Trash",
+    "description": "Deleted notes that you can still restore or permanently delete.",
+    "loading": "Loading trash...",
+    "empty": {
+      "title": "Trash is empty",
+      "description": "Notes you delete will appear here."
+    },
+    "restore": "Restore",
+    "permanentDelete": "Permanently delete",
+    "permanentDeleteDialog": {
+      "title": "Permanently delete",
+      "description": "This action cannot be undone. The note will be permanently deleted.",
+      "confirm": "Permanently delete"
+    },
+    "toast": {
+      "restored": "Note restored.",
+      "restoreError": "Could not restore note.",
+      "permanentlyDeleted": "Note permanently deleted.",
+      "permanentDeleteError": "Could not permanently delete note."
+    }
+  },
   "profileSettings": {
     "title": "Settings",
     "description": "Manage your profile and account preferences."

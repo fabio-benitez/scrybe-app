@@ -211,6 +211,28 @@
       }
     }
   },
+  "trash": {
+    "title": "Papelera",
+    "description": "Notas eliminadas que todavía puedes restaurar o borrar definitivamente.",
+    "loading": "Cargando papelera...",
+    "empty": {
+      "title": "La papelera está vacía",
+      "description": "Las notas que elimines aparecerán aquí."
+    },
+    "restore": "Restaurar",
+    "permanentDelete": "Eliminar definitivamente",
+    "permanentDeleteDialog": {
+      "title": "Eliminar definitivamente",
+      "description": "Esta acción no se puede deshacer. La nota se eliminará de forma permanente.",
+      "confirm": "Eliminar definitivamente"
+    },
+    "toast": {
+      "restored": "Nota restaurada.",
+      "restoreError": "No se pudo restaurar la nota.",
+      "permanentlyDeleted": "Nota eliminada definitivamente.",
+      "permanentDeleteError": "No se pudo eliminar definitivamente la nota."
+    }
+  },
   "profileSettings": {
     "title": "Ajustes",
     "description": "Gestiona tu perfil y las preferencias de tu cuenta."
