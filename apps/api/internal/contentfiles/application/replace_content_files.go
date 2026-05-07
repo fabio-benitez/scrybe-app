@@ -2,9 +2,12 @@ package application
 
 import (
 	"context"
+	"errors"
+	"log/slog"
 	"strings"
 
 	"github.com/fabio-benitez/scrybe-app/apps/api/internal/contentfiles/domain"
+	filesapp "github.com/fabio-benitez/scrybe-app/apps/api/internal/files/application"
 	"github.com/google/uuid"
 )
 
@@ -14,13 +17,19 @@ type ReplaceContentFilesInput struct {
 	FileIDs   []string
 }
 
-type ReplaceContentFilesUseCase struct {
-	repo domain.Repository
+type fileDeleter interface {
+	Execute(ctx context.Context, userID string, fileID string) error
 }
 
-func NewReplaceContentFilesUseCase(repo domain.Repository) *ReplaceContentFilesUseCase {
+type ReplaceContentFilesUseCase struct {
+	repo        domain.Repository
+	fileDeleter fileDeleter
+}
+
+func NewReplaceContentFilesUseCase(repo domain.Repository, fd fileDeleter) *ReplaceContentFilesUseCase {
 	return &ReplaceContentFilesUseCase{
-		repo: repo,
+		repo:        repo,
+		fileDeleter: fd,
 	}
 }
 
@@ -39,7 +48,33 @@ func (uc *ReplaceContentFilesUseCase) Execute(ctx context.Context, input Replace
 		}
 	}
 
-	return uc.repo.ReplaceContentFiles(ctx, input.UserID, input.ContentID, dedupedIDs)
+	files, removedFileIDs, err := uc.repo.ReplaceContentFiles(ctx, input.UserID, input.ContentID, dedupedIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, fileID := range removedFileIDs {
+		if err := uc.fileDeleter.Execute(ctx, input.UserID, fileID); err != nil {
+			if errors.Is(err, filesapp.ErrFileInUse) {
+				slog.InfoContext(ctx,
+					"skipping orphan file cleanup: file still referenced",
+					"user_id", input.UserID,
+					"content_id", input.ContentID,
+					"file_id", fileID,
+				)
+			} else {
+				slog.ErrorContext(ctx,
+					"failed to cleanup orphan file",
+					"user_id", input.UserID,
+					"content_id", input.ContentID,
+					"file_id", fileID,
+					"error", err,
+				)
+			}
+		}
+	}
+
+	return files, nil
 }
 
 func deduplicateIDs(ids []string) []string {

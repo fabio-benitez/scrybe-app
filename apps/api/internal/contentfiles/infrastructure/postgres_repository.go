@@ -84,10 +84,10 @@ func (r *PostgresRepository) ReplaceContentFiles(
 	ctx context.Context,
 	userID, contentID string,
 	fileIDs []string,
-) ([]*domain.File, error) {
+) ([]*domain.File, []string, error) {
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer tx.Rollback(ctx)
 
@@ -102,10 +102,10 @@ func (r *PostgresRepository) ReplaceContentFiles(
 
 	if err := tx.QueryRow(ctx, contentExistsQuery, contentID, userID).Scan(&dummy); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, domain.ErrContentNotFound
+			return nil, nil, domain.ErrContentNotFound
 		}
 
-		return nil, err
+		return nil, nil, err
 	}
 
 	if len(fileIDs) > 0 {
@@ -120,12 +120,41 @@ func (r *PostgresRepository) ReplaceContentFiles(
 		var count int
 
 		if err := tx.QueryRow(ctx, countQuery, userID, fileIDs).Scan(&count); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 
 		if count != len(fileIDs) {
-			return nil, domain.ErrFileNotFound
+			return nil, nil, domain.ErrFileNotFound
 		}
+	}
+
+	// Captura los IDs de archivos que se eliminarán de la relación de este contenido.
+	removedQuery := `
+		SELECT file_id FROM content_files
+		WHERE content_id = $1
+		  AND user_id    = $2
+		  AND file_id <> ALL($3::uuid[])
+	`
+
+	removedRows, err := tx.Query(ctx, removedQuery, contentID, userID, fileIDs)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var removedFileIDs []string
+
+	for removedRows.Next() {
+		var id string
+		if err := removedRows.Scan(&id); err != nil {
+			removedRows.Close()
+			return nil, nil, err
+		}
+		removedFileIDs = append(removedFileIDs, id)
+	}
+	removedRows.Close()
+
+	if err := removedRows.Err(); err != nil {
+		return nil, nil, err
 	}
 
 	deleteQuery := `
@@ -135,7 +164,7 @@ func (r *PostgresRepository) ReplaceContentFiles(
 	`
 
 	if _, err := tx.Exec(ctx, deleteQuery, contentID, userID); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	if len(fileIDs) > 0 {
@@ -146,7 +175,7 @@ func (r *PostgresRepository) ReplaceContentFiles(
 		`
 
 		if _, err := tx.Exec(ctx, insertQuery, userID, contentID, fileIDs); err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 	}
 
@@ -162,7 +191,7 @@ func (r *PostgresRepository) ReplaceContentFiles(
 
 	rows, err := tx.Query(ctx, listQuery, contentID, userID)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	files := make([]*domain.File, 0)
@@ -171,23 +200,23 @@ func (r *PostgresRepository) ReplaceContentFiles(
 		var f domain.File
 		if err := scanContentFile(rows, &f); err != nil {
 			rows.Close()
-			return nil, err
+			return nil, nil, err
 		}
 		files = append(files, &f)
 	}
 
 	if err := rows.Err(); err != nil {
 		rows.Close()
-		return nil, err
+		return nil, nil, err
 	}
 
 	rows.Close()
 
 	if err := tx.Commit(ctx); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return files, nil
+	return files, removedFileIDs, nil
 }
 
 func scanContentFile(row pgx.Row, f *domain.File) error {

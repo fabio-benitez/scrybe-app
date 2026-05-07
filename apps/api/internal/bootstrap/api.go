@@ -109,7 +109,7 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	contentFilesRepo := contentfilesinfra.NewPostgresRepository(dbPool)
 	listContentFilesUC := contentfilesapp.NewListContentFilesUseCase(contentFilesRepo)
-	replaceContentFilesUC := contentfilesapp.NewReplaceContentFilesUseCase(contentFilesRepo)
+	replaceContentFilesUC := contentfilesapp.NewReplaceContentFilesUseCase(contentFilesRepo, deleteFileUC)
 	contentFilesHandler := contentfileshttp.NewHandler(listContentFilesUC, replaceContentFilesUC)
 
 	// Router
