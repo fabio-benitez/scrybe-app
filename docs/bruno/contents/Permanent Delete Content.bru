@@ -1,0 +1,42 @@
+meta {
+  name: Permanent Delete Content
+  type: http
+  seq: 8
+}
+
+delete {
+  url: {{api_base_url}}/contents/{{content_id}}/permanent
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Permanent Delete Content
+
+  Elimina permanentemente un contenido de la papelera. Operación irreversible.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Variables usadas:
+  - `content_id`
+
+  ### Notas:
+  - Solo opera sobre contenidos que estén en la papelera (deleted_at IS NOT NULL).
+  - Borra el contenido y sus relaciones content_files y content_tags (por cascade en DB).
+  - Los ficheros vinculados exclusivamente a este contenido se eliminan del storage
+    automáticamente en backend (best-effort, transparente al cliente).
+  - Los ficheros compartidos con otros contenidos del usuario no se tocan.
+  - UUID inválido en path → 404.
+  - Contenido inexistente, de otro usuario o no en papelera → 404.
+
+  ### Respuestas:
+  - 204 → contenido eliminado permanentemente (sin body)
+  - 401 → no autenticado
+  - 404 → contenido no encontrado o no está en la papelera
+  - 500 → error interno
+}

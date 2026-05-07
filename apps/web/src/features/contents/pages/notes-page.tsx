@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom"
-import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 import {
   ChevronDownIcon,
@@ -9,16 +8,12 @@ import {
 
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import type { CategoryColor } from "@/features/categories/types/category"
+import { NoteCard } from "@/features/contents/components/note-card"
 import { useContents } from "@/features/contents/hooks/use-contents"
 import type { Content } from "@/features/contents/types/content"
 
 import { Button } from "@/shared/components/ui/button"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/shared/components/ui/card"
+import { Card, CardContent } from "@/shared/components/ui/card"
 import {
   Collapsible,
   CollapsibleContent,
@@ -37,6 +32,7 @@ const categoryColorClass: Record<CategoryColor, string> = {
   pink: "text-pink-500",
 }
 
+
 function getFolderColorClass(
   color?: CategoryColor | null,
   isUncategorized = false,
@@ -48,77 +44,6 @@ function getFolderColorClass(
   return color ? categoryColorClass[color] : "text-muted-foreground"
 }
 
-function formatUpdatedAt(
-  value: string,
-  locale: string,
-  t: TFunction,
-) {
-  const updatedAt = new Date(value)
-  const elapsedMs = Date.now() - updatedAt.getTime()
-  const minuteMs = 60 * 1000
-  const hourMs = 60 * minuteMs
-  const dayMs = 24 * hourMs
-
-  if (elapsedMs < minuteMs) {
-    return t("notes.updatedAt.justNow")
-  }
-
-  if (elapsedMs > 7 * dayMs) {
-    return t("notes.updatedAt.date", {
-      date: new Intl.DateTimeFormat(locale, {
-        dateStyle: "medium",
-      }).format(updatedAt),
-    })
-  }
-
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: "always" })
-  let relativeTime: string
-
-  if (elapsedMs < hourMs) {
-    relativeTime = rtf.format(-Math.floor(elapsedMs / minuteMs), "minute")
-  } else if (elapsedMs < dayMs) {
-    relativeTime = rtf.format(-Math.floor(elapsedMs / hourMs), "hour")
-  } else {
-    relativeTime = rtf.format(-Math.floor(elapsedMs / dayMs), "day")
-  }
-
-  return t("notes.updatedAt.relative", { time: relativeTime })
-}
-
-function NoteCard({ content }: { content: Content }) {
-  const { t, i18n } = useTranslation()
-
-  return (
-      <Link
-        to={`/app/notes/${content.id}`}
-        state={{ breadcrumbLabel: content.title }}
-        className="block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-      >
-      <Card
-        size="sm"
-        className="h-full bg-muted/30 transition-colors hover:bg-muted/40"
-      >
-        <CardHeader className="max-w-xs space-y-2 pb-0">
-          <CardTitle className="line-clamp-2 text-base">
-            {content.title}
-          </CardTitle>
-
-          {content.summary && (
-            <p className="line-clamp-3 text-sm text-muted-foreground">
-              {content.summary}
-            </p>
-          )}
-        </CardHeader>
-
-        <CardContent className="pt-4">
-          <p className="text-xs text-muted-foreground">
-            {formatUpdatedAt(content.updated_at, i18n.language, t)}
-          </p>
-        </CardContent>
-      </Card>
-    </Link>
-  )
-}
 
 interface NoteGroupProps {
   title: string
@@ -178,7 +103,7 @@ function NoteGroup({
       <CollapsibleContent>
         <div className="grid gap-3 px-4 pb-5 pt-1 md:grid-cols-2 xl:grid-cols-4">
           {contents.map((content) => (
-            <NoteCard key={content.id} content={content} />
+            <NoteCard key={content.id} content={content} color={color} />
           ))}
         </div>
       </CollapsibleContent>

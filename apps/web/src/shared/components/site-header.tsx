@@ -16,6 +16,10 @@ import { useSidebar } from "@/shared/components/ui/sidebar"
 import { LanguageSwitcher } from "@/shared/i18n/language-switcher"
 import { ThemeToggle } from "@/shared/theme/theme-toggle"
 
+
+const UUID_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 const routeLabels: Record<string, string> = {
   notes: "app.navigation.notes",
   favorites: "app.navigation.favorites",
@@ -32,7 +36,11 @@ export function SiteHeader() {
   const { pathname, state } = useLocation()
   const { t } = useTranslation()
 
-  const segments = pathname.split("/").filter(Boolean).slice(1)
+  const segments = pathname
+    .split("/")
+    .filter(Boolean)
+    .slice(1)
+    .filter((segment) => !UUID_REGEX.test(segment))
 
   const breadcrumbLabel =
     typeof state?.breadcrumbLabel === "string" ? state.breadcrumbLabel : null

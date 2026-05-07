@@ -161,6 +161,9 @@
       "back": "Back to notes",
       "title": "New note",
       "description": "Create a note and organize it in your space.",
+      "loading": "Loading note...",
+      "editTitle": "Edit note",
+      "editDescription": "Update the note content and properties.",
       "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
@@ -173,7 +176,9 @@
       },
       "toast": {
         "created": "Note created successfully.",
-        "createError": "Could not create note."
+        "updated": "Note updated successfully.",
+        "createError": "Could not create note.",
+        "updateError": "Could not update note."
       }
     },
     "detail": {
@@ -192,7 +197,40 @@
       "edit": "Edit",
       "favorite": "Mark as favorite",
       "uncategorized": "Uncategorized",
-      "emptyContent": "This note has no content."
+      "emptyContent": "This note has no content.",
+      "delete": "Delete",
+      "deleteDialog": {
+        "title": "Delete note",
+        "description": "This note will be moved to the trash. You can restore it later.",
+        "cancel": "Cancel",
+        "confirm": "Delete note"
+      },
+      "toast": {
+        "deleted": "Note moved to trash.",
+        "deleteError": "Could not delete note."
+      }
+    }
+  },
+  "trash": {
+    "title": "Trash",
+    "description": "Deleted notes that you can still restore or permanently delete.",
+    "loading": "Loading trash...",
+    "empty": {
+      "title": "Trash is empty",
+      "description": "Notes you delete will appear here."
+    },
+    "restore": "Restore",
+    "permanentDelete": "Permanently delete",
+    "permanentDeleteDialog": {
+      "title": "Permanently delete",
+      "description": "This action cannot be undone. The note will be permanently deleted.",
+      "confirm": "Permanently delete"
+    },
+    "toast": {
+      "restored": "Note restored.",
+      "restoreError": "Could not restore note.",
+      "permanentlyDeleted": "Note permanently deleted.",
+      "permanentDeleteError": "Could not permanently delete note."
     }
   },
   "profileSettings": {

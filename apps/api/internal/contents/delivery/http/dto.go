@@ -28,6 +28,8 @@ type ContentResponse struct {
 	CreatedAt   time.Time       `json:"created_at"`
 	UpdatedAt   time.Time       `json:"updated_at"`
 	PublishedAt *time.Time      `json:"published_at"`
+	DeletedAt   *time.Time      `json:"deleted_at"`
+	DeleteAfter *time.Time      `json:"delete_after"`
 }
 
 type UpdateContentRequest struct {

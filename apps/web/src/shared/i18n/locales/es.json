@@ -161,6 +161,9 @@
       "back": "Volver a notas",
       "title": "Nueva nota",
       "description": "Crea una nota y organízala dentro de tu espacio.",
+      "loading": "Cargando nota...",
+      "editTitle": "Editar nota",
+      "editDescription": "Modifica el contenido y las propiedades de la nota.",
       "cancel": "Cancelar",
       "save": "Guardar",
       "saving": "Guardando...",
@@ -173,7 +176,9 @@
       },
       "toast": {
         "created": "Nota creada correctamente.",
-        "createError": "No se pudo crear la nota."
+        "updated": "Nota actualizada correctamente.",
+        "createError": "No se pudo crear la nota.",
+        "updateError": "No se pudo actualizar la nota."
       }
     },
     "detail": {
@@ -192,7 +197,40 @@
       "edit": "Editar",
       "favorite": "Marcar como favorita",
       "uncategorized": "Sin categoría",
-      "emptyContent": "Esta nota no tiene contenido."
+      "emptyContent": "Esta nota no tiene contenido.",
+      "delete": "Eliminar",
+      "deleteDialog": {
+        "title": "Eliminar nota",
+        "description": "Esta nota se moverá a la papelera. Podrás restaurarla más adelante.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar nota"
+      },
+      "toast": {
+        "deleted": "Nota movida a la papelera.",
+        "deleteError": "No se pudo eliminar la nota."
+      }
+    }
+  },
+  "trash": {
+    "title": "Papelera",
+    "description": "Notas eliminadas que todavía puedes restaurar o borrar definitivamente.",
+    "loading": "Cargando papelera...",
+    "empty": {
+      "title": "La papelera está vacía",
+      "description": "Las notas que elimines aparecerán aquí."
+    },
+    "restore": "Restaurar",
+    "permanentDelete": "Eliminar definitivamente",
+    "permanentDeleteDialog": {
+      "title": "Eliminar definitivamente",
+      "description": "Esta acción no se puede deshacer. La nota se eliminará de forma permanente.",
+      "confirm": "Eliminar definitivamente"
+    },
+    "toast": {
+      "restored": "Nota restaurada.",
+      "restoreError": "No se pudo restaurar la nota.",
+      "permanentlyDeleted": "Nota eliminada definitivamente.",
+      "permanentDeleteError": "No se pudo eliminar definitivamente la nota."
     }
   },
   "profileSettings": {

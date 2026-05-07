@@ -23,4 +23,7 @@ type Repository interface {
 	FindByID(ctx context.Context, userID string, contentID string) (*Content, error)
 	Update(ctx context.Context, userID string, contentID string, fields UpdateContentFields) (*Content, error)
 	Delete(ctx context.Context, userID string, contentID string) error
+	FindAllInTrashByUserID(ctx context.Context, userID string) ([]*Content, error)
+	Restore(ctx context.Context, userID string, contentID string) (*Content, error)
+	PermanentDelete(ctx context.Context, userID string, contentID string) (orphanFileIDs []string, err error)
 }

@@ -1,10 +1,32 @@
-import { Link, useParams } from "react-router-dom"
+import { Link, useNavigate, useParams } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { ArrowLeftIcon, PencilIcon, StarIcon } from "lucide-react"
+import {
+  ArrowLeftIcon,
+  PencilIcon,
+  StarIcon,
+  Trash2Icon,
+} from "lucide-react"
+
+import { toast } from "sonner"
 
 import { NoteContentViewer } from "@/features/contents/components/note-content-viewer"
 import { useCategories } from "@/features/categories/hooks/use-categories"
-import { useContent } from "@/features/contents/hooks/use-contents"
+import {
+  useContent,
+  useDeleteContent,
+} from "@/features/contents/hooks/use-contents"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/shared/components/ui/alert-dialog"
 
 import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
@@ -20,9 +42,11 @@ function formatDate(value: string, locale: string) {
 
 export default function NoteDetailPage() {
   const { contentId = "" } = useParams()
+  const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { data: content, isError, isLoading } = useContent(contentId)
   const { data: categories } = useCategories()
+  const deleteContent = useDeleteContent()
 
   if (isLoading) {
     return (
@@ -58,6 +82,19 @@ export default function NoteDetailPage() {
   )
   const categoryName =
     category?.name ?? t("notes.detail.uncategorized")
+
+  const contentIdToDelete = content.id
+  
+  async function handleDelete() {
+    try {
+      await deleteContent.mutateAsync(contentIdToDelete)
+
+      toast.success(t("notes.detail.toast.deleted"))
+      navigate("/app/notes")
+    } catch {
+      toast.error(t("notes.detail.toast.deleteError"))
+    }
+  }
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
@@ -103,10 +140,43 @@ export default function NoteDetailPage() {
                   <StarIcon className="size-4" />
                 </Button>
 
-                <Button type="button" variant="outline" disabled>
-                  <PencilIcon className="size-4" />
-                  {t("notes.detail.edit")}
+                <Button type="button" variant="outline" asChild>
+                  <Link to={`/app/notes/${content.id}/edit`}>
+                    <PencilIcon className="size-4" />
+                    {t("notes.detail.edit")}
+                  </Link>
                 </Button>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button type="button" variant="destructive">
+                      <Trash2Icon className="size-4" />
+                      {t("notes.detail.delete")}
+                    </Button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        {t("notes.detail.deleteDialog.title")}
+                      </AlertDialogTitle>
+
+                      <AlertDialogDescription>
+                        {t("notes.detail.deleteDialog.description")}
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>
+                        {t("notes.detail.deleteDialog.cancel")}
+                      </AlertDialogCancel>
+
+                      <AlertDialogAction onClick={handleDelete}>
+                        {t("notes.detail.deleteDialog.confirm")}
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
               </div>
             </div>
 

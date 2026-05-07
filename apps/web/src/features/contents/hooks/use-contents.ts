@@ -5,6 +5,9 @@ import {
   deleteContent,
   getContent,
   listContents,
+  listTrashContents,
+  permanentlyDeleteContent,
+  restoreContent,
   updateContent,
 } from "@/features/contents/services/content-service"
 import type {
@@ -13,6 +16,7 @@ import type {
 } from "@/features/contents/types/content"
 
 export const contentsQueryKey = ["contents"] as const
+export const trashContentsQueryKey = [...contentsQueryKey, "trash"] as const
 
 export function useContents() {
   return useQuery({
@@ -62,6 +66,36 @@ export function useDeleteContent() {
     mutationFn: deleteContent,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: contentsQueryKey })
+    },
+  })
+}
+
+export function useTrashContents() {
+  return useQuery({
+    queryKey: trashContentsQueryKey,
+    queryFn: listTrashContents,
+  })
+}
+
+export function useRestoreContent() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: restoreContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: contentsQueryKey })
+      queryClient.invalidateQueries({ queryKey: trashContentsQueryKey })
+    },
+  })
+}
+
+export function usePermanentlyDeleteContent() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: permanentlyDeleteContent,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: trashContentsQueryKey })
     },
   })
 }

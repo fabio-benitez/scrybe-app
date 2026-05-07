@@ -38,3 +38,19 @@ export function deleteContent(contentId: string): Promise<void> {
     method: "DELETE",
   })
 }
+
+export function listTrashContents(): Promise<Content[]> {
+  return apiFetch<Content[]>("/contents/trash")
+}
+
+export function restoreContent(contentId: string): Promise<Content> {
+  return apiFetch<Content>(`/contents/${contentId}/restore`, {
+    method: "PATCH",
+  })
+}
+
+export function permanentlyDeleteContent(contentId: string): Promise<void> {
+  return apiFetch<void>(`/contents/${contentId}/permanent`, {
+    method: "DELETE",
+  })
+}
