@@ -20,6 +20,8 @@ export interface FileItem {
   /**
    * Current upload progress as a percentage (0-100)
    */
+  fileId?: string
+
   progress: number
   /**
    * Current status of the file upload process
@@ -64,7 +66,7 @@ export interface UploadOptions {
     file: File,
     onProgress: (event: { progress: number }) => void,
     signal: AbortSignal
-  ) => Promise<string>
+  ) => Promise<UploadedFileResult>
   /**
    * Callback triggered when a file is uploaded successfully
    * @param {string} url - URL of the successfully uploaded file
@@ -79,13 +81,18 @@ export interface UploadOptions {
   onError?: (error: Error) => void
 }
 
+export interface UploadedFileResult {
+  url: string
+  fileId: string
+}
+
 /**
  * Custom hook for managing multiple file uploads with progress tracking and cancellation
  */
 function useFileUpload(options: UploadOptions) {
   const [fileItems, setFileItems] = useState<FileItem[]>([])
 
-  const uploadFile = async (file: File): Promise<string | null> => {
+  const uploadFile = async (file: File): Promise<UploadedFileResult | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
         `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
@@ -112,7 +119,7 @@ function useFileUpload(options: UploadOptions) {
         throw new Error("Upload function is not defined")
       }
 
-      const url = await options.upload(
+      const uploadedFile = await options.upload(
         file,
         (event: { progress: number }) => {
           setFileItems((prev) =>
@@ -124,18 +131,18 @@ function useFileUpload(options: UploadOptions) {
         abortController.signal
       )
 
-      if (!url) throw new Error("Upload failed: No URL returned")
+      if (!uploadedFile.url) throw new Error("Upload failed: No URL returned")
 
       if (!abortController.signal.aborted) {
         setFileItems((prev) =>
           prev.map((item) =>
             item.id === fileId
-              ? { ...item, status: "success", url, progress: 100 }
+              ? { ...item, status: "success", url: uploadedFile.url, fileId: uploadedFile.fileId, progress: 100 }
               : item
           )
         )
-        options.onSuccess?.(url)
-        return url
+        options.onSuccess?.(uploadedFile.url)
+        return uploadedFile
       }
 
       return null
@@ -156,7 +163,9 @@ function useFileUpload(options: UploadOptions) {
     }
   }
 
-  const uploadFiles = async (files: File[]): Promise<string[]> => {
+  const uploadFiles = async (
+    files: File[],
+  ): Promise<UploadedFileResult[]> => {
     if (!files || files.length === 0) {
       options.onError?.(new Error("No files to upload"))
       return []
@@ -176,7 +185,7 @@ function useFileUpload(options: UploadOptions) {
     const results = await Promise.all(uploadPromises)
 
     // Filter out null results (failed uploads)
-    return results.filter((url): url is string => url !== null)
+    return results.filter((result): result is UploadedFileResult => result !== null)
   }
 
   const removeFileItem = (fileId: string) => {
@@ -451,20 +460,21 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     useFileUpload(uploadOptions)
 
   const handleUpload = async (files: File[]) => {
-    const urls = await uploadFiles(files)
+    const uploadedFiles = await uploadFiles(files)
 
-    if (urls.length > 0) {
+    if (uploadedFiles.length > 0) {
       const pos = props.getPos()
 
       if (isValidPosition(pos)) {
-        const imageNodes = urls.map((url, index) => {
+        const imageNodes = uploadedFiles.map((uploadedFile, index) => {
           const filename =
             files[index]?.name.replace(/\.[^/.]+$/, "") || "unknown"
           return {
             type: extension.options.type,
             attrs: {
               ...extension.options,
-              src: url,
+              src: uploadedFile.url,
+              fileId: uploadedFile.fileId,
               alt: filename,
               title: filename,
             },
