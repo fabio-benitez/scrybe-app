@@ -103,9 +103,11 @@ export default function NoteDetailPage() {
                   <StarIcon className="size-4" />
                 </Button>
 
-                <Button type="button" variant="outline" disabled>
-                  <PencilIcon className="size-4" />
-                  {t("notes.detail.edit")}
+                <Button type="button" variant="outline" asChild>
+                  <Link to={`/app/notes/${content.id}/edit`}>
+                    <PencilIcon className="size-4" />
+                    {t("notes.detail.edit")}
+                  </Link>
                 </Button>
               </div>
             </div>

@@ -34,6 +34,7 @@ export function AppRouter() {
             <Route path="/app/notes" element={<NotesPage />} />
             <Route path="/app/notes/new" element={<NoteEditorPage />} />
             <Route path="/app/notes/:contentId" element={<NoteDetailPage />} />
+            <Route path="/app/notes/:contentId/edit" element={<NoteEditorPage />} />
             <Route path="/app/settings" element={<ProfileSettingsPage />} />
           </Route>
         </Route>

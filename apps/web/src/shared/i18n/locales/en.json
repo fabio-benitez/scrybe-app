@@ -161,6 +161,9 @@
       "back": "Back to notes",
       "title": "New note",
       "description": "Create a note and organize it in your space.",
+      "loading": "Loading note...",
+      "editTitle": "Edit note",
+      "editDescription": "Update the note content and properties.",
       "cancel": "Cancel",
       "save": "Save",
       "saving": "Saving...",
@@ -173,7 +176,9 @@
       },
       "toast": {
         "created": "Note created successfully.",
-        "createError": "Could not create note."
+        "updated": "Note updated successfully.",
+        "createError": "Could not create note.",
+        "updateError": "Could not update note."
       }
     },
     "detail": {

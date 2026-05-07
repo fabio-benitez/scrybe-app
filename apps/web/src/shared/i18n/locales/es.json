@@ -161,6 +161,9 @@
       "back": "Volver a notas",
       "title": "Nueva nota",
       "description": "Crea una nota y organízala dentro de tu espacio.",
+      "loading": "Cargando nota...",
+      "editTitle": "Editar nota",
+      "editDescription": "Modifica el contenido y las propiedades de la nota.",
       "cancel": "Cancelar",
       "save": "Guardar",
       "saving": "Guardando...",
@@ -173,7 +176,9 @@
       },
       "toast": {
         "created": "Nota creada correctamente.",
-        "createError": "No se pudo crear la nota."
+        "updated": "Nota actualizada correctamente.",
+        "createError": "No se pudo crear la nota.",
+        "updateError": "No se pudo actualizar la nota."
       }
     },
     "detail": {

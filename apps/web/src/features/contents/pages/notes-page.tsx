@@ -1,9 +1,12 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
 import {
   ChevronDownIcon,
+  ClockIcon,
+  FileTextIcon,
   FolderIcon,
+  PencilIcon,
   PlusIcon,
 } from "lucide-react"
 
@@ -36,6 +39,18 @@ const categoryColorClass: Record<CategoryColor, string> = {
   purple: "text-purple-500",
   pink: "text-pink-500",
 }
+
+const categoryIconClass: Record<CategoryColor, string> = {
+  gray: "bg-slate-500/15 text-slate-400",
+  red: "bg-red-500/15 text-red-400",
+  orange: "bg-orange-500/15 text-orange-400",
+  yellow: "bg-yellow-500/15 text-yellow-400",
+  green: "bg-green-500/15 text-green-400",
+  blue: "bg-blue-500/15 text-blue-400",
+  purple: "bg-purple-500/15 text-purple-400",
+  pink: "bg-pink-500/15 text-pink-400",
+}
+
 
 function getFolderColorClass(
   color?: CategoryColor | null,
@@ -85,8 +100,28 @@ function formatUpdatedAt(
   return t("notes.updatedAt.relative", { time: relativeTime })
 }
 
-function NoteCard({ content }: { content: Content }) {
+function extractTextFromTipTap(content: unknown): string {
+  if (!content || typeof content !== "object") return ""
+
+  const node = content as {
+    text?: string
+    content?: unknown[]
+  }
+
+  const ownText = typeof node.text === "string" ? node.text : ""
+  const childrenText = Array.isArray(node.content)
+    ? node.content.map(extractTextFromTipTap).join(" ")
+    : ""
+
+  return `${ownText} ${childrenText}`.trim()
+}
+
+
+function NoteCard({ content, color }: { content: Content; color?: CategoryColor | null }) {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
+  const excerpt = extractTextFromTipTap(content.content)
+  const iconClass = color ? categoryIconClass[color] : "bg-muted text-muted-foreground"
 
   return (
       <Link
@@ -96,22 +131,49 @@ function NoteCard({ content }: { content: Content }) {
       >
       <Card
         size="sm"
-        className="h-full bg-muted/30 transition-colors hover:bg-muted/40"
+        className="flex h-full min-h-40 flex-col bg-muted/30 transition-colors hover:bg-muted/40"
       >
-        <CardHeader className="max-w-xs space-y-2 pb-0">
-          <CardTitle className="line-clamp-2 text-base">
-            {content.title}
-          </CardTitle>
+        <CardHeader className="pb-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0 flex-1 space-y-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <div className={cn("shrink-0 rounded-xl p-2.5", iconClass)}>
+                  <FileTextIcon className="size-5" />
+                </div>
 
-          {content.summary && (
-            <p className="line-clamp-3 text-sm text-muted-foreground">
-              {content.summary}
-            </p>
-          )}
+                <CardTitle className="line-clamp-2 text-base leading-tight">
+                  {content.title}
+                </CardTitle>
+              </div>
+
+              {excerpt && (
+                <p className="ml-1.5 line-clamp-2 text-sm text-muted-foreground">
+                  {excerpt}
+                </p>
+              )}
+            </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="size-9 shrink-0 text-muted-foreground"
+              onClick={(event) => {
+                event.preventDefault()
+                event.stopPropagation()
+                navigate(`/app/notes/${content.id}/edit`, {
+                  state: { breadcrumbLabel: content.title },
+                })
+              }}
+            >
+              <PencilIcon className="size-4.5" />
+            </Button>
+          </div>
         </CardHeader>
 
-        <CardContent className="pt-4">
-          <p className="text-xs text-muted-foreground">
+        <CardContent className="mt-auto pt-4">
+          <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <ClockIcon className="size-3.5" />
             {formatUpdatedAt(content.updated_at, i18n.language, t)}
           </p>
         </CardContent>
@@ -178,7 +240,7 @@ function NoteGroup({
       <CollapsibleContent>
         <div className="grid gap-3 px-4 pb-5 pt-1 md:grid-cols-2 xl:grid-cols-4">
           {contents.map((content) => (
-            <NoteCard key={content.id} content={content} />
+            <NoteCard key={content.id} content={content} color={color} />
           ))}
         </div>
       </CollapsibleContent>
