@@ -34,12 +34,27 @@ type deleteContentUseCase interface {
 	Execute(ctx context.Context, input application.DeleteContentInput) error
 }
 
+type listTrashUseCase interface {
+	Execute(ctx context.Context, userID string) ([]*domain.Content, error)
+}
+
+type restoreContentUseCase interface {
+	Execute(ctx context.Context, userID string, contentID string) (*domain.Content, error)
+}
+
+type permanentDeleteContentUseCase interface {
+	Execute(ctx context.Context, userID string, contentID string) error
+}
+
 type Handler struct {
-	createContentUC createContentUseCase
-	listContentsUC  listContentsUseCase
-	getContentUC    getContentUseCase
-	updateContentUC updateContentUseCase
-	deleteContentUC deleteContentUseCase
+	createContentUC   createContentUseCase
+	listContentsUC    listContentsUseCase
+	getContentUC      getContentUseCase
+	updateContentUC   updateContentUseCase
+	deleteContentUC   deleteContentUseCase
+	listTrashUC       listTrashUseCase
+	restoreContentUC  restoreContentUseCase
+	permanentDeleteUC permanentDeleteContentUseCase
 }
 
 func NewHandler(
@@ -48,13 +63,19 @@ func NewHandler(
 	getContentUC getContentUseCase,
 	updateContentUC updateContentUseCase,
 	deleteContentUC deleteContentUseCase,
+	listTrashUC listTrashUseCase,
+	restoreContentUC restoreContentUseCase,
+	permanentDeleteUC permanentDeleteContentUseCase,
 ) *Handler {
 	return &Handler{
-		createContentUC: createContentUC,
-		listContentsUC:  listContentsUC,
-		getContentUC:    getContentUC,
-		updateContentUC: updateContentUC,
-		deleteContentUC: deleteContentUC,
+		createContentUC:   createContentUC,
+		listContentsUC:    listContentsUC,
+		getContentUC:      getContentUC,
+		updateContentUC:   updateContentUC,
+		deleteContentUC:   deleteContentUC,
+		listTrashUC:       listTrashUC,
+		restoreContentUC:  restoreContentUC,
+		permanentDeleteUC: permanentDeleteUC,
 	}
 }
 
@@ -62,9 +83,14 @@ func (h *Handler) Routes() http.Handler {
 	r := chi.NewRouter()
 	r.Get("/", h.ListContents)
 	r.Post("/", h.CreateContent)
-	r.Get("/{content_id}", h.GetContent)
-	r.Patch("/{content_id}", h.UpdateContent)
-	r.Delete("/{content_id}", h.DeleteContent)
+	r.Get("/trash", h.ListTrash)
+	r.Route("/{content_id}", func(r chi.Router) {
+		r.Get("/", h.GetContent)
+		r.Patch("/", h.UpdateContent)
+		r.Delete("/", h.DeleteContent)
+		r.Patch("/restore", h.RestoreContent)
+		r.Delete("/permanent", h.PermanentDeleteContent)
+	})
 	return r
 }
 
@@ -313,5 +339,82 @@ func toContentResponse(c *domain.Content) ContentResponse {
 		CreatedAt:   c.CreatedAt,
 		UpdatedAt:   c.UpdatedAt,
 		PublishedAt: c.PublishedAt,
+		DeletedAt:   c.DeletedAt,
+		DeleteAfter: c.DeleteAfter,
 	}
+}
+
+func (h *Handler) ListTrash(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	contents, err := h.listTrashUC.Execute(r.Context(), user.ID)
+	if err != nil {
+		slog.ErrorContext(r.Context(), "failed to list trash contents",
+			"user_id", user.ID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to list trash contents")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toContentResponseList(contents))
+}
+
+func (h *Handler) RestoreContent(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	contentID := chi.URLParam(r, "content_id")
+
+	content, err := h.restoreContentUC.Execute(r.Context(), user.ID, contentID)
+	if err != nil {
+		if errors.Is(err, domain.ErrContentNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "content not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to restore content",
+			"user_id", user.ID,
+			"content_id", contentID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to restore content")
+		return
+	}
+
+	httpresponse.JSON(w, http.StatusOK, toContentResponse(content))
+}
+
+func (h *Handler) PermanentDeleteContent(w http.ResponseWriter, r *http.Request) {
+	user, ok := authhttp.GetAuthenticatedUser(r.Context())
+	if !ok {
+		httpresponse.Error(w, http.StatusUnauthorized, "authenticated user not found")
+		return
+	}
+
+	contentID := chi.URLParam(r, "content_id")
+
+	if err := h.permanentDeleteUC.Execute(r.Context(), user.ID, contentID); err != nil {
+		if errors.Is(err, domain.ErrContentNotFound) {
+			httpresponse.Error(w, http.StatusNotFound, "content not found")
+			return
+		}
+
+		slog.ErrorContext(r.Context(), "failed to permanently delete content",
+			"user_id", user.ID,
+			"content_id", contentID,
+			"error", err,
+		)
+		httpresponse.Error(w, http.StatusInternalServerError, "failed to permanently delete content")
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

@@ -17,7 +17,7 @@ auth:bearer {
 docs {
   ## Delete Content
   
-  Elimina permanentemente un contenido del usuario autenticado.
+  Mueve un contenido a la papelera (soft delete).
   
   ### Requiere:
   - Authorization Bearer token
@@ -26,12 +26,15 @@ docs {
   - `content_id`
   
   ### Notas:
-  - Hard delete (no soft delete).
+  - Soft delete: establece deleted_at = NOW(), delete_after = NOW() + 30 días, updated_at = NOW().
+  - Solo opera si el contenido NO está ya en la papelera (deleted_at IS NULL).
+  - El contenido desaparece de GET /contents y GET /contents/{id}.
+  - El contenido queda accesible en GET /contents/trash.
   - UUID inválido en path → 404.
-  - Contenido inexistente o de otro usuario → 404.
+  - Contenido inexistente, de otro usuario o ya en papelera → 404.
   
   ### Respuestas:
-  - 204 → contenido eliminado (sin body)
+  - 204 → contenido movido a la papelera (sin body)
   - 401 → no autenticado
   - 404 → contenido no encontrado
   - 500 → error interno

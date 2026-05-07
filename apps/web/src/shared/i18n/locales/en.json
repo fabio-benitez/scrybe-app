@@ -197,7 +197,18 @@
       "edit": "Edit",
       "favorite": "Mark as favorite",
       "uncategorized": "Uncategorized",
-      "emptyContent": "This note has no content."
+      "emptyContent": "This note has no content.",
+      "delete": "Delete",
+      "deleteDialog": {
+        "title": "Delete note",
+        "description": "This note will be moved to the trash. You can restore it later.",
+        "cancel": "Cancel",
+        "confirm": "Delete note"
+      },
+      "toast": {
+        "deleted": "Note moved to trash.",
+        "deleteError": "Could not delete note."
+      }
     }
   },
   "profileSettings": {

@@ -197,7 +197,18 @@
       "edit": "Editar",
       "favorite": "Marcar como favorita",
       "uncategorized": "Sin categoría",
-      "emptyContent": "Esta nota no tiene contenido."
+      "emptyContent": "Esta nota no tiene contenido.",
+      "delete": "Eliminar",
+      "deleteDialog": {
+        "title": "Eliminar nota",
+        "description": "Esta nota se moverá a la papelera. Podrás restaurarla más adelante.",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar nota"
+      },
+      "toast": {
+        "deleted": "Nota movida a la papelera.",
+        "deleteError": "No se pudo eliminar la nota."
+      }
     }
   },
   "profileSettings": {

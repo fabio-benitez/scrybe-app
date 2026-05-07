@@ -97,7 +97,10 @@ func RunAPI(cfg *config.APIConfig) error {
 	getContentUC := contentsapp.NewGetContentUseCase(contentsRepo)
 	updateContentUC := contentsapp.NewUpdateContentUseCase(contentsRepo)
 	deleteContentUC := contentsapp.NewDeleteContentUseCase(contentsRepo)
-	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, updateContentUC, deleteContentUC)
+	listTrashUC := contentsapp.NewListTrashUseCase(contentsRepo)
+	restoreContentUC := contentsapp.NewRestoreContentUseCase(contentsRepo)
+	permanentDeleteContentUC := contentsapp.NewPermanentDeleteContentUseCase(contentsRepo, deleteFileUC)
+	contentsHandler := contentshttp.NewHandler(createContentUC, listContentsUC, getContentUC, updateContentUC, deleteContentUC, listTrashUC, restoreContentUC, permanentDeleteContentUC)
 
 	contentTagsRepo := contenttagsinfra.NewPostgresRepository(dbPool)
 	listContentTagsUC := contenttagsapp.NewListContentTagsUseCase(contentTagsRepo)
@@ -129,10 +132,13 @@ func RunAPI(cfg *config.APIConfig) error {
 			r.Route("/contents", func(r chi.Router) {
 				r.Get("/", contentsHandler.ListContents)
 				r.Post("/", contentsHandler.CreateContent)
+				r.Get("/trash", contentsHandler.ListTrash)
 				r.Route("/{content_id}", func(r chi.Router) {
 					r.Get("/", contentsHandler.GetContent)
 					r.Patch("/", contentsHandler.UpdateContent)
 					r.Delete("/", contentsHandler.DeleteContent)
+					r.Patch("/restore", contentsHandler.RestoreContent)
+					r.Delete("/permanent", contentsHandler.PermanentDeleteContent)
 					r.Mount("/tags", contentTagsHandler.Routes())
 					r.Mount("/files", contentFilesHandler.Routes())
 				})

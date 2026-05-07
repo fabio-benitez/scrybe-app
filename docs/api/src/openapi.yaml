@@ -39,8 +39,14 @@ paths:
 
   /contents:
     $ref: "./paths/contents.yaml#/contents"
+  /contents/trash:
+    $ref: "./paths/contents.yaml#/content-trash"
   /contents/{content_id}:
     $ref: "./paths/contents.yaml#/content-by-id"
+  /contents/{content_id}/restore:
+    $ref: "./paths/contents.yaml#/content-restore"
+  /contents/{content_id}/permanent:
+    $ref: "./paths/contents.yaml#/content-permanent"
 
   /contents/{content_id}/tags:
     $ref: "./paths/content-tags.yaml#/content-tags"

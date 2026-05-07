@@ -1,0 +1,39 @@
+meta {
+  name: List Trash
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{api_base_url}}/contents/trash
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## List Trash
+
+  Lista todos los contenidos en la papelera del usuario autenticado.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Notas:
+  - Devuelve contenidos con deleted_at IS NOT NULL.
+  - Ordenados por deleted_at DESC (eliminados más recientemente primero).
+  - Si no hay contenidos en papelera → devuelve []
+  - Los campos deleted_at y delete_after están poblados en cada elemento.
+
+  ### Respuestas:
+  - 200 → lista de contenidos en papelera
+  - 401 → no autenticado
+  - 500 → error interno
+}

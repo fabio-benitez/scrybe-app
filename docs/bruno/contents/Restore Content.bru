@@ -1,0 +1,41 @@
+meta {
+  name: Restore Content
+  type: http
+  seq: 7
+}
+
+patch {
+  url: {{api_base_url}}/contents/{{content_id}}/restore
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{access_token}}
+}
+
+docs {
+  ## Restore Content
+
+  Restaura un contenido de la papelera al estado activo.
+
+  ### Requiere:
+  - Authorization Bearer token
+
+  ### Variables usadas:
+  - `content_id`
+
+  ### Notas:
+  - Solo opera si el contenido está en la papelera (deleted_at IS NOT NULL).
+  - Establece deleted_at = NULL, delete_after = NULL, updated_at = NOW().
+  - El contenido vuelve a aparecer en GET /contents y GET /contents/{id}.
+  - El contenido desaparece de GET /contents/trash.
+  - UUID inválido en path → 404.
+  - Contenido inexistente, de otro usuario o no en papelera → 404.
+
+  ### Respuestas:
+  - 200 → contenido restaurado (con deleted_at: null, delete_after: null)
+  - 401 → no autenticado
+  - 404 → contenido no encontrado o no está en la papelera
+  - 500 → error interno
+}

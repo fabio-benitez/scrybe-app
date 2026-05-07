@@ -136,3 +136,7 @@ ContentResponse:
       $ref: "./common.yaml#/DateTime"
     published_at:
       $ref: "./common.yaml#/NullableDateTime"
+    deleted_at:
+      $ref: "./common.yaml#/NullableDateTime"
+    delete_after:
+      $ref: "./common.yaml#/NullableDateTime"

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import type { TFunction } from "i18next"
 import { useTranslation } from "react-i18next"
@@ -8,12 +9,33 @@ import {
   FolderIcon,
   PencilIcon,
   PlusIcon,
+  EllipsisIcon,
+  Trash2Icon,
 } from "lucide-react"
 
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import type { CategoryColor } from "@/features/categories/types/category"
-import { useContents } from "@/features/contents/hooks/use-contents"
+import { useContents, useDeleteContent } from "@/features/contents/hooks/use-contents"
 import type { Content } from "@/features/contents/types/content"
+import { toast } from "sonner"
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/shared/components/ui/alert-dialog"
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/components/ui/dropdown-menu"
 
 import { Button } from "@/shared/components/ui/button"
 import {
@@ -122,6 +144,18 @@ function NoteCard({ content, color }: { content: Content; color?: CategoryColor 
   const navigate = useNavigate()
   const excerpt = extractTextFromTipTap(content.content)
   const iconClass = color ? categoryIconClass[color] : "bg-muted text-muted-foreground"
+  const deleteContent = useDeleteContent()
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+
+  async function handleDelete() {
+    try {
+      await deleteContent.mutateAsync(content.id)
+      setIsDeleteDialogOpen(false)
+      toast.success(t("notes.detail.toast.deleted"))
+    } catch {
+      toast.error(t("notes.detail.toast.deleteError"))
+    }
+  }
 
   return (
       <Link
@@ -153,21 +187,81 @@ function NoteCard({ content, color }: { content: Content; color?: CategoryColor 
               )}
             </div>
 
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-9 shrink-0 text-muted-foreground"
-              onClick={(event) => {
-                event.preventDefault()
-                event.stopPropagation()
-                navigate(`/app/notes/${content.id}/edit`, {
-                  state: { breadcrumbLabel: content.title },
-                })
-              }}
-            >
-              <PencilIcon className="size-4.5" />
-            </Button>
+            <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="size-9 shrink-0 text-muted-foreground"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                    }}
+                  >
+                    <EllipsisIcon className="size-4.5" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      navigate(`/app/notes/${content.id}/edit`, {
+                        state: { breadcrumbLabel: content.title },
+                      })
+                    }}
+                  >
+                    <PencilIcon className="size-4" />
+                    {t("notes.detail.edit")}
+                  </DropdownMenuItem>
+
+
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      setIsDeleteDialogOpen(true)
+                    }}
+                  >
+                    <Trash2Icon className="size-4" />
+                    {t("notes.detail.delete")}
+                  </DropdownMenuItem>
+
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>
+                    {t("notes.detail.deleteDialog.title")}
+                  </AlertDialogTitle>
+
+                  <AlertDialogDescription>
+                    {t("notes.detail.deleteDialog.description")}
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>
+                    {t("notes.detail.deleteDialog.cancel")}
+                  </AlertDialogCancel>
+
+                  <AlertDialogAction
+                    onClick={(event) => {
+                      event.preventDefault()
+                      event.stopPropagation()
+                      void handleDelete()
+                    }}
+                  >
+                    {t("notes.detail.deleteDialog.confirm")}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </CardHeader>
 

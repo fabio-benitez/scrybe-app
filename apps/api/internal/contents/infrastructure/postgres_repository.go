@@ -80,6 +80,7 @@ func (r *PostgresRepository) FindAllByUserID(
 			created_at, updated_at, published_at, deleted_at, delete_after
 		FROM contents
 		WHERE user_id = $1
+			AND deleted_at IS NULL
 		ORDER BY updated_at DESC
 	`
 
@@ -118,7 +119,8 @@ func (r *PostgresRepository) FindByID(
 			created_at, updated_at, published_at, deleted_at, delete_after
 		FROM contents
 		WHERE id = $1
-		  AND user_id = $2
+			AND user_id = $2
+			AND deleted_at IS NULL
 	`
 
 	var c domain.Content
@@ -283,9 +285,14 @@ func (r *PostgresRepository) Delete(
 	contentID string,
 ) error {
 	query := `
-		DELETE FROM contents
+		UPDATE contents
+		SET
+			deleted_at = NOW(),
+			delete_after = NOW() + INTERVAL '30 days',
+			updated_at = NOW()
 		WHERE id = $1
 		  AND user_id = $2
+		  AND deleted_at IS NULL
 	`
 
 	result, err := r.db.Exec(ctx, query, contentID, userID)
@@ -298,4 +305,143 @@ func (r *PostgresRepository) Delete(
 	}
 
 	return nil
+}
+
+func (r *PostgresRepository) FindAllInTrashByUserID(
+	ctx context.Context,
+	userID string,
+) ([]*domain.Content, error) {
+	query := `
+		SELECT
+			id, user_id, category_id, title, slug, summary,
+			content, status, visibility, is_favorite,
+			created_at, updated_at, published_at, deleted_at, delete_after
+		FROM contents
+		WHERE user_id = $1
+			AND deleted_at IS NOT NULL
+		ORDER BY deleted_at DESC
+	`
+
+	rows, err := r.db.Query(ctx, query, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	contents := make([]*domain.Content, 0)
+
+	for rows.Next() {
+		var c domain.Content
+		if err := scanContent(rows, &c); err != nil {
+			return nil, err
+		}
+		contents = append(contents, &c)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return contents, nil
+}
+
+func (r *PostgresRepository) Restore(
+	ctx context.Context,
+	userID string,
+	contentID string,
+) (*domain.Content, error) {
+	query := `
+		UPDATE contents
+		SET
+			deleted_at   = NULL,
+			delete_after = NULL,
+			updated_at   = NOW()
+		WHERE id       = $1
+		  AND user_id  = $2
+		  AND deleted_at IS NOT NULL
+		RETURNING
+			id, user_id, category_id, title, slug, summary,
+			content, status, visibility, is_favorite,
+			created_at, updated_at, published_at, deleted_at, delete_after
+	`
+
+	var c domain.Content
+
+	if err := scanContent(r.db.QueryRow(ctx, query, contentID, userID), &c); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, domain.ErrContentNotFound
+		}
+		return nil, err
+	}
+
+	return &c, nil
+}
+
+func (r *PostgresRepository) PermanentDelete(
+	ctx context.Context,
+	userID string,
+	contentID string,
+) ([]string, error) {
+	tx, err := r.db.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted})
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback(ctx)
+
+	orphanQuery := `
+		SELECT cf.file_id
+		FROM content_files cf
+		WHERE cf.content_id = $1
+		  AND cf.user_id    = $2
+		  AND NOT EXISTS (
+		    SELECT 1
+		    FROM content_files cf2
+		    WHERE cf2.file_id    = cf.file_id
+		      AND cf2.user_id    = $2
+		      AND cf2.content_id <> $1
+		  )
+	`
+
+	rows, err := tx.Query(ctx, orphanQuery, contentID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var orphanFileIDs []string
+
+	for rows.Next() {
+		var fileID string
+		if err := rows.Scan(&fileID); err != nil {
+			rows.Close()
+			return nil, err
+		}
+		orphanFileIDs = append(orphanFileIDs, fileID)
+	}
+	rows.Close()
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	deleteQuery := `
+		DELETE FROM contents
+		WHERE id      = $1
+		  AND user_id = $2
+		  AND deleted_at IS NOT NULL
+	`
+
+	result, err := tx.Exec(ctx, deleteQuery, contentID, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	if result.RowsAffected() == 0 {
+		return nil, domain.ErrContentNotFound
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, err
+	}
+
+	return orphanFileIDs, nil
 }
