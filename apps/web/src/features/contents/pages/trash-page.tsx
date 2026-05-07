@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import { NoteCard } from "@/features/contents/components/note-card"
 import { useTrashContents } from "@/features/contents/hooks/use-contents"
+import { useCategories } from "@/features/categories/hooks/use-categories"
 
 import {
   Card,
@@ -10,6 +11,7 @@ import {
 
 export default function TrashPage() {
   const { t } = useTranslation()
+  const { data: categories } = useCategories()
 
   const { data: contents, isLoading } = useTrashContents()
 
@@ -48,9 +50,20 @@ export default function TrashPage() {
       {contents && contents.length > 0 && (
         <Card className="p-4">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            {contents.map((content) => (
-              <NoteCard key={content.id} content={content} mode="trash" />
-            ))}
+            {contents.map((content) => {
+              const category = categories?.find(
+                (category) => category.id === content.category_id,
+              )
+
+              return (
+                <NoteCard
+                  key={content.id}
+                  content={content}
+                  color={category?.color}
+                  mode="trash"
+                />
+              )
+            })}
           </div>
         </Card>
       )}

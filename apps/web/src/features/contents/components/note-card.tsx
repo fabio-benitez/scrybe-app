@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
 import { toast } from "sonner"
 import {
@@ -277,12 +277,28 @@ export function NoteCard({
   }
 
   return (
-    <Link
-      to={`/app/notes/${content.id}`}
-      state={{ breadcrumbLabel: content.title }}
-      className="block h-full rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+    <div
+      role="link"
+      tabIndex={0}
+      onClick={() => {
+        if (isDeleteDialogOpen) return
+
+        navigate(`/app/notes/${content.id}`, {
+          state: { breadcrumbLabel: content.title },
+        })
+      }}
+      onKeyDown={(event) => {
+        if (isDeleteDialogOpen) return
+
+        if (event.key === "Enter" || event.key === " ") {
+          navigate(`/app/notes/${content.id}`, {
+            state: { breadcrumbLabel: content.title },
+          })
+        }
+      }}
+      className="block h-full cursor-pointer rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background"
     >
       {card}
-    </Link>
+    </div>
   )
 }
