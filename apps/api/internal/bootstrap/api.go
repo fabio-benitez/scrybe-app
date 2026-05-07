@@ -52,13 +52,13 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	filesRepo := filesinfra.NewPostgresRepository(dbPool)
 	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
-	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage)
+	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage, filesRepo)
 
 	profileRepo := profileinfra.NewPostgresRepository(dbPool)
 	getProfileUC := profileapp.NewGetProfileUseCase(profileRepo)
 	updateProfileUC := profileapp.NewUpdateProfileUseCase(profileRepo)
-	updateAvatarUC := profileapp.NewUpdateAvatarUseCase(profileRepo, filesRepo, deleteFileUC)
-	deleteAvatarUC := profileapp.NewDeleteAvatarUseCase(profileRepo, deleteFileUC)
+	updateAvatarUC := profileapp.NewUpdateAvatarUseCase(profileRepo, filesRepo, deleteFileUC, filesRepo)
+	deleteAvatarUC := profileapp.NewDeleteAvatarUseCase(profileRepo, deleteFileUC, filesRepo)
 	profileHandler := profilehttp.NewHandler(getProfileUC, updateProfileUC, updateAvatarUC, deleteAvatarUC)
 
 	getFileUC := filesapp.NewGetFileUseCase(filesRepo)
@@ -109,7 +109,7 @@ func RunAPI(cfg *config.APIConfig) error {
 
 	contentFilesRepo := contentfilesinfra.NewPostgresRepository(dbPool)
 	listContentFilesUC := contentfilesapp.NewListContentFilesUseCase(contentFilesRepo)
-	replaceContentFilesUC := contentfilesapp.NewReplaceContentFilesUseCase(contentFilesRepo)
+	replaceContentFilesUC := contentfilesapp.NewReplaceContentFilesUseCase(contentFilesRepo, deleteFileUC)
 	contentFilesHandler := contentfileshttp.NewHandler(listContentFilesUC, replaceContentFilesUC)
 
 	// Router

@@ -6,7 +6,7 @@ import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
 
 // --- Tiptap Core Extensions ---
 import { StarterKit } from "@tiptap/starter-kit"
-import { Image } from "@tiptap/extension-image"
+import { Image as TiptapImage } from "@tiptap/extension-image"
 import { TaskItem, TaskList } from "@tiptap/extension-list"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Typography } from "@tiptap/extension-typography"
@@ -181,6 +181,27 @@ const MobileToolbarContent = ({
     )}
   </>
 )
+
+const Image = TiptapImage.extend({
+  addAttributes() {
+    return {
+      ...this.parent?.(),
+      fileId: {
+        default: null,
+        parseHTML: (element) => element.getAttribute("data-file-id"),
+        renderHTML: (attributes) => {
+          if (!attributes.fileId) {
+            return {}
+          }
+
+          return {
+            "data-file-id": attributes.fileId,
+          }
+        },
+      },
+    }
+  },
+})
 
 export function SimpleEditor({
   placeholder,

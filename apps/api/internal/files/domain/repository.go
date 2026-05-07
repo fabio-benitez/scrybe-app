@@ -9,4 +9,5 @@ type Repository interface {
 	MarkUploaded(ctx context.Context, userID string, fileID string, checksumSHA256 string) error
 	MarkFailed(ctx context.Context, userID string, fileID string) error
 	Delete(ctx context.Context, userID string, fileID string) error
+	IsReferenced(ctx context.Context, userID string, fileID string) (bool, error)
 }

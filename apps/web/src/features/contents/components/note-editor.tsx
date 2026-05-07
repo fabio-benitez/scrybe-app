@@ -7,6 +7,9 @@ import { toast } from "sonner"
 
 import { SimpleEditor } from "@/shared/components/tiptap-templates/simple/simple-editor"
 
+import { replaceContentFiles } from "@/features/contents/services/content-service"
+import { extractFileIdsFromContent } from "@/features/contents/utils/content-files"
+
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import {
   useCreateContent,
@@ -88,21 +91,26 @@ export function NoteEditor({
       category_id: categoryId === "uncategorized" ? null : categoryId,
     }
 
+    const fileIds = extractFileIdsFromContent(contentRef.current)
+
     try {
       if (isEditMode && initialContent) {
         await updateContent.mutateAsync(payload)
+        await replaceContentFiles(initialContent.id, fileIds)
 
         toast.success(t("notes.editor.toast.updated"))
         navigate(`/app/notes/${initialContent.id}`)
         return
       }
 
-      await createContent.mutateAsync({
+      const createdContent = await createContent.mutateAsync({
         ...payload,
         status: "draft",
         visibility: "private",
         is_favorite: false,
       })
+
+      await replaceContentFiles(createdContent.id, fileIds)
 
       toast.success(t("notes.editor.toast.created"))
       navigate("/app/notes")

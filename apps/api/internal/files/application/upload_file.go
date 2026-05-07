@@ -24,6 +24,11 @@ type UploadFileInput struct {
 	Body         io.Reader
 }
 
+type UploadFileResult struct {
+	File           *domain.File
+	AlreadyExisted bool
+}
+
 type UploadFileUseCase struct {
 	repo             domain.Repository
 	storage          domain.Storage
@@ -81,7 +86,7 @@ func NewUploadFileUseCase(
 	}, nil
 }
 
-func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput) (*domain.File, error) {
+func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput) (*UploadFileResult, error) {
 	if err := uc.validate(input); err != nil {
 		return nil, err
 	}
@@ -142,14 +147,14 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 		uc.deleteUploadedObject(ctx, createdFile)
 		uc.markFailed(ctx, createdFile)
 
-		slog.InfoContext(ctx, "duplicate file upload rejected",
+		slog.InfoContext(ctx, "duplicate file upload deduplicated",
 			"user_id", createdFile.UserID,
 			"file_id", createdFile.ID,
 			"existing_file_id", existingFile.ID,
 			"checksum_sha256", checksum,
 		)
 
-		return nil, ErrFileAlreadyExists
+		return &UploadFileResult{File: existingFile, AlreadyExisted: true}, nil
 	}
 
 	if err := uc.repo.MarkUploaded(ctx, createdFile.UserID, createdFile.ID, checksum); err != nil {
@@ -157,7 +162,17 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 		uc.markFailed(ctx, createdFile)
 
 		if errors.Is(err, domain.ErrFileConflict) {
-			return nil, ErrFileAlreadyExists
+			conflictFile, findErr := uc.repo.FindUploadedByChecksum(ctx, createdFile.UserID, checksum)
+			if findErr != nil {
+				if errors.Is(findErr, domain.ErrFileNotFound) {
+					return nil, fmt.Errorf(
+						"conflict file vanished during race condition resolution (checksum=%s): %w",
+						checksum, findErr,
+					)
+				}
+				return nil, fmt.Errorf("resolving conflicting file by checksum: %w", findErr)
+			}
+			return &UploadFileResult{File: conflictFile, AlreadyExisted: true}, nil
 		}
 
 		return nil, fmt.Errorf("marking file as uploaded: %w", err)
@@ -168,7 +183,7 @@ func (uc *UploadFileUseCase) Execute(ctx context.Context, input UploadFileInput)
 	createdFile.ChecksumSHA256 = &checksum
 	createdFile.UploadedAt = &now
 
-	return createdFile, nil
+	return &UploadFileResult{File: createdFile, AlreadyExisted: false}, nil
 }
 
 func (uc *UploadFileUseCase) validate(input UploadFileInput) error {

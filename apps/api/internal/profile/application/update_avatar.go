@@ -25,10 +25,15 @@ type avatarFileDeleter interface {
 	Execute(ctx context.Context, userID string, fileID string) error
 }
 
+type fileReferenceChecker interface {
+	IsReferenced(ctx context.Context, userID string, fileID string) (bool, error)
+}
+
 type UpdateAvatarUseCase struct {
 	profileRepo domain.Repository
 	fileFinder  avatarFileFinder
 	fileDeleter avatarFileDeleter
+	refChecker  fileReferenceChecker
 }
 
 type UpdateAvatarInput struct {
@@ -40,11 +45,13 @@ func NewUpdateAvatarUseCase(
 	profileRepo domain.Repository,
 	fileFinder avatarFileFinder,
 	fileDeleter avatarFileDeleter,
+	refChecker fileReferenceChecker,
 ) *UpdateAvatarUseCase {
 	return &UpdateAvatarUseCase{
 		profileRepo: profileRepo,
 		fileFinder:  fileFinder,
 		fileDeleter: fileDeleter,
+		refChecker:  refChecker,
 	}
 }
 
@@ -82,12 +89,26 @@ func (uc *UpdateAvatarUseCase) Execute(ctx context.Context, input UpdateAvatarIn
 	}
 
 	if prevAvatarFileID != nil && *prevAvatarFileID != fileID {
-		if err := uc.fileDeleter.Execute(ctx, input.UserID, *prevAvatarFileID); err != nil {
-			slog.ErrorContext(ctx, "failed to delete previous avatar file",
+		referenced, err := uc.refChecker.IsReferenced(ctx, input.UserID, *prevAvatarFileID)
+		if err != nil {
+			slog.ErrorContext(ctx, "failed to check if previous avatar file is still referenced",
 				"user_id", input.UserID,
 				"prev_avatar_file_id", *prevAvatarFileID,
 				"error", err,
 			)
+		} else if referenced {
+			slog.InfoContext(ctx, "skipping deletion of previous avatar file: still referenced",
+				"user_id", input.UserID,
+				"prev_avatar_file_id", *prevAvatarFileID,
+			)
+		} else {
+			if err := uc.fileDeleter.Execute(ctx, input.UserID, *prevAvatarFileID); err != nil {
+				slog.ErrorContext(ctx, "failed to delete previous avatar file",
+					"user_id", input.UserID,
+					"prev_avatar_file_id", *prevAvatarFileID,
+					"error", err,
+				)
+			}
 		}
 	}
 

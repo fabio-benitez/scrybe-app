@@ -54,3 +54,13 @@ export function permanentlyDeleteContent(contentId: string): Promise<void> {
     method: "DELETE",
   })
 }
+
+export function replaceContentFiles(
+  contentId: string,
+  fileIds: string[],
+): Promise<void> {
+  return apiFetch<void>(`/contents/${contentId}/files`, {
+    method: "PUT",
+    body: JSON.stringify({ file_ids: fileIds }),
+  })
+}
