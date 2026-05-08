@@ -235,6 +235,51 @@
   },
   "profileSettings": {
     "title": "Ajustes",
-    "description": "Gestiona tu perfil y las preferencias de tu cuenta."
+    "description": "Gestiona tu perfil y las preferencias de tu cuenta.",
+    "tabs": {
+      "profile": "Perfil",
+      "preferences": "Preferencias"
+    },
+    "profile": {
+      "title": "Perfil",
+      "description": "Actualiza tu nombre visible y tu imagen de perfil.",
+      "displayName": "Nombre visible",
+      "displayNamePlaceholder": "Tu nombre",
+      "displayNameHelp": "Este nombre se mostrará en tu perfil y navegación.",
+      "save": "Guardar cambios",
+      "saving": "Guardando...",
+      "validation": {
+        "displayNameRequired": "El nombre es obligatorio."
+      },
+      "toast": {
+        "updated": "Perfil actualizado correctamente.",
+        "updateError": "No se pudo actualizar el perfil."
+      }
+    },
+    "avatar": {
+      "title": "Imagen de perfil",
+      "description": "Sube una imagen para personalizar tu perfil.",
+      "change": "Cambiar imagen",
+      "delete": "Eliminar imagen",
+      "deleteDialog": {
+        "title": "Eliminar imagen de perfil",
+        "description": "¿Seguro que quieres eliminar tu imagen de perfil?",
+        "cancel": "Cancelar",
+        "confirm": "Eliminar"
+      },
+      "discardChange": "Descartar cambio"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "description": "Personaliza cómo se ve y se comporta la aplicación.",
+      "theme": {
+        "title": "Tema",
+        "description": "Cambia entre modo claro y oscuro."
+      },
+      "language": {
+        "title": "Idioma",
+        "description": "Elige el idioma de la interfaz."
+      }
+    }
   }
 }

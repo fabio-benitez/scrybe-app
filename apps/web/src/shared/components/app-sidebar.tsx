@@ -24,7 +24,6 @@ import {
 
 import { useTranslation } from "react-i18next"
 
-
 const navMain = [
   {
     titleKey: "app.navigation.home",
@@ -40,11 +39,13 @@ const navMain = [
     titleKey: "app.navigation.favorites",
     url: "/app/favorites",
     icon: StarIcon,
+    disabled: true,
   },
   {
     titleKey: "app.navigation.library",
     url: "/app/library",
     icon: LibraryIcon,
+    disabled: true,
   },
   {
     titleKey: "app.navigation.trash",
@@ -58,11 +59,13 @@ const navOrganization = [
     titleKey: "app.navigation.categories",
     url: "/app/categories",
     icon: FolderIcon,
+    disabled: true,
   },
   {
     titleKey: "app.navigation.tags",
     url: "/app/tags",
     icon: TagsIcon,
+    disabled: true,
   },
 ]
 
@@ -75,7 +78,6 @@ const navSettings = [
 ]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-
   const { t } = useTranslation()
 
   return (
@@ -88,7 +90,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="/app" className="flex items-center gap-1">
-                <img src="/logo.svg" alt={t("app.brand.name")} className="size-7" />
+                <img
+                  src="/logo.svg"
+                  alt={t("app.brand.name")}
+                  className="size-7"
+                />
                 <span className="text-base font-semibold">
                   {t("app.brand.name")}
                 </span>
@@ -97,11 +103,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <NavMain labelKey="app.navigation.main" items={navMain} />
         <NavMain labelKey="app.navigation.organization" items={navOrganization} />
         <NavMain labelKey="app.navigation.settings" items={navSettings} />
       </SidebarContent>
+
       <SidebarFooter>
         <NavUser />
       </SidebarFooter>

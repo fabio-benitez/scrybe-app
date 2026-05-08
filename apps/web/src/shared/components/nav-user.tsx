@@ -120,7 +120,7 @@ export function NavUser() {
             <DropdownMenuSeparator />
 
             <DropdownMenuGroup>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/app/settings")}>
                 <UserIcon />
                 {t("app.userMenu.profile")}
               </DropdownMenuItem>

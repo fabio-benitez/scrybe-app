@@ -144,7 +144,7 @@ export default function NotesPage() {
           </p>
         </div>
 
-        <Button asChild>
+        <Button className="w-fit" asChild>
           <Link to="/app/notes/new">
             <PlusIcon className="size-4" />
             {t("notes.new")}
