@@ -14,15 +14,17 @@ import (
 )
 
 type SupabaseStorage struct {
-	baseURL    string
-	secretKey  string
-	httpClient *http.Client
+	baseURL       string
+	publicBaseURL string
+	secretKey     string
+	httpClient    *http.Client
 }
 
-func NewSupabaseStorage(baseURL string, secretKey string) *SupabaseStorage {
+func NewSupabaseStorage(baseURL string, publicBaseURL string, secretKey string) *SupabaseStorage {
 	return &SupabaseStorage{
-		baseURL:   strings.TrimRight(baseURL, "/"),
-		secretKey: strings.TrimSpace(secretKey),
+		baseURL:       strings.TrimRight(baseURL, "/"),
+		publicBaseURL: strings.TrimRight(publicBaseURL, "/"),
+		secretKey:     strings.TrimSpace(secretKey),
 		httpClient: &http.Client{
 			Timeout: 60 * time.Second,
 		},
@@ -207,6 +209,5 @@ func (s *SupabaseStorage) CreateSignedURL(ctx context.Context, input domain.Sign
 		return "", fmt.Errorf("create signed url: empty signedURL in response")
 	}
 
-	baseURL := strings.TrimRight(s.baseURL, "/")
-	return baseURL + "/storage/v1" + result.SignedURL, nil
+	return s.publicBaseURL + "/storage/v1" + result.SignedURL, nil
 }

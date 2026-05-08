@@ -25,6 +25,7 @@ type AuthConfig struct {
 type StorageConfig struct {
 	Provider         string
 	BaseURL          string
+	PublicBaseURL    string
 	SecretKey        string
 	Bucket           string
 	MaxUploadBytes   int64
@@ -53,6 +54,7 @@ func LoadAPIConfig() (*APIConfig, error) {
 		Storage: StorageConfig{
 			Provider:         getEnvOrDefault("STORAGE_PROVIDER", "supabase"),
 			BaseURL:          getEnvOrDefault("STORAGE_BASE_URL", ""),
+			PublicBaseURL:    getEnvOrDefault("STORAGE_PUBLIC_BASE_URL", ""),
 			SecretKey:        getEnvOrDefault("STORAGE_SECRET_KEY", ""),
 			Bucket:           getEnvOrDefault("STORAGE_BUCKET", "attachments"),
 			MaxUploadBytes:   getEnvAsInt64OrDefault("STORAGE_MAX_UPLOAD_BYTES", 52428800),
@@ -86,6 +88,10 @@ func (c *APIConfig) validate() error {
 	if strings.EqualFold(c.Storage.Provider, "supabase") {
 		if c.Storage.BaseURL == "" {
 			return errors.New("STORAGE_BASE_URL is required when STORAGE_PROVIDER is supabase")
+		}
+
+		if c.Storage.PublicBaseURL == "" {
+			return errors.New("STORAGE_PUBLIC_BASE_URL is required when STORAGE_PROVIDER is supabase")
 		}
 
 		if c.Storage.SecretKey == "" {
