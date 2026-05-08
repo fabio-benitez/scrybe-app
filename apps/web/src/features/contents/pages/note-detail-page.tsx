@@ -16,6 +16,8 @@ import {
   useDeleteContent,
 } from "@/features/contents/hooks/use-contents"
 
+import { categoryColorStyles } from "@/features/categories/utils/category-colors"
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -32,6 +34,7 @@ import { Badge } from "@/shared/components/ui/badge"
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { Separator } from "@/shared/components/ui/separator"
+import { cn } from "@/shared/lib/utils"
 
 function formatDate(value: string, locale: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -84,7 +87,7 @@ export default function NoteDetailPage() {
     category?.name ?? t("notes.detail.uncategorized")
 
   const contentIdToDelete = content.id
-  
+
   async function handleDelete() {
     try {
       await deleteContent.mutateAsync(contentIdToDelete)
@@ -118,8 +121,16 @@ export default function NoteDetailPage() {
                   </h1>
 
                   <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-                    {content.category_id && (
-                      <Badge variant="secondary">{categoryName}</Badge>
+                    {content.category_id && category && (
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "border",
+                          categoryColorStyles[category.color ?? "gray"].badge,
+                        )}
+                      >
+                        {categoryName}
+                      </Badge>
                     )}
                     <span>
                       {t("notes.detail.updatedAt")}:{" "}

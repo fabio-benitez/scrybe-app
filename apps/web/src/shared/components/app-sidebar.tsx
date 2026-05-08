@@ -59,7 +59,6 @@ const navOrganization = [
     titleKey: "app.navigation.categories",
     url: "/app/categories",
     icon: FolderIcon,
-    disabled: true,
   },
   {
     titleKey: "app.navigation.tags",

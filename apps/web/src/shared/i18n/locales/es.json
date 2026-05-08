@@ -211,6 +211,90 @@
       }
     }
   },
+  "categories": {
+    "title": "Categorías",
+    "description": "Organiza tus notas en categorías para encontrarlas más fácilmente.",
+    "new": "Nueva categoría",
+    "loading": "Cargando categorías...",
+    "empty": {
+      "title": "No hay categorías todavía",
+      "description": "Crea tu primera categoría para empezar a organizar tus notas."
+    },
+    "search": {
+      "placeholder": "Buscar categorías...",
+      "empty": "No se encontraron categorías."
+    },
+    "sort": {
+      "nameAsc": "Nombre A-Z",
+      "notesDesc": "Más notas",
+      "updatedDesc": "Más recientes"
+    },
+    "table": {
+      "category": "Nombre",
+      "description": "Descripción",
+      "notes": "Notas",
+      "updatedAt": "Última actualización",
+      "actions": "Acciones",
+      "noDescription": "Sin descripción",
+      "notesCount": "{{count}} notas"
+    },
+    "actions": {
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "pagination": {
+      "summary": "{{total}} categorías · Página {{page}} de {{totalPages}}",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "colors": {
+      "gray": "Gris",
+      "red": "Rojo",
+      "orange": "Naranja",
+      "yellow": "Amarillo",
+      "green": "Verde",
+      "blue": "Azul",
+      "purple": "Morado",
+      "pink": "Rosa"
+    },
+    "form": {
+      "createTitle": "Nueva categoría",
+      "createDescription": "Crea una categoría para organizar tus notas.",
+      "editTitle": "Editar categoría",
+      "editDescription": "Modifica los datos de esta categoría.",
+      "name": "Nombre",
+      "namePlaceholder": "Trabajo, Ideas, Personal...",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Descripción opcional",
+      "color": "Color",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "saving": "Guardando...",
+      "validation": {
+        "nameRequired": "El nombre es obligatorio.",
+        "nameMax": "El nombre no puede superar los 80 caracteres.",
+        "descriptionMax": "La descripción no puede superar los 500 caracteres."
+      },
+      "toast": {
+        "created": "Categoría creada correctamente.",
+        "updated": "Categoría actualizada correctamente.",
+        "createError": "No se pudo crear la categoría.",
+        "updateError": "No se pudo actualizar la categoría."
+      }
+    },
+    "deleteDialog": {
+      "title": "Eliminar categoría",
+      "description": "Esta categoría se eliminará definitivamente.",
+      "descriptionWithNotes": "Hay {{count}} notas asociadas. Si eliminas esta categoría, esas notas pasarán a “Sin categoría”.",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar",
+      "deleting": "Eliminando...",
+      "toast": {
+        "deleted": "Categoría eliminada correctamente.",
+        "deleteError": "No se pudo eliminar la categoría."
+      }
+    }
+  },
   "trash": {
     "title": "Papelera",
     "description": "Notas eliminadas que todavía puedes restaurar o borrar definitivamente.",
@@ -280,6 +364,13 @@
         "title": "Idioma",
         "description": "Elige el idioma de la interfaz."
       }
+    }
+  },
+  "dates": {
+    "updatedAt": {
+      "justNow": "Actualizada ahora",
+      "relative": "Actualizada {{time}}",
+      "date": "Actualizada el {{date}}"
     }
   }
 }
