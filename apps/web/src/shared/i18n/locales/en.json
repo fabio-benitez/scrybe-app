@@ -211,6 +211,90 @@
       }
     }
   },
+  "categories": {
+    "title": "Categories",
+    "description": "Organize your notes into categories to find them more easily.",
+    "new": "New category",
+    "loading": "Loading categories...",
+    "empty": {
+      "title": "There are no categories yet",
+      "description": "Create your first category to start organizing your notes."
+    },
+    "search": {
+      "placeholder": "Search categories...",
+      "empty": "No categories found."
+    },
+    "sort": {
+      "nameAsc": "Name A-Z",
+      "notesDesc": "Most notes",
+      "updatedDesc": "Recently updated"
+    },
+    "table": {
+      "category": "Name",
+      "description": "Description",
+      "notes": "Notes",
+      "updatedAt": "Last updated",
+      "actions": "Actions",
+      "noDescription": "No description",
+      "notesCount": "{{count}} notes"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "summary": "{{total}} categories · Page {{page}} of {{totalPages}}",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "colors": {
+      "gray": "Gray",
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue",
+      "purple": "Purple",
+      "pink": "Pink"
+    },
+    "form": {
+      "createTitle": "New category",
+      "createDescription": "Create a category to organize your notes.",
+      "editTitle": "Edit category",
+      "editDescription": "Update this category.",
+      "name": "Name",
+      "namePlaceholder": "Work, Ideas, Personal...",
+      "description": "Description",
+      "descriptionPlaceholder": "Optional description",
+      "color": "Color",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving...",
+      "validation": {
+        "nameRequired": "Name is required.",
+        "nameMax": "Name cannot exceed 80 characters.",
+        "descriptionMax": "Description cannot exceed 500 characters."
+      },
+      "toast": {
+        "created": "Category created successfully.",
+        "updated": "Category updated successfully.",
+        "createError": "Could not create category.",
+        "updateError": "Could not update category."
+      }
+    },
+    "deleteDialog": {
+      "title": "Delete category",
+      "description": "This category will be permanently deleted.",
+      "descriptionWithNotes": "There are {{count}} associated notes. If you delete this category, those notes will move to “Uncategorized”.",
+      "cancel": "Cancel",
+      "confirm": "Delete",
+      "deleting": "Deleting...",
+      "toast": {
+        "deleted": "Category deleted successfully.",
+        "deleteError": "Could not delete category."
+      }
+    }
+  },
   "trash": {
     "title": "Trash",
     "description": "Deleted notes that you can still restore or permanently delete.",
@@ -280,6 +364,13 @@
         "title": "Language",
         "description": "Choose the interface language."
       }
+    }
+  },
+  "dates": {
+    "updatedAt": {
+      "justNow": "Updated just now",
+      "relative": "Updated {{time}}",
+      "date": "Updated on {{date}}"
     }
   }
 }

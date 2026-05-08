@@ -11,6 +11,7 @@ import type {
   CreateCategoryPayload,
   UpdateCategoryPayload,
 } from "@/features/categories/types/category"
+import { contentsQueryKey } from "@/features/contents/hooks/use-contents"
 
 export const categoriesQueryKey = ["categories"] as const
 
@@ -62,6 +63,7 @@ export function useDeleteCategory() {
     mutationFn: deleteCategory,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: categoriesQueryKey })
+      queryClient.invalidateQueries({ queryKey: contentsQueryKey })
     },
   })
 }
