@@ -22,7 +22,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-4 md:p-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">
             {t("dashboard.title")}
@@ -32,7 +32,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <Button asChild>
+        <Button className="w-fit" asChild>
           <Link to="/app/notes/new">
             <PlusIcon className="size-4" />
             {t("dashboard.actions.newNote")}

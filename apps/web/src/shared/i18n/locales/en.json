@@ -235,6 +235,51 @@
   },
   "profileSettings": {
     "title": "Settings",
-    "description": "Manage your profile and account preferences."
+    "description": "Manage your profile and account preferences.",
+    "tabs": {
+      "profile": "Profile",
+      "preferences": "Preferences"
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "Update your display name and profile picture.",
+      "displayName": "Display name",
+      "displayNamePlaceholder": "Your name",
+      "displayNameHelp": "This name will appear in your profile and navigation.",
+      "save": "Save changes",
+      "saving": "Saving...",
+      "validation": {
+        "displayNameRequired": "Display name is required."
+      },
+      "toast": {
+        "updated": "Profile updated successfully.",
+        "updateError": "Could not update profile."
+      }
+    },
+    "avatar": {
+      "title": "Profile picture",
+      "description": "Upload an image to personalize your profile.",
+      "change": "Change image",
+      "delete": "Remove image",
+      "deleteDialog": {
+        "title": "Remove profile picture",
+        "description": "Are you sure you want to remove your profile picture?",
+        "cancel": "Cancel",
+        "confirm": "Remove"
+      },
+      "discardChange": "Discard change"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "description": "Customize how the app looks and behaves.",
+      "theme": {
+        "title": "Theme",
+        "description": "Switch between light and dark mode."
+      },
+      "language": {
+        "title": "Language",
+        "description": "Choose the interface language."
+      }
+    }
   }
 }
