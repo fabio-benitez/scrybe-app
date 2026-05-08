@@ -30,6 +30,7 @@ interface CategoryFormDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   category?: Category
+  onSuccess?: (category: Category) => void
 }
 
 export function CategoryFormDialog({
@@ -37,6 +38,7 @@ export function CategoryFormDialog({
   open,
   onOpenChange,
   category,
+  onSuccess,
 }: CategoryFormDialogProps) {
   const { t } = useTranslation()
   const createCategory = useCreateCategory()
@@ -86,11 +88,15 @@ export function CategoryFormDialog({
 
     try {
       if (isEditMode && category) {
-        await updateCategory.mutateAsync(payload)
+        const updatedCategory = await updateCategory.mutateAsync(payload)
+
         toast.success(t("categories.form.toast.updated"))
+        onSuccess?.(updatedCategory)
       } else {
-        await createCategory.mutateAsync(payload)
+        const createdCategory = await createCategory.mutateAsync(payload)
+
         toast.success(t("categories.form.toast.created"))
+        onSuccess?.(createdCategory)
       }
 
       onOpenChange(false)

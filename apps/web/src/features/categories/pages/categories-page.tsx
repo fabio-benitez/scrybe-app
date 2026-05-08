@@ -19,7 +19,7 @@ import { CategoryFormDialog } from "@/features/categories/components/category-fo
 import { DeleteCategoryDialog } from "@/features/categories/components/delete-category-dialog"
 import { useCategories } from "@/features/categories/hooks/use-categories"
 import type { Category } from "@/features/categories/types/category"
-import { categoryColorDotClass } from "@/features/categories/utils/category-colors"
+import { categoryColorStyles } from "@/features/categories/utils/category-colors"
 import { useContents } from "@/features/contents/hooks/use-contents"
 
 import { Button } from "@/shared/components/ui/button"
@@ -238,7 +238,7 @@ export default function CategoriesPage() {
                           <span
                             className={cn(
                               "size-3.5 shrink-0 rounded-full",
-                              categoryColorDotClass[category.color ?? "gray"],
+                              categoryColorStyles[category.color ?? "gray"].dot,
                             )}
                           />
 

@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import type { CategoryColor } from "@/features/categories/types/category"
 import {
-  categoryColorDotClass,
+  categoryColorStyles,
   categoryColors,
 } from "@/features/categories/utils/category-colors"
 
@@ -46,7 +46,7 @@ export function CategoryColorPicker({
             <span
               className={cn(
                 "size-5 rounded-full",
-                categoryColorDotClass[color],
+                categoryColorStyles[color].dot,
               )}
             />
           </span>
