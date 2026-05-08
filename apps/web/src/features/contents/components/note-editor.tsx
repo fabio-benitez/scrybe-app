@@ -9,9 +9,9 @@ import { SimpleEditor } from "@/shared/components/tiptap-templates/simple/simple
 
 import { CategoryFormDialog } from "@/features/categories/components/category-form-dialog"
 import { useCategories } from "@/features/categories/hooks/use-categories"
-import { categoryColorStyles } from "@/features/categories/utils/category-colors"
 import { replaceContentFiles } from "@/features/contents/services/content-service"
 import { extractFileIdsFromContent } from "@/features/contents/utils/content-files"
+import { CategoryCombobox } from "@/features/categories/components/category-combobox"
 
 import {
   useCreateContent,
@@ -23,14 +23,7 @@ import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
 import { Input } from "@/shared/components/ui/input"
 import { Label } from "@/shared/components/ui/label"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/components/ui/select"
-import { cn } from "@/shared/lib/utils"
+
 
 const emptyContent: JSONContent = {
   type: "doc",
@@ -228,41 +221,11 @@ export function NoteEditor({
                   </Button>
                 </div>
 
-                <Select value={categoryId} onValueChange={setCategoryId}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder={t("notes.uncategorized")} />
-                  </SelectTrigger>
-
-                  <SelectContent
-                    position="popper"
-                    side="bottom"
-                    align="start"
-                    className="w-(--radix-select-trigger-width)"
-                  >
-                    <SelectItem value="uncategorized" className="text-sm">
-                      {t("notes.uncategorized")}
-                    </SelectItem>
-
-                    {categories?.map((category) => (
-                      <SelectItem
-                        key={category.id}
-                        value={category.id}
-                        className="text-sm"
-                      >
-                        <div className="flex items-center gap-2">
-                          <span
-                            className={cn(
-                              "size-2.5 rounded-full",
-                              categoryColorStyles[category.color ?? "gray"].dot,
-                            )}
-                          />
-
-                          <span>{category.name}</span>
-                        </div>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <CategoryCombobox
+                  value={categoryId}
+                  onValueChange={setCategoryId}
+                  categories={categories ?? []}
+                />
               </div>
             </CardContent>
           </Card>
