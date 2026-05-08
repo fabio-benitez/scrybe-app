@@ -51,7 +51,11 @@ func RunAPI(cfg *config.APIConfig) error {
 	authMiddleware := authhttp.NewMiddleware(jwtValidator)
 
 	filesRepo := filesinfra.NewPostgresRepository(dbPool)
-	filesStorage := filesinfra.NewSupabaseStorage(cfg.Storage.BaseURL, cfg.Storage.SecretKey)
+	filesStorage := filesinfra.NewSupabaseStorage(
+		cfg.Storage.BaseURL,
+		cfg.Storage.PublicBaseURL,
+		cfg.Storage.SecretKey,
+	)
 	deleteFileUC := filesapp.NewDeleteFileUseCase(filesRepo, filesStorage, filesRepo)
 
 	profileRepo := profileinfra.NewPostgresRepository(dbPool)
