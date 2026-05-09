@@ -5,6 +5,7 @@ import {
   PencilIcon,
   StarIcon,
   Trash2Icon,
+  FolderIcon,
 } from "lucide-react"
 
 import { toast } from "sonner"
@@ -125,10 +126,16 @@ export default function NoteDetailPage() {
                       <Badge
                         variant="outline"
                         className={cn(
-                          "border",
+                          "flex items-center gap-1.5 border",
                           categoryColorStyles[category.color ?? "gray"].badge,
                         )}
                       >
+                        <FolderIcon
+                          className={cn(
+                            "size-3.5",
+                            categoryColorStyles[category.color ?? "gray"].icon,
+                          )}
+                        />
                         {categoryName}
                       </Badge>
                     )}

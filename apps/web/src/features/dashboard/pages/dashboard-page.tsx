@@ -372,12 +372,12 @@ export default function DashboardPage() {
                       className="grid min-h-6 grid-cols-[minmax(0,8rem)_1fr_auto] items-center gap-3"
                     >
                       <div className="flex min-w-0 items-center gap-2">
-                        <span
+                        <FolderIcon
                           className={cn(
-                            "size-2.5 shrink-0 rounded-full",
+                            "size-4 shrink-0",
                             category
-                              ? categoryColorStyles[color].dot
-                              : "bg-muted-foreground",
+                              ? categoryColorStyles[color].icon
+                              : "text-muted-foreground",
                           )}
                         />
                         <span className="truncate text-sm font-medium">

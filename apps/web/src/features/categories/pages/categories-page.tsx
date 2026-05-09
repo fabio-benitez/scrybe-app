@@ -5,6 +5,7 @@ import {
   PlusIcon,
   SearchIcon,
   Trash2Icon,
+  FolderIcon
 } from "lucide-react"
 
 import {
@@ -235,10 +236,10 @@ export default function CategoriesPage() {
                     <TableRow key={category.id} className="h-16">
                       <TableCell className="pl-10">
                         <div className="flex min-w-0 items-center gap-3">
-                          <span
+                          <FolderIcon
                             className={cn(
-                              "size-3.5 shrink-0 rounded-full",
-                              categoryColorStyles[category.color ?? "gray"].dot,
+                              "size-4 shrink-0",
+                              categoryColorStyles[category.color ?? "gray"].icon,
                             )}
                           />
 
