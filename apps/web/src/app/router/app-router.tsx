@@ -7,6 +7,7 @@ import RegisterPage from "@/features/auth/pages/register-page"
 import DashboardPage from "@/features/dashboard/pages/dashboard-page"
 import CategoriesPage from "@/features/categories/pages/categories-page"
 import NotesPage from "@/features/contents/pages/notes-page"
+import FavoritesPage from "@/features/contents/pages/favorites-page"
 import NoteDetailPage from "@/features/contents/pages/note-detail-page"
 import NoteEditorPage from "@/features/contents/pages/note-editor-page"
 import TrashPage from "@/features/contents/pages/trash-page"
@@ -34,6 +35,7 @@ export function AppRouter() {
           <Route element={<AppLayout />}>
             <Route path="/app" element={<DashboardPage />} />
             <Route path="/app/notes" element={<NotesPage />} />
+            <Route path="/app/favorites" element={<FavoritesPage />} />
             <Route path="/app/notes/new" element={<NoteEditorPage />} />
             <Route path="/app/notes/:contentId" element={<NoteDetailPage />} />
             <Route path="/app/notes/:contentId/edit" element={<NoteEditorPage />} />

@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import type { LucideIcon } from "lucide-react"
+import type { ComponentType } from "react"
 
 import {
   SidebarGroup,
@@ -14,7 +14,7 @@ import { cn } from "@/shared/lib/utils"
 interface NavItem {
   titleKey: string
   url: string
-  icon: LucideIcon
+  icon: ComponentType<{ className?: string }>
   disabled?: boolean
 }
 

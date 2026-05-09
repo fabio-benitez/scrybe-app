@@ -11,13 +11,13 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/shared/components/ui/sidebar"
+import { PinnedIcon } from "@/shared/components/pinned-icon"
 
 import {
   FolderIcon,
   HomeIcon,
-  LibraryIcon,
+  PaperclipIcon,
   SettingsIcon,
-  StarIcon,
   TagsIcon,
   Trash2Icon,
 } from "lucide-react"
@@ -38,13 +38,12 @@ const navMain = [
   {
     titleKey: "app.navigation.favorites",
     url: "/app/favorites",
-    icon: StarIcon,
-    disabled: true,
+    icon: PinnedIcon,
   },
   {
-    titleKey: "app.navigation.library",
-    url: "/app/library",
-    icon: LibraryIcon,
+    titleKey: "app.navigation.files",
+    url: "/app/files",
+    icon: PaperclipIcon,
     disabled: true,
   },
   {

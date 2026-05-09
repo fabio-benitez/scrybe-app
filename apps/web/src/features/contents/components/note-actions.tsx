@@ -5,7 +5,6 @@ import { toast } from "sonner"
 import {
   PencilIcon,
   RotateCcwIcon,
-  StarIcon,
   Trash2Icon,
 } from "lucide-react"
 
@@ -14,6 +13,7 @@ import {
   useDeleteContent,
   usePermanentlyDeleteContent,
   useRestoreContent,
+  useToggleFavoriteContent,
 } from "@/features/contents/hooks/use-contents"
 
 import {
@@ -28,6 +28,8 @@ import {
 } from "@/shared/components/ui/alert-dialog"
 import { Button } from "@/shared/components/ui/button"
 import { cn } from "@/shared/lib/utils"
+import { featureColors } from "@/shared/lib/feature-colors"
+import { PinnedIcon } from "@/shared/components/pinned-icon"
 
 type NoteActionsMode = "active" | "trash"
 
@@ -46,6 +48,7 @@ export function NoteActions({
   const deleteContent = useDeleteContent()
   const restoreContent = useRestoreContent()
   const permanentlyDeleteContent = usePermanentlyDeleteContent()
+  const toggleFavoriteContent = useToggleFavoriteContent(content.id)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   async function handleRestore() {
@@ -77,6 +80,14 @@ export function NoteActions({
     }
   }
 
+  async function handleToggleFavorite() {
+    try {
+      await toggleFavoriteContent.mutateAsync(!content.is_favorite)
+    } catch {
+      toast.error(t("notes.detail.toast.updateError"))
+    }
+  }
+
   return (
     <div className={cn("flex items-center gap-1.5", className)}>
       {mode === "active" && (
@@ -85,14 +96,21 @@ export function NoteActions({
             type="button"
             variant="outline"
             size="icon"
-            className="size-9"
+            className={cn(
+              "size-9",
+              content.is_favorite && featureColors.favorites.iconWrapper,
+            )}
             aria-label={t("notes.detail.favorite")}
-            disabled
+            onClick={(event) => {
+              event.preventDefault()
+              event.stopPropagation()
+              void handleToggleFavorite()
+            }}
           >
-            <StarIcon
+            <PinnedIcon
               className={cn(
                 "size-4",
-                content.is_favorite && "fill-yellow-500 text-yellow-500",
+                content.is_favorite && featureColors.favorites.icon,
               )}
             />
           </Button>

@@ -99,3 +99,24 @@ export function usePermanentlyDeleteContent() {
     },
   })
 }
+
+export function useToggleFavoriteContent(contentId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (isFavorite: boolean) =>
+      updateContent(contentId, {
+        is_favorite: isFavorite,
+      }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: contentsQueryKey,
+      })
+
+      queryClient.invalidateQueries({
+        queryKey: [...contentsQueryKey, contentId],
+      })
+    },
+  })
+}

@@ -79,7 +79,7 @@
       "home": "Home",
       "notes": "Notes",
       "favorites": "Favorites",
-      "library": "Library",
+      "files": "Files",
       "trash": "Trash",
       "categories": "Categories",
       "tags": "Tags"
@@ -246,6 +246,10 @@
       "updatedAt": "Last updated",
       "actions": "Actions"
     }
+  },
+  "favorites": {
+    "title": "Favorites",
+    "description": "Quickly access your favorite notes."
   },
   "categories": {
     "title": "Categories",

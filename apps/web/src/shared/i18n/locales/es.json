@@ -78,8 +78,8 @@
       "settings": "Ajustes",
       "home": "Inicio",
       "notes": "Notas",
-      "favorites": "Favoritos",
-      "library": "Biblioteca",
+      "favorites": "Favoritas",
+      "files": "Archivos",
       "trash": "Papelera",
       "categories": "Categorías",
       "tags": "Etiquetas"
@@ -246,6 +246,10 @@
       "updatedAt": "Última actualización",
       "actions": "Acciones"
     }
+  },
+  "favorites": {
+    "title": "Favoritas",
+    "description": "Accede rápidamente a tus notas favoritas."
   },
   "categories": {
     "title": "Categorías",
