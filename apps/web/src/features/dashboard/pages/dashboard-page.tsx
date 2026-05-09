@@ -11,10 +11,12 @@ import {
 
 import { DashboardStatCard } from "@/features/dashboard/components/dashboard-stat-card"
 import { useCategories } from "@/features/categories/hooks/use-categories"
+import type { CategoryColor } from "@/features/categories/types/category"
 import { categoryColorStyles } from "@/features/categories/utils/category-colors"
 import { useContents } from "@/features/contents/hooks/use-contents"
 
-import { Badge } from "@/shared/components/ui/badge"
+import { CategoryBadge } from "@/features/categories/components/category-badge"
+
 import { Button } from "@/shared/components/ui/button"
 import {
   Card,
@@ -97,7 +99,7 @@ export default function DashboardPage() {
 
   function renderCompactNote(note: (typeof contents)[number]) {
     const category = note.category_id ? categoriesById.get(note.category_id) : null
-    const color = category?.color ?? "gray"
+    const color: CategoryColor = category?.color ?? "gray"
 
     return (
       <Link
@@ -107,23 +109,23 @@ export default function DashboardPage() {
         className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-lg px-2 py-2 transition-colors hover:bg-muted/40"
       >
         <div className="flex min-w-0 items-center gap-2">
-          <FileTextIcon className="size-4 shrink-0 text-muted-foreground" />
+          <FileTextIcon
+            className={cn(
+              "size-4 shrink-0",
+              category
+                ? categoryColorStyles[color].icon
+                : "text-muted-foreground",
+            )}
+          />
 
           <span className="truncate text-sm font-medium">
             {note.title}
           </span>
 
-          <Badge
-            variant="outline"
-            className={cn(
-              "shrink-0 px-1.5 py-0 text-[11px]",
-              category
-                ? categoryColorStyles[color].badge
-                : "border-muted-foreground/20 bg-muted text-muted-foreground",
-            )}
-          >
-            {category?.name ?? t("dashboard.uncategorized")}
-          </Badge>
+          <CategoryBadge
+            category={category}
+            fallbackLabel={t("notes.uncategorized")}
+          />
         </div>
 
         <span className="shrink-0 text-xs text-muted-foreground">
@@ -360,7 +362,7 @@ export default function DashboardPage() {
               <div className="space-y-4">
                 {topCategories.map((item) => {
                   const category = item.category
-                  const color = category?.color ?? "gray"
+                  const color: CategoryColor = category?.color ?? "gray"
                   const percentage =
                     contents.length > 0
                       ? Math.round((item.count / contents.length) * 100)

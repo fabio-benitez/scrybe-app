@@ -195,7 +195,7 @@ export default function CategoriesPage() {
                   <SelectValue />
                 </SelectTrigger>
 
-                <SelectContent>
+                <SelectContent position="popper">
                   <SelectItem value="name-asc">
                     {t("categories.sort.nameAsc")}
                   </SelectItem>

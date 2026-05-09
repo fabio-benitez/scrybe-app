@@ -213,12 +213,38 @@
         "title": "Delete note",
         "description": "This note will be moved to the trash. You can restore it later.",
         "cancel": "Cancel",
-        "confirm": "Delete note"
+        "confirm": "Delete"
       },
       "toast": {
         "deleted": "Note moved to trash.",
         "deleteError": "Could not delete note."
       }
+    },
+    "search": {
+      "placeholder": "Search notes...",
+      "empty": "No notes found."
+    },
+    "filters": {
+      "category": "Category",
+      "allCategories": "All",
+      "sort": "Sort",
+      "recent": "Recent",
+      "oldest": "Oldest"
+    },
+    "view": {
+      "list": "List view",
+      "grid": "Grid view"
+    },
+    "pagination": {
+      "summary": "Showing {{from}}-{{to}} of {{total}} notes",
+      "previous": "Previous",
+      "next": "Next"
+    },
+    "table": {
+      "note": "Note",
+      "category": "Category",
+      "updatedAt": "Last updated",
+      "actions": "Actions"
     }
   },
   "categories": {

@@ -213,12 +213,38 @@
         "title": "Eliminar nota",
         "description": "Esta nota se moverá a la papelera. Podrás restaurarla más adelante.",
         "cancel": "Cancelar",
-        "confirm": "Eliminar nota"
+        "confirm": "Eliminar"
       },
       "toast": {
         "deleted": "Nota movida a la papelera.",
         "deleteError": "No se pudo eliminar la nota."
       }
+    },
+    "search": {
+      "placeholder": "Buscar notas...",
+      "empty": "No se encontraron notas."
+    },
+    "filters": {
+      "category": "Categoría",
+      "allCategories": "Todas",
+      "sort": "Orden",
+      "recent": "Recientes",
+      "oldest": "Antiguas"
+    },
+    "view": {
+      "list": "Vista lista",
+      "grid": "Vista grid"
+    },
+    "pagination": {
+      "summary": "Mostrando {{from}}-{{to}} de {{total}} notas",
+      "previous": "Anterior",
+      "next": "Siguiente"
+    },
+    "table": {
+      "note": "Nota",
+      "category": "Categoría",
+      "updatedAt": "Última actualización",
+      "actions": "Acciones"
     }
   },
   "categories": {

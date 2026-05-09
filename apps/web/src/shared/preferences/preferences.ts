@@ -1,19 +1,68 @@
-type Language = "es" | "en"
+export type Language = "es" | "en"
+export type NotesViewMode = "list" | "grid"
 
-const LANGUAGE_STORAGE_KEY = "scrybe.language"
+interface Preferences {
+  language: Language
+  notesView: NotesViewMode
+}
 
-const DEFAULT_LANGUAGE: Language = "es"
+const STORAGE_KEY = "scrybe.preferences"
 
-export function getLanguage(): Language {
-  const stored = localStorage.getItem(LANGUAGE_STORAGE_KEY)
+const DEFAULT_PREFERENCES: Preferences = {
+  language: "es",
+  notesView: "list",
+}
 
-  if (stored === "es" || stored === "en") {
-    return stored
+function getPreferences(): Preferences {
+  const stored = localStorage.getItem(STORAGE_KEY)
+
+  if (!stored) {
+    return DEFAULT_PREFERENCES
   }
 
-  return DEFAULT_LANGUAGE
+  try {
+    const parsed = JSON.parse(stored) as Partial<Preferences>
+
+    return {
+      language:
+        parsed.language === "en" ? "en" : DEFAULT_PREFERENCES.language,
+
+      notesView:
+        parsed.notesView === "grid"
+          ? "grid"
+          : DEFAULT_PREFERENCES.notesView,
+    }
+  } catch {
+    return DEFAULT_PREFERENCES
+  }
+}
+
+function savePreferences(preferences: Preferences) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(preferences))
+}
+
+export function getLanguage(): Language {
+  return getPreferences().language
 }
 
 export function setLanguage(language: Language) {
-  localStorage.setItem(LANGUAGE_STORAGE_KEY, language)
+  const preferences = getPreferences()
+
+  savePreferences({
+    ...preferences,
+    language,
+  })
+}
+
+export function getNotesView(): NotesViewMode {
+  return getPreferences().notesView
+}
+
+export function setNotesView(notesView: NotesViewMode) {
+  const preferences = getPreferences()
+
+  savePreferences({
+    ...preferences,
+    notesView,
+  })
 }
