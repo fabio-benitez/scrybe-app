@@ -25,12 +25,16 @@ interface CategoryComboboxProps {
   value: string
   onValueChange: (value: string) => void
   categories: Category[]
+  allLabel?: string
+  allValue?: string
 }
 
 export function CategoryCombobox({
   value,
   onValueChange,
   categories,
+  allLabel,
+  allValue = "all",
 }: CategoryComboboxProps) {
   const { t } = useTranslation()
 
@@ -67,9 +71,15 @@ export function CategoryCombobox({
                 </span>
               </>
             ) : (
-              <span className="truncate text-muted-foreground">
-                {t("notes.uncategorized")}
-              </span>
+              <div className="flex min-w-0 items-center gap-2 text-muted-foreground">
+                <FolderIcon className="size-4 shrink-0 text-slate-500" />
+
+                <span className="truncate">
+                  {value === allValue && allLabel
+                    ? allLabel
+                    : t("notes.uncategorized")}
+                </span>
+              </div>
             )}
           </div>
 
@@ -92,6 +102,25 @@ export function CategoryCombobox({
             </CommandEmpty>
 
             <CommandGroup>
+              {allLabel && (
+                <CommandItem
+                  value={allLabel}
+                  onSelect={() => {
+                    onValueChange(allValue)
+                    setOpen(false)
+                  }}
+                >
+                  <CheckIcon
+                    className={cn(
+                      "mr-2 size-4",
+                      value === allValue ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+
+                  {allLabel}
+                </CommandItem>
+              )}
+
               <CommandItem
                 value="uncategorized"
                 onSelect={() => {
@@ -108,7 +137,11 @@ export function CategoryCombobox({
                   )}
                 />
 
-                {t("notes.uncategorized")}
+                <FolderIcon className="mr-2 size-4 shrink-0 text-slate-500" />
+
+                <span className="truncate">
+                  {t("notes.uncategorized")}
+                </span>
               </CommandItem>
 
               {categories.map((category) => (
