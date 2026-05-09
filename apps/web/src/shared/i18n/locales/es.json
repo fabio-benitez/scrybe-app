@@ -100,34 +100,44 @@
   "dashboard": {
     "title": "Inicio",
     "description": "Resumen de tu espacio personal.",
+    "uncategorized": "Sin categoría",
     "actions": {
-      "newNote": "Nueva nota"
+      "newNote": "Nueva nota",
+      "viewNotes": "Ver notas",
+      "manageCategories": "Categorías",
+      "settings": "Ajustes",
+      "viewAllNotes": "Ver todas las notas",
+      "viewAllFavorites": "Ver favoritas",
+      "viewAllCategories": "Ver todas las categorías"
     },
     "stats": {
       "notes": {
         "title": "Notas",
-        "description": "Notas creadas"
+        "description": "últimos 7 días"
       },
       "categories": {
         "title": "Categorías",
-        "description": "Categorías organizadas"
+        "description": "últimos 7 días"
       },
-      "tags": {
-        "title": "Etiquetas",
-        "description": "Etiquetas disponibles"
-      },
-      "files": {
-        "title": "Archivos",
-        "description": "Archivos almacenados"
+      "favorites": {
+        "title": "Favoritas",
+        "description": "Notas marcadas como favoritas"
       }
+    },
+    "favoriteNotes": {
+      "title": "Favoritas",
+      "empty": "Marca notas como favoritas para acceder rápidamente a ellas."
     },
     "recentNotes": {
       "title": "Notas recientes",
       "empty": "Aún no hay notas recientes."
     },
     "topCategories": {
-      "title": "Categorías principales",
-      "empty": "Las categorías más utilizadas aparecerán aquí."
+      "title": "Notas por categoría",
+      "empty": "Aún no hay categorías con notas."
+    },
+    "quickActions": {
+      "title": "Acciones rápidas"
     }
   },
   "notes": {
