@@ -6,8 +6,9 @@ import {
   FolderIcon,
   PlusIcon,
   SettingsIcon,
-  StarIcon,
 } from "lucide-react"
+
+import { PinnedIcon } from "@/shared/components/pinned-icon"
 
 import { DashboardStatCard } from "@/features/dashboard/components/dashboard-stat-card"
 import { useCategories } from "@/features/categories/hooks/use-categories"
@@ -193,8 +194,8 @@ export default function DashboardPage() {
             title={t("dashboard.stats.favorites.title")}
             value={contents.filter((content) => content.is_favorite).length}
             description={t("dashboard.stats.favorites.description")}
-            icon={StarIcon}
-            to="/app/notes"
+            icon={PinnedIcon}
+            to="/app/favorites"
             iconWrapperClassName={featureColors.favorites.iconWrapper}
             iconClassName={featureColors.favorites.icon}
           />
@@ -303,7 +304,7 @@ export default function DashboardPage() {
 
           <CardFooter className="border-t p-1.25">
             <Link
-              to="/app/notes"
+              to="/app/favorites"
               className="flex h-9 w-full items-center gap-2 px-5 text-sm font-medium transition-colors hover:bg-muted/40"
             >
               {t("dashboard.actions.viewAllFavorites")}

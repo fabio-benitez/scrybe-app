@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom"
-import type { LucideIcon } from "lucide-react"
+import type { ComponentType } from "react"
 
 import { Card, CardContent } from "@/shared/components/ui/card"
 import { cn } from "@/shared/lib/utils"
@@ -9,7 +9,7 @@ interface DashboardStatCardProps {
   value: string | number
   description?: string
   trend?: number
-  icon: LucideIcon
+  icon: ComponentType<{ className?: string }>
   to?: string
   iconClassName?: string
   iconWrapperClassName?: string

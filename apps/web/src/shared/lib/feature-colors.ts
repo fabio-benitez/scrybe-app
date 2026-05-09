@@ -8,8 +8,8 @@ export const featureColors = {
     icon: "text-blue-400",
   },
   favorites: {
-    iconWrapper: "bg-yellow-500/15",
-    icon: "text-yellow-400",
+    iconWrapper: "bg-emerald-500/15",
+    icon: "text-emerald-400",
   },
   files: {
     iconWrapper: "bg-green-500/15",

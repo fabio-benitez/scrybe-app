@@ -34,4 +34,5 @@ export interface UpdateContentPayload {
   summary?: string | null
   content?: unknown
   category_id?: string | null
+  is_favorite?: boolean
 }
