@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { CheckIcon, ChevronsUpDownIcon } from "lucide-react"
+import { CheckIcon, ChevronsUpDownIcon, FolderIcon } from "lucide-react"
 import { useTranslation } from "react-i18next"
 
 import type { Category } from "@/features/categories/types/category"
@@ -53,12 +53,12 @@ export function CategoryCombobox({
           <div className="flex min-w-0 items-center gap-2">
             {selectedCategory ? (
               <>
-                <span
+                <FolderIcon
                   className={cn(
-                    "size-2.5 shrink-0 rounded-full",
+                    "size-4 shrink-0",
                     categoryColorStyles[
                       selectedCategory.color ?? "gray"
-                    ].dot,
+                    ].icon,
                   )}
                 />
 
@@ -129,12 +129,12 @@ export function CategoryCombobox({
                     )}
                   />
 
-                  <span
+                  <FolderIcon
                     className={cn(
-                      "mr-2 size-2.5 rounded-full",
+                      "mr-2 size-4 shrink-0",
                       categoryColorStyles[
                         category.color ?? "gray"
-                      ].dot,
+                      ].icon,
                     )}
                   />
 

@@ -7,6 +7,7 @@ import {
 } from "lucide-react"
 
 import { useCategories } from "@/features/categories/hooks/use-categories"
+import { categoryColorStyles } from "@/features/categories/utils/category-colors"
 import type { CategoryColor } from "@/features/categories/types/category"
 import { NoteCard } from "@/features/contents/components/note-card"
 import { useContents } from "@/features/contents/hooks/use-contents"
@@ -21,28 +22,7 @@ import {
 } from "@/shared/components/ui/collapsible"
 import { cn } from "@/shared/lib/utils"
 
-const categoryColorClass: Record<CategoryColor, string> = {
-  gray: "text-slate-500",
-  red: "text-red-500",
-  orange: "text-orange-500",
-  yellow: "text-yellow-500",
-  green: "text-green-500",
-  blue: "text-blue-500",
-  purple: "text-purple-500",
-  pink: "text-pink-500",
-}
 
-
-function getFolderColorClass(
-  color?: CategoryColor | null,
-  isUncategorized = false,
-) {
-  if (isUncategorized) {
-    return "text-sky-500"
-  }
-
-  return color ? categoryColorClass[color] : "text-muted-foreground"
-}
 
 
 interface NoteGroupProps {
@@ -78,7 +58,9 @@ function NoteGroup({
             <FolderIcon
               className={cn(
                 "size-4 shrink-0",
-                getFolderColorClass(color, isUncategorized),
+                isUncategorized
+                  ? "text-muted-foreground"
+                  : categoryColorStyles[color ?? "gray"].icon,
               )}
             />
 
