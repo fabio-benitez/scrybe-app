@@ -65,6 +65,8 @@ interface NotesBrowserProps {
   description: string
   contents: Content[]
   isLoading?: boolean
+  mode?: "active" | "trash"
+  hideCreateButton?: boolean
 }
 
 export function NotesBrowser({
@@ -72,6 +74,8 @@ export function NotesBrowser({
   description,
   contents,
   isLoading = false,
+  mode = "active",
+  hideCreateButton = false,
 }: NotesBrowserProps) {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -183,12 +187,14 @@ export function NotesBrowser({
           </p>
         </div>
 
-        <Button className="w-fit" asChild>
-          <Link to="/app/notes/new">
-            <PlusIcon className="size-4" />
-            {t("notes.new")}
-          </Link>
-        </Button>
+        {!hideCreateButton && (
+          <Button className="w-fit" asChild>
+            <Link to="/app/notes/new">
+              <PlusIcon className="size-4" />
+              {t("notes.new")}
+            </Link>
+          </Button>
+        )}
       </div>
 
       {isLoading && (
@@ -301,6 +307,7 @@ export function NotesBrowser({
                     content={content}
                     color={category?.color}
                     category={category}
+                    mode={mode}
                   />
                 )
               })}
@@ -391,7 +398,10 @@ export function NotesBrowser({
                             className="flex justify-center"
                             onClick={(event) => event.stopPropagation()}
                           >
-                            <NoteActions content={content} />
+                            <NoteActions
+                              content={content}
+                              mode={mode}
+                            />
                           </div>
                         </TableCell>
                       </TableRow>
