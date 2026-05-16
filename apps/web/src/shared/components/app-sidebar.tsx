@@ -45,6 +45,7 @@ const navMain = [
     url: "/app/files",
     icon: PaperclipIcon,
     disabled: true,
+    badgeKey: "app.navigation.comingSoon",
   },
   {
     titleKey: "app.navigation.trash",
@@ -64,6 +65,7 @@ const navOrganization = [
     url: "/app/tags",
     icon: TagsIcon,
     disabled: true,
+    badgeKey: "app.navigation.comingSoon",
   },
 ]
 

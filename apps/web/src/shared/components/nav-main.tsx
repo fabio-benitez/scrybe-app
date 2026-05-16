@@ -9,6 +9,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/shared/components/ui/sidebar"
+import { Badge } from "@/shared/components/ui/badge"
 import { cn } from "@/shared/lib/utils"
 
 interface NavItem {
@@ -16,6 +17,7 @@ interface NavItem {
   url: string
   icon: ComponentType<{ className?: string }>
   disabled?: boolean
+  badgeKey?: string
 }
 
 interface NavMainProps {
@@ -42,20 +44,46 @@ export function NavMain({ labelKey, items }: NavMainProps) {
               {item.disabled ? (
                 <>
                   <item.icon />
-                  <span>{t(item.titleKey)}</span>
+
+                  <div className="flex items-center gap-2.5">
+                    <span>{t(item.titleKey)}</span>
+
+                    {item.badgeKey && (
+                      <Badge
+                        variant="secondary"
+                        className="pointer-events-none px-1.5 py-0 text-[10px]"
+                      >
+                        {t(item.badgeKey)}
+                      </Badge>
+                    )}
+                  </div>
                 </>
               ) : (
                 <NavLink
                   to={item.url}
                   end={item.url === "/app"}
                   className={({ isActive }) =>
-                    isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : ""
+                    cn(
+                      "flex w-full items-center gap-2",
+                      isActive &&
+                      "bg-sidebar-accent text-sidebar-accent-foreground"
+                    )
                   }
                 >
                   <item.icon />
-                  <span>{t(item.titleKey)}</span>
+
+                  <div className="flex w-full items-center justify-between gap-2">
+                    <span>{t(item.titleKey)}</span>
+
+                    {item.badgeKey && (
+                      <Badge
+                        variant="secondary"
+                        className="pointer-events-none px-1.5 py-0 text-[10px]"
+                      >
+                        {t(item.badgeKey)}
+                      </Badge>
+                    )}
+                  </div>
                 </NavLink>
               )}
             </SidebarMenuButton>
