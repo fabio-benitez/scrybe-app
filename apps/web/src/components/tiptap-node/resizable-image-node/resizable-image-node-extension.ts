@@ -11,6 +11,10 @@ export const ResizableImage = Image.extend({
       width: {
         default: "100%",
       },
+
+      fileId: {
+        default: null,
+      },
     }
   },
 
