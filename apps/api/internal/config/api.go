@@ -41,7 +41,7 @@ type CORSConfig struct {
 
 func LoadAPIConfig() (*APIConfig, error) {
 	cfg := &APIConfig{
-		Addr: getEnvOrDefault("API_ADDR", ":8081"),
+		Addr: ":" + getEnvOrDefault("PORT", "8081"),
 
 		Database: DatabaseConfig{
 			URL: getEnvOrDefault("DATABASE_URL", ""),
