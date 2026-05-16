@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import type { Content as TiptapContent } from "@tiptap/core"
 import { EditorContent, useEditor } from "@tiptap/react"
 import { useTranslation } from "react-i18next"
@@ -22,6 +23,8 @@ import "@/components/tiptap-node/list-node/list-node.scss"
 import "@/components/tiptap-node/image-node/image-node.scss"
 import "@/components/tiptap-node/heading-node/heading-node.scss"
 import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+
+import { resolveContentFileUrls } from "@/features/files/utils/resolve-content-file-urls"
 
 interface NoteContentViewerProps {
   content: unknown
@@ -52,11 +55,22 @@ function isEmptyTiptapContent(content: unknown) {
 export function NoteContentViewer({ content }: NoteContentViewerProps) {
   const { t } = useTranslation()
   const isEmpty = isEmptyTiptapContent(content)
+  const [resolvedContent, setResolvedContent] = useState(content)
+
+  useEffect(() => {
+    async function resolveUrls() {
+      const resolved = await resolveContentFileUrls(content)
+
+      setResolvedContent(resolved)
+    }
+
+    void resolveUrls()
+  }, [content])
 
   const editor = useEditor({
     immediatelyRender: false,
     editable: false,
-    content: content as TiptapContent,
+    content: resolvedContent as TiptapContent,
     editorProps: {
       attributes: {
         class: "min-h-64 outline-none",
@@ -82,6 +96,14 @@ export function NoteContentViewer({ content }: NoteContentViewerProps) {
       Selection,
     ],
   })
+
+  useEffect(() => {
+    if (!editor || !resolvedContent) {
+      return
+    }
+
+    editor.commands.setContent(resolvedContent)
+  }, [editor, resolvedContent])
 
   if (isEmpty) {
     return (
