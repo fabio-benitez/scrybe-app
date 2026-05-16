@@ -82,7 +82,8 @@
       "files": "Files",
       "trash": "Trash",
       "categories": "Categories",
-      "tags": "Tags"
+      "tags": "Tags",
+      "comingSoon": "Coming soon"
     },
     "userMenu": {
       "profile": "Profile",
