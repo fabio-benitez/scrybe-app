@@ -5,7 +5,7 @@
 .simple-editor-wrapper {
   width: 100%;
   min-height: 24rem;
-  overflow: hidden;
+  overflow: clip;
 }
 
 .simple-editor-content {
