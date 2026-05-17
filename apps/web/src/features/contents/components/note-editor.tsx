@@ -18,6 +18,7 @@ import {
   useUpdateContent,
 } from "@/features/contents/hooks/use-contents"
 import type { Content } from "@/features/contents/types/content"
+import { resolveContentFileUrls } from "@/features/files/utils/resolve-content-file-urls"
 
 import { Button } from "@/shared/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/shared/components/ui/card"
@@ -60,16 +61,22 @@ export function NoteEditor({
   const contentRef = useRef<JSONContent>(emptyContent)
 
   useEffect(() => {
-    if (!isEditMode) return
-    if (!initialContent) return
+    async function hydrateContent() {
+      if (!isEditMode) return
+      if (!initialContent) return
 
-    const nextContent = initialContent.content as JSONContent
+      const resolvedContent = await resolveContentFileUrls(
+        initialContent.content as JSONContent,
+      )
 
-    setTitle(initialContent.title)
-    setContent(nextContent)
-    contentRef.current = nextContent
-    setCategoryId(initialContent.category_id ?? "uncategorized")
-    setHasHydratedInitialContent(true)
+      setTitle(initialContent.title)
+      setContent(resolvedContent)
+      contentRef.current = resolvedContent
+      setCategoryId(initialContent.category_id ?? "uncategorized")
+      setHasHydratedInitialContent(true)
+    }
+
+    void hydrateContent()
   }, [initialContent, isEditMode])
 
   async function handleSave(event: SyntheticEvent<HTMLFormElement>) {
@@ -172,7 +179,7 @@ export function NoteEditor({
         </div>
 
         <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_20rem]">
-          <Card className="min-h-128">
+          <Card className="min-h-128 overflow-clip">
             <CardContent className="space-y-6 p-6">
               <Input
                 className="h-auto border-0 bg-transparent px-2.5 py-2 text-4xl font-semibold leading-tight shadow-none placeholder:text-muted-foreground/50 focus-visible:ring-0 md:text-4xl"
@@ -181,7 +188,7 @@ export function NoteEditor({
                 onChange={(event) => setTitle(event.target.value)}
               />
 
-              <div className="overflow-hidden rounded-xl border bg-muted/10">
+              <div className="overflow-clip rounded-xl border bg-muted/10">
                 <SimpleEditor
                   key={initialContent?.id ?? "new-note"}
                   placeholder={t("notes.editor.contentPlaceholder")}

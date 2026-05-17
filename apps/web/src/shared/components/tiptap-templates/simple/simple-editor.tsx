@@ -264,14 +264,16 @@ export function SimpleEditor({
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
-          className="sticky top-0 z-10 justify-start rounded-none border-b bg-background/95 backdrop-blur"
-          style={{
-            ...(isMobile
+          className="z-30 justify-start rounded-none border-b bg-background/95 backdrop-blur"
+          style={
+            isMobile
               ? {
                 bottom: `calc(100% - ${height - rect.y}px)`,
               }
-              : {}),
-          }}
+              : {
+                ["--tt-toolbar-top" as string]: "var(--header-height)",
+              }
+          }
         >
           {mobileView === "main" ? (
             <MainToolbarContent
