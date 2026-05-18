@@ -1,7 +1,7 @@
 {
   "auth": {
     "shell": {
-      "tagline": "Organize your content simply and efficiently",
+      "tagline": "Organize your notes, files, and resources in one place.",
       "features": {
         "content": {
           "title": "Structured content",
@@ -15,7 +15,8 @@
           "title": "Flexible tags",
           "description": "Classify with custom tags to find everything instantly."
         }
-      }
+      },
+      "footer": "Designed to organize notes, files and resources in a clear and accessible way."
     },
     "login": {
       "title": "Sign in",

@@ -58,7 +58,7 @@ export default function RegisterPage() {
 
   return (
     <AuthShell>
-      <Card>
+      <Card className="border-white/10 bg-white/3 shadow-2xl backdrop-blur-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{t("auth.register.title")}</CardTitle>
           <CardDescription>{t("auth.register.description")}</CardDescription>
@@ -130,7 +130,16 @@ export default function RegisterPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="
+                  w-full
+                  bg-linear-to-r
+                  from-violet-500
+                  to-violet-600
+                  text-white
+                  border border-violet-400/10
+                  hover:brightness-105
+                  transition-all
+                "
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? t("auth.register.submitting") : t("auth.register.submit")}

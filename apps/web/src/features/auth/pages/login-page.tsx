@@ -60,7 +60,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
-      <Card>
+      <Card className="border-white/10 bg-white/3 shadow-2xl backdrop-blur-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">{t("auth.login.title")}</CardTitle>
           <CardDescription>{t("auth.login.description")}</CardDescription>
@@ -121,7 +121,16 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                className="w-full"
+                className="
+                  w-full
+                  bg-linear-to-r
+                  from-violet-500
+                  to-violet-600
+                  text-white
+                  border border-violet-400/10
+                  hover:brightness-105
+                  transition-all
+                "
                 disabled={form.formState.isSubmitting}
               >
                 {form.formState.isSubmitting ? t("auth.login.submitting") : t("auth.login.submit")}
@@ -145,13 +154,13 @@ export default function LoginPage() {
         {t("auth.legal.prefix")}{" "}
         <a href="#" className="underline underline-offset-4 hover:text-foreground">
           {t("auth.legal.terms")}
-          </a>{" "}
-          {t("auth.legal.middle")}{" "}
+        </a>{" "}
+        {t("auth.legal.middle")}{" "}
         <a href="#" className="underline underline-offset-4 hover:text-foreground">
           {t("auth.legal.privacy")}
-          </a>{" "}
-          {t("auth.legal.suffix")}
+        </a>{" "}
+        {t("auth.legal.suffix")}
       </p>
-    </AuthShell>  
+    </AuthShell>
   )
 }
