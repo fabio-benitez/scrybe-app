@@ -1,7 +1,7 @@
 {
   "auth": {
     "shell": {
-      "tagline": "Organiza tu contenido de forma simple y eficiente",
+      "tagline": "Organiza tus notas, archivos y recursos en un solo lugar.",
       "features": {
         "content": {
           "title": "Contenidos estructurados",
@@ -15,7 +15,8 @@
           "title": "Etiquetas flexibles",
           "description": "Clasifica con etiquetas personalizadas para encontrar todo al instante."
         }
-      }
+      },
+      "footer": "Diseñado para organizar notas, archivos y recursos de forma clara y accesible."
     },
     "login": {
       "title": "Iniciar sesión",
